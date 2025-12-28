@@ -1,4 +1,4 @@
-package com.randomproject;
+package com.randomproject.mediumpoc;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

@@ -1,4 +1,4 @@
-package com.randomproject;
+package com.randomproject.mediumpoc;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

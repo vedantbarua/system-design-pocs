@@ -1,4 +1,4 @@
-package com.randomproject;
+package com.randomproject.mediumpoc;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
