@@ -13,7 +13,7 @@
                 <div th:each="article : ${articles}" class="card mb-3">
                     <div class="card-body">
                         <h5 class="card-title"><a th:href="@{/article/{id}(id=${article.id})}" th:text="${article.title}">Title</a></h5>
-                        <p class="card-text" th:text="${article.content.substring(0, 100) + '...'}">Content preview</p>
+                        <p class="card-text" th:text="${article.content.length() > 100 ? article.content.substring(0,100) + '...' : article.content}">Content preview</p>
                         <p class="card-text"><small class="text-muted" th:text="'By ' + ${article.author}">Author</small></p>
                     </div>
                 </div>
