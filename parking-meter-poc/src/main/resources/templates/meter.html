@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Parking Meter POC</title>
+    <style>
+        body { font-family: "Segoe UI", Arial, sans-serif; background: #f5f7fb; margin: 0; padding: 24px; color: #1f2a44; }
+        .card { max-width: 720px; margin: 0 auto; background: #fff; border-radius: 12px; padding: 24px 28px; box-shadow: 0 10px 30px rgba(31,42,68,0.08); }
+        h1 { margin-top: 0; }
+        .state { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 16px 0 24px; }
+        .state div { background: #f0f4ff; border: 1px solid #d6e0ff; padding: 12px; border-radius: 8px; }
+        form { display: flex; gap: 10px; align-items: center; margin: 8px 0; }
+        input[type="number"] { width: 120px; padding: 8px; border-radius: 6px; border: 1px solid #cdd5e0; }
+        button { padding: 10px 14px; border: none; border-radius: 8px; background: #2d6cdf; color: #fff; cursor: pointer; }
+        button.secondary { background: #6a7ea5; }
+        .message { background: #e7f4ff; border-left: 4px solid #2d6cdf; padding: 10px 12px; border-radius: 6px; margin-bottom: 12px; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h1>Parking Meter POC</h1>
+    <p>Demonstrates the coding-interview style parking meter: coins buy time, capped at a max; time counts down toward expiration.</p>
+
+    <div th:if="${message}" class="message" th:text="${message}"></div>
+
+    <div class="state">
+        <div>
+            <strong>Remaining Minutes</strong><br/>
+            <span th:text="${state.remainingMinutes()}">0</span>
+        </div>
+        <div>
+            <strong>Status</strong><br/>
+            <span th:text="${state.expired()} ? 'Expired' : 'Active'">Active</span>
+        </div>
+        <div>
+            <strong>Max Allowed</strong><br/>
+            <span th:text="${state.maxMinutes()}">120</span>
+        </div>
+        <div>
+            <strong>Minutes per Quarter</strong><br/>
+            <span th:text="${state.minutesPerQuarter()}">15</span>
+        </div>
+    </div>
+
+    <form th:action="@{/insert}" method="post">
+        <label for="quarters">Insert quarters</label>
+        <input id="quarters" type="number" name="quarters" min="1" step="1" placeholder="e.g. 2">
+        <button type="submit">Add Time</button>
+    </form>
+
+    <form th:action="@{/advance}" method="post">
+        <label for="minutes">Fast-forward minutes</label>
+        <input id="minutes" type="number" name="minutes" min="1" step="1" placeholder="e.g. 30">
+        <button type="submit" class="secondary">Advance Clock</button>
+    </form>
+
+    <form th:action="@{/tick}" method="post">
+        <button type="submit" class="secondary">Tick 1 Minute</button>
+    </form>
+</div>
+</body>
+</html>
