@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>URL Shortener POC</title>
+    <style>
+        :root {
+            --ink: #0f172a;
+            --muted: #475569;
+            --accent: #2563eb;
+            --bg: linear-gradient(135deg, #f3f6ff 0%, #eef2ff 100%);
+            --card: #ffffff;
+        }
+        body { margin: 0; font-family: "Manrope", "Segoe UI", system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--ink); }
+        .page { max-width: 1000px; margin: 0 auto; padding: 32px 20px 48px; }
+        .hero { background: radial-gradient(circle at 20% 20%, rgba(37, 99, 235, 0.08), transparent 45%), var(--card); border-radius: 16px; padding: 22px 24px; box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08); }
+        .hero h1 { margin: 0 0 8px; }
+        .hero p { margin: 0; color: var(--muted); }
+        .stack { display: grid; gap: 18px; margin-top: 20px; }
+        .card { background: var(--card); border-radius: 14px; padding: 20px 22px; box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06); }
+        .card h2 { margin: 0 0 10px; }
+        form { display: grid; gap: 12px; }
+        label { font-weight: 600; }
+        input[type="url"], input[type="text"] { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid #d3ddf0; font-size: 15px; }
+        input[type="url"]:focus, input[type="text"]:focus { outline: 2px solid rgba(37, 99, 235, 0.25); border-color: var(--accent); }
+        button { background: var(--accent); color: #fff; border: none; border-radius: 10px; padding: 12px 14px; font-weight: 700; cursor: pointer; }
+        button:hover { background: #1d4ed8; }
+        .message { background: #e0ecff; border-left: 4px solid var(--accent); padding: 12px 14px; border-radius: 10px; color: #0f2a62; }
+        table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+        th, td { padding: 10px 8px; text-align: left; border-bottom: 1px solid #e7eaf3; }
+        th { font-size: 13px; letter-spacing: 0.02em; color: var(--muted); }
+        .empty { color: var(--muted); font-style: italic; }
+        .pill { display: inline-block; padding: 6px 10px; background: #eef2ff; border-radius: 999px; font-size: 13px; color: #312e81; }
+    </style>
+</head>
+<body>
+<div class="page">
+    <div class="hero">
+        <h1>URL Shortener POC</h1>
+        <p>Create short codes that redirect to longer URLs. Backed by an in-memory map, ideal for demos.</p>
+        <p class="pill" th:text="'Base redirect: ' + ${baseUrl} + '/s/{code}'">Base redirect: http://localhost:8082/s/{code}</p>
+    </div>
+
+    <div class="stack">
+        <div class="card">
+            <h2>Create a short link</h2>
+            <form th:action="@{/shorten}" method="post">
+                <div>
+                    <label for="url">Target URL</label>
+                    <input id="url" name="url" type="url" placeholder="https://example.com/path" required>
+                </div>
+                <div>
+                    <label for="alias">Custom code (optional)</label>
+                    <input id="alias" name="alias" type="text" placeholder="e.g. docs" maxlength="64">
+                </div>
+                <div>
+                    <button type="submit">Shorten URL</button>
+                </div>
+            </form>
+            <p style="color: var(--muted); margin: 8px 0 0;">If no code is provided, a base-36 counter is used.</p>
+        </div>
+
+        <div th:if="${message}" class="message" th:text="${message}"></div>
+
+        <div class="card">
+            <h2>Existing links</h2>
+            <div th:if="${#lists.isEmpty(links)}" class="empty">No links yet. Create one above to see it here.</div>
+            <table th:if="${!#lists.isEmpty(links)}">
+                <thead>
+                <tr>
+                    <th>Short URL</th>
+                    <th>Target</th>
+                    <th>Hits</th>
+                    <th>Created</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="link : ${links}">
+                    <td><a th:href="@{'/s/' + ${link.code}}" th:text="${baseUrl + '/s/' + link.code}">http://localhost:8082/s/abc</a></td>
+                    <td><a th:href="${link.targetUrl}" th:text="${link.targetUrl}" target="_blank" rel="noopener">target</a></td>
+                    <td th:text="${link.hits}">0</td>
+                    <td th:text="${#temporals.format(link.createdAt, 'yyyy-MM-dd HH:mm')}">2024-01-01 12:00</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>
