@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat System POC</title>
+    <style>
+        :root {
+            --ink: #0f172a;
+            --muted: #475569;
+            --accent: #ea580c;
+            --accent-dark: #c2410c;
+            --bg: radial-gradient(circle at 20% 20%, rgba(234, 88, 12, 0.07), transparent 32%), #f8fafc;
+            --card: #ffffff;
+        }
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: "Plus Jakarta Sans", "Segoe UI", system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--ink); }
+        a { color: var(--accent); text-decoration: none; }
+        .page { max-width: 1100px; margin: 0 auto; padding: 36px 22px 52px; }
+        .hero { background: linear-gradient(135deg, #fff7ed, #fffbeb); border: 1px solid #fed7aa; border-radius: 16px; padding: 22px 24px; box-shadow: 0 14px 40px rgba(15, 23, 42, 0.08); }
+        .hero h1 { margin: 0 0 8px; letter-spacing: -0.02em; }
+        .hero p { margin: 0; color: var(--muted); }
+        .stack { display: grid; gap: 18px; margin-top: 20px; }
+        .card { background: var(--card); border-radius: 14px; padding: 20px 22px; box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06); border: 1px solid #e2e8f0; }
+        .card h2 { margin: 0 0 10px; }
+        form { display: grid; gap: 12px; }
+        label { font-weight: 600; }
+        input[type="text"] { width: 100%; padding: 11px 12px; border-radius: 10px; border: 1px solid #d3ddf0; font-size: 15px; background: #f8fafc; }
+        input[type="text"]:focus { outline: 2px solid rgba(234, 88, 12, 0.25); border-color: var(--accent); background: #fff; }
+        button { background: var(--accent); color: #fff; border: none; border-radius: 10px; padding: 12px 14px; font-weight: 700; cursor: pointer; }
+        button:hover { background: var(--accent-dark); }
+        .message { background: #fef3c7; border: 1px solid #f59e0b; padding: 12px 14px; border-radius: 10px; color: #92400e; }
+        .rooms { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+        .room { border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px; background: #fff; box-shadow: 0 6px 16px rgba(15, 23, 42, 0.05); }
+        .room h3 { margin: 0 0 6px; letter-spacing: -0.01em; }
+        .room small { color: var(--muted); }
+        .empty { color: var(--muted); font-style: italic; }
+    </style>
+</head>
+<body>
+<div class="page">
+    <div class="hero">
+        <h1>Chat System POC</h1>
+        <p>Spin up lightweight rooms, drop messages, and peek at chat history. In-memory only — restart resets everything.</p>
+    </div>
+
+    <div class="stack">
+        <div class="card">
+            <h2>Create a room</h2>
+            <form th:action="@{/rooms}" method="post" th:object="${createRoomRequest}">
+                <div>
+                    <label for="name">Name</label>
+                    <input id="name" type="text" th:field="*{name}" placeholder="general, onboarding, support" minlength="3" maxlength="40" required>
+                </div>
+                <div>
+                    <label for="topic">Topic (optional)</label>
+                    <input id="topic" type="text" th:field="*{topic}" placeholder="What this room is for" maxlength="120">
+                </div>
+                <div>
+                    <button type="submit">Create and join</button>
+                </div>
+            </form>
+        </div>
+
+        <div th:if="${message}" class="message" th:text="${message}"></div>
+
+        <div class="card">
+            <h2>Rooms</h2>
+            <div th:if="${#lists.isEmpty(rooms)}" class="empty">No rooms yet. Create one above to get started.</div>
+            <div class="rooms" th:if="${!#lists.isEmpty(rooms)}">
+                <div class="room" th:each="room : ${rooms}">
+                    <h3 th:text="${room.name}">general</h3>
+                    <p th:text="${room.topic != null && !room.topic.isEmpty() ? room.topic : 'No topic set'}">Topic line</p>
+                    <small th:text="'Created ' + ${#temporals.format(room.createdAt, 'yyyy-MM-dd HH:mm')}">2024-01-01 10:00</small>
+                    <div style="margin-top: 10px;">
+                        <a th:href="@{|/rooms/${room.name}|}">Open room →</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

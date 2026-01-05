@@ -35,3 +35,14 @@ In-memory URL shortener with redirect handler and simple UI.
 4. Open `http://localhost:8082`
 
 See [url-shortner-poc/README.md](url-shortner-poc/README.md) for endpoints and config.
+
+### Chat System POC
+Multi-room chat with in-memory storage and Thymeleaf UI.
+
+#### How to Run
+1. Ensure Java 17+ and Maven are installed.
+2. Navigate to the project directory: `cd chat-system-poc`
+3. Run: `mvn org.springframework.boot:spring-boot-maven-plugin:run`
+4. Open `http://localhost:8083`
+
+See [chat-system-poc/README.md](chat-system-poc/README.md) for details.

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${room.name + ' · Chat'}">Room</title>
+    <style>
+        :root {
+            --ink: #0f172a;
+            --muted: #475569;
+            --accent: #0ea5e9;
+            --accent-dark: #0284c7;
+            --bg: radial-gradient(circle at 18% 18%, rgba(14, 165, 233, 0.08), transparent 32%), #f8fafc;
+            --card: #ffffff;
+        }
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: "Plus Jakarta Sans", "Segoe UI", system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--ink); }
+        a { color: var(--accent); text-decoration: none; }
+        .page { max-width: 1100px; margin: 0 auto; padding: 32px 20px 48px; }
+        .hero { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; background: linear-gradient(120deg, #e0f2fe, #f8fafc); border-radius: 16px; padding: 18px 20px; border: 1px solid #bae6fd; box-shadow: 0 14px 36px rgba(15, 23, 42, 0.08); }
+        .hero h1 { margin: 0; letter-spacing: -0.02em; }
+        .hero p { margin: 0; color: var(--muted); }
+        .stack { display: grid; gap: 18px; margin-top: 20px; }
+        .card { background: var(--card); border-radius: 14px; padding: 18px 20px; box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06); border: 1px solid #e2e8f0; }
+        .card h2 { margin: 0 0 10px; }
+        .message { background: #e0f2fe; border: 1px solid #7dd3fc; padding: 10px 12px; border-radius: 10px; color: #0f172a; }
+        form { display: grid; gap: 12px; }
+        label { font-weight: 600; }
+        input[type="text"], textarea { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid #d3ddf0; font-size: 15px; background: #f8fafc; }
+        textarea { min-height: 90px; resize: vertical; }
+        input[type="text"]:focus, textarea:focus { outline: 2px solid rgba(14, 165, 233, 0.25); border-color: var(--accent); background: #fff; }
+        button { background: var(--accent); color: #fff; border: none; border-radius: 10px; padding: 12px 14px; font-weight: 700; cursor: pointer; }
+        button:hover { background: var(--accent-dark); }
+        .chat { display: grid; gap: 12px; max-height: 500px; overflow-y: auto; padding-right: 4px; }
+        .bubble { border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 14px; background: #fff; box-shadow: 0 6px 16px rgba(15, 23, 42, 0.05); }
+        .bubble strong { display: inline-block; margin-bottom: 4px; }
+        .bubble small { color: var(--muted); }
+        .empty { color: var(--muted); font-style: italic; }
+    </style>
+</head>
+<body>
+<div class="page">
+    <div class="hero">
+        <div>
+            <h1 th:text="${room.name}">general</h1>
+            <p th:text="${room.topic != null && !room.topic.isEmpty() ? room.topic : 'No topic set'}">Topic</p>
+        </div>
+        <div style="margin-left: auto;"><a href="/">← Back to rooms</a></div>
+    </div>
+
+    <div class="stack">
+        <div th:if="${message}" class="message" th:text="${message}"></div>
+
+        <div class="card">
+            <h2>Messages</h2>
+            <p style="margin-top: 0; color: var(--muted);" th:text="'Keeping the latest ' + ${maxMessages} + ' messages in memory.'">Message cap</p>
+            <div class="chat" th:if="${!#lists.isEmpty(messages)}">
+                <div class="bubble" th:each="m : ${messages}">
+                    <strong th:text="${m.sender}">Sender</strong>
+                    <div th:text="${m.content}">Message goes here</div>
+                    <small th:text="${#temporals.format(m.sentAt, 'yyyy-MM-dd HH:mm:ss')}">2024-01-01</small>
+                </div>
+            </div>
+            <div class="empty" th:if="${#lists.isEmpty(messages)}">No messages yet. Break the silence below.</div>
+        </div>
+
+        <div class="card">
+            <h2>Post a message</h2>
+            <form th:action="@{|/rooms/${room.name}/message|}" method="post" th:object="${chatMessageRequest}">
+                <div>
+                    <label for="sender">Name</label>
+                    <input id="sender" type="text" th:field="*{sender}" placeholder="Your name" maxlength="32" required>
+                </div>
+                <div>
+                    <label for="content">Message</label>
+                    <textarea id="content" th:field="*{content}" placeholder="What would you like to say?" maxlength="280" required></textarea>
+                </div>
+                <div>
+                    <button type="submit">Send</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>
