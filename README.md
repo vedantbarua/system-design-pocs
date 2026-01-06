@@ -46,3 +46,14 @@ Multi-room chat with in-memory storage and Thymeleaf UI.
 4. Open `http://localhost:8083`
 
 See [chat-system-poc/README.md](chat-system-poc/README.md) for details.
+
+### Key-Value Store POC
+In-memory key-value store with optional TTL and a simple UI.
+
+#### How to Run
+1. Ensure Java 17+ and Maven are installed.
+2. Navigate to the project directory: `cd key-value-store-poc`
+3. Run: `mvn org.springframework.boot:spring-boot-maven-plugin:run`
+4. Open `http://localhost:8084`
+
+See [key-value-store-poc/README.md](key-value-store-poc/README.md) for endpoints and usage.
