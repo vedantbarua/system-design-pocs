@@ -68,3 +68,14 @@ Fixed-window rate limiter with UI and JSON endpoints.
 4. Open `http://localhost:8085`
 
 See [rate-limiter-poc/README.md](rate-limiter-poc/README.md) for endpoints and usage.
+
+### Consistent Hashing POC
+Hash ring with virtual nodes, UI, and JSON endpoints.
+
+#### How to Run
+1. Ensure you have Java 17+ and Maven installed.
+2. Navigate to the project directory: `cd consistent-hashing-poc`
+3. Run: `mvn org.springframework.boot:spring-boot-maven-plugin:run`
+4. Open `http://localhost:8086`
+
+See [consistent-hashing-poc/README.md](consistent-hashing-poc/README.md) for endpoints and usage.
