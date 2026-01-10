@@ -79,3 +79,14 @@ Hash ring with virtual nodes, UI, and JSON endpoints.
 4. Open `http://localhost:8086`
 
 See [consistent-hashing-poc/README.md](consistent-hashing-poc/README.md) for endpoints and usage.
+
+### Unique ID Generator POC
+Snowflake-style unique ID generator with UI and JSON endpoints.
+
+#### How to Run
+1. Ensure you have Java 17+ and Maven installed.
+2. Navigate to the project directory: `cd unique-id-generator-in-distributed-systems-poc`
+3. Run: `mvn org.springframework.boot:spring-boot-maven-plugin:run`
+4. Open `http://localhost:8087`
+
+See [unique-id-generator-in-distributed-systems-poc/README.md](unique-id-generator-in-distributed-systems-poc/README.md) for endpoints and usage.

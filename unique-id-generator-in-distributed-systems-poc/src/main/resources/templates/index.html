@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Unique ID Generator POC</title>
+    <style>
+        :root {
+            --ink: #0b1f2a;
+            --muted: #4b5563;
+            --accent: #d97706;
+            --accent-dark: #b45309;
+            --sky: #f0f9ff;
+            --card: #ffffff;
+            --bg: radial-gradient(circle at 15% 20%, rgba(254, 215, 170, 0.6), transparent 45%),
+                  radial-gradient(circle at 85% 10%, rgba(186, 230, 253, 0.7), transparent 50%),
+                  linear-gradient(160deg, #fefce8 0%, #e0f2fe 100%);
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: "Manrope", "Trebuchet MS", sans-serif;
+            background: var(--bg);
+            color: var(--ink);
+        }
+        h1, h2 {
+            font-family: "Bitter", "Georgia", serif;
+        }
+        .page { max-width: 1200px; margin: 0 auto; padding: 32px 22px 60px; }
+        .hero {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+            justify-content: space-between;
+            background: var(--card);
+            border-radius: 22px;
+            padding: 28px 30px;
+            box-shadow: 0 22px 48px rgba(15, 23, 42, 0.12);
+            animation: rise 0.6s ease;
+        }
+        .hero h1 { margin: 0 0 10px; font-size: 34px; }
+        .hero p { margin: 0; color: var(--muted); max-width: 560px; }
+        .pill {
+            background: #fffbeb;
+            color: #92400e;
+            padding: 8px 14px;
+            border-radius: 999px;
+            font-weight: 600;
+            font-size: 13px;
+            align-self: flex-start;
+        }
+        .meta { margin-top: 12px; font-size: 14px; color: var(--muted); }
+        .meta strong { color: var(--ink); }
+        .grid {
+            display: grid;
+            gap: 22px;
+            margin-top: 26px;
+        }
+        @media (min-width: 960px) {
+            .grid { grid-template-columns: 1.1fr 0.9fr; }
+        }
+        .card {
+            background: var(--card);
+            border-radius: 18px;
+            padding: 22px 24px;
+            box-shadow: 0 16px 30px rgba(15, 23, 42, 0.08);
+            animation: rise 0.8s ease;
+        }
+        form { display: grid; gap: 12px; }
+        label { font-weight: 600; }
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid #cbd5e1;
+            font-size: 15px;
+        }
+        input:focus {
+            outline: 2px solid rgba(217, 119, 6, 0.25);
+            border-color: var(--accent);
+        }
+        button {
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        button:hover { background: var(--accent-dark); }
+        .message {
+            margin-top: 18px;
+            background: #fef3c7;
+            border-left: 4px solid #d97706;
+            padding: 12px 14px;
+            border-radius: 10px;
+            color: #92400e;
+        }
+        .panel {
+            border-radius: 14px;
+            padding: 16px;
+            margin-top: 14px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+        }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 10px 8px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        th { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+        .empty { color: var(--muted); font-style: italic; }
+        .tag {
+            display: inline-block;
+            padding: 6px 10px;
+            background: #fff7ed;
+            border-radius: 999px;
+            font-size: 12px;
+            color: #9a3412;
+            font-weight: 600;
+        }
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-top: 12px;
+        }
+        .stat {
+            background: #fff7ed;
+            border-radius: 12px;
+            padding: 10px 12px;
+        }
+        .stat span { display: block; color: #9a3412; font-size: 12px; }
+        .stat strong { font-size: 18px; }
+        @keyframes rise {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+    <header class="hero">
+        <div>
+            <h1>Unique ID Generator POC</h1>
+            <p>Snowflake-style IDs with timestamp, node id, and sequence bits for distributed systems.</p>
+            <div class="meta">
+                Epoch: <strong th:text="${config.epochInstant}">2024-01-01T00:00:00Z</strong> ·
+                Node bits: <strong th:text="${config.nodeBits}">10</strong> ·
+                Sequence bits: <strong th:text="${config.sequenceBits}">12</strong>
+            </div>
+        </div>
+        <div class="pill">UI + JSON API</div>
+    </header>
+
+    <div th:if="${message}" class="message" th:text="${message}"></div>
+
+    <div class="grid">
+        <section class="card">
+            <h2>Generate IDs</h2>
+            <form th:action="@{/generate}" method="post">
+                <div>
+                    <label for="nodeId">Node ID (0 - <span th:text="${config.maxNodeId}">1023</span>)</label>
+                    <input id="nodeId" name="nodeId" type="number" min="0" th:attr="max=${config.maxNodeId}" th:placeholder="${config.defaultNodeId}">
+                </div>
+                <div>
+                    <label for="count">Count (1 - <span th:text="${config.maxBatch}">20</span>)</label>
+                    <input id="count" name="count" type="number" min="1" th:attr="max=${config.maxBatch}" placeholder="1">
+                </div>
+                <div>
+                    <button type="submit">Generate</button>
+                </div>
+            </form>
+
+            <div th:if="${generated}" class="panel">
+                <div class="tag">Latest batch</div>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Node</th>
+                        <th>Seq</th>
+                        <th>Timestamp</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="id : ${generated}">
+                        <td th:text="${id.id}">0</td>
+                        <td th:text="${id.nodeId}">0</td>
+                        <td th:text="${id.sequence}">0</td>
+                        <td th:text="${id.timestampInstant}">2024-01-01T00:00:00Z</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Decode an ID</h2>
+            <form th:action="@{/decode}" method="post">
+                <div>
+                    <label for="id">ID to decode</label>
+                    <input id="id" name="id" type="text" placeholder="Enter a generated id" required>
+                </div>
+                <div>
+                    <button type="submit">Decode</button>
+                </div>
+            </form>
+
+            <div th:if="${decoded}" class="panel">
+                <strong>Decoded fields</strong>
+                <div class="stat-grid">
+                    <div class="stat">
+                        <span>Node ID</span>
+                        <strong th:text="${decoded.nodeId}">0</strong>
+                    </div>
+                    <div class="stat">
+                        <span>Sequence</span>
+                        <strong th:text="${decoded.sequence}">0</strong>
+                    </div>
+                    <div class="stat">
+                        <span>Timestamp</span>
+                        <strong th:text="${decoded.timestampInstant}">2024-01-01T00:00:00Z</strong>
+                    </div>
+                </div>
+                <div class="meta">Epoch millis: <span th:text="${decoded.epochMillis}">0</span></div>
+            </div>
+        </section>
+    </div>
+
+    <section class="card" style="margin-top: 24px;">
+        <h2>Active nodes</h2>
+        <div th:if="${#lists.isEmpty(nodes)}" class="empty">No nodes have generated IDs yet.</div>
+        <table th:if="${!#lists.isEmpty(nodes)}">
+            <thead>
+            <tr>
+                <th>Node ID</th>
+                <th>Last timestamp</th>
+                <th>Sequence</th>
+                <th>Generated count</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="node : ${nodes}">
+                <td th:text="${node.nodeId}">0</td>
+                <td th:text="${node.lastTimestampInstant}">-</td>
+                <td th:text="${node.lastSequence}">0</td>
+                <td th:text="${node.generatedCount}">0</td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</div>
+</body>
+</html>
