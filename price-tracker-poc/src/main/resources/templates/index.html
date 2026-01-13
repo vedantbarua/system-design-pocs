@@ -2,71 +2,99 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Key-Value Store POC</title>
+    <title>Price Tracker POC</title>
     <style>
         :root {
-            --ink: #102a43;
+            --ink: #1f2933;
             --muted: #52606d;
-            --accent: #d97706;
-            --accent-dark: #b45309;
-            --bg: radial-gradient(circle at top left, rgba(255, 237, 213, 0.7), transparent 45%),
+            --accent: #0f766e;
+            --accent-dark: #115e59;
+            --highlight: #fef9c3;
+            --danger: #dc2626;
+            --bg: radial-gradient(circle at top right, rgba(187, 247, 208, 0.55), transparent 45%),
                   linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
             --card: #ffffff;
         }
-        body { margin: 0; font-family: "Space Grotesk", "Segoe UI", system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--ink); }
-        .page { max-width: 1100px; margin: 0 auto; padding: 32px 20px 48px; }
-        .hero { background: var(--card); border-radius: 18px; padding: 24px 26px; box-shadow: 0 18px 48px rgba(15, 23, 42, 0.08); }
-        .hero h1 { margin: 0 0 10px; font-size: 30px; }
+        body { margin: 0; font-family: "Manrope", "Segoe UI", system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--ink); }
+        .page { max-width: 1150px; margin: 0 auto; padding: 32px 20px 50px; }
+        .hero { background: var(--card); border-radius: 18px; padding: 26px 28px; box-shadow: 0 20px 48px rgba(15, 23, 42, 0.08); }
+        .hero h1 { margin: 0 0 10px; font-size: 32px; }
         .hero p { margin: 0; color: var(--muted); }
-        .badge { display: inline-block; margin-top: 10px; padding: 6px 10px; background: #fff7ed; color: #7c2d12; border-radius: 999px; font-size: 13px; font-weight: 600; }
+        .badge { display: inline-block; margin-top: 12px; padding: 6px 12px; background: #ecfdf3; color: #065f46; border-radius: 999px; font-size: 13px; font-weight: 600; }
         .stack { display: grid; gap: 20px; margin-top: 22px; }
         .card { background: var(--card); border-radius: 16px; padding: 20px 22px; box-shadow: 0 12px 32px rgba(15, 23, 42, 0.06); }
         .card h2 { margin: 0 0 10px; }
         form { display: grid; gap: 12px; }
         label { font-weight: 600; }
-        input[type="text"], input[type="number"], textarea { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 15px; }
-        textarea { min-height: 90px; resize: vertical; }
-        input:focus, textarea:focus { outline: 2px solid rgba(217, 119, 6, 0.25); border-color: var(--accent); }
-        button { background: var(--accent); color: #fff; border: none; border-radius: 10px; padding: 12px 14px; font-weight: 700; cursor: pointer; }
+        input[type="text"], input[type="number"], input[type="url"] { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 15px; }
+        input:focus { outline: 2px solid rgba(15, 118, 110, 0.2); border-color: var(--accent); }
+        button { background: var(--accent); color: #fff; border: none; border-radius: 10px; padding: 10px 14px; font-weight: 700; cursor: pointer; }
         button:hover { background: var(--accent-dark); }
-        .message { background: #ffedd5; border-left: 4px solid var(--accent); padding: 12px 14px; border-radius: 10px; color: #7c2d12; }
+        .message { background: var(--highlight); border-left: 4px solid #ca8a04; padding: 12px 14px; border-radius: 10px; color: #854d0e; }
         table { width: 100%; border-collapse: collapse; margin-top: 8px; }
-        th, td { padding: 10px 8px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        th, td { padding: 10px 8px; text-align: left; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
         th { font-size: 12px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); }
         .empty { color: var(--muted); font-style: italic; }
-        .pill { display: inline-block; padding: 6px 10px; background: #fef3c7; border-radius: 999px; font-size: 12px; color: #92400e; }
-        .delete button { background: #ef4444; }
-        .delete button:hover { background: #dc2626; }
+        .pill { display: inline-block; padding: 6px 10px; background: #e0f2fe; border-radius: 999px; font-size: 12px; color: #0369a1; }
+        .deal { background: #dcfce7; color: #166534; }
+        .miss { background: #fee2e2; color: #991b1b; }
+        .delete button { background: var(--danger); }
+        .delete button:hover { background: #b91c1c; }
         .hint { color: var(--muted); font-size: 13px; margin: 6px 0 0; }
+        .url { color: var(--accent); text-decoration: none; }
+        .url:hover { text-decoration: underline; }
+        .inline-form { display: flex; gap: 8px; align-items: center; }
+        .inline-form input { max-width: 120px; }
+        .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-top: 12px; }
+        .metric { background: #f8fafc; border-radius: 12px; padding: 12px 14px; }
+        .metric strong { display: block; font-size: 18px; }
     </style>
 </head>
 <body>
 <div class="page">
     <div class="hero">
-        <h1>Key-Value Store POC</h1>
-        <p>In-memory map with optional TTL, built for quick experiments. Data resets on restart.</p>
+        <h1>Price Tracker POC</h1>
+        <p>Track target prices, log updates, and surface deals instantly. In-memory data resets on restart.</p>
         <span class="badge">UI + JSON API</span>
+        <div class="metrics">
+            <div class="metric">
+                <span>Total tracked</span>
+                <strong th:text="${items.size()}">0</strong>
+            </div>
+            <div class="metric">
+                <span>Deals below target</span>
+                <strong th:text="${alertCount}">0</strong>
+            </div>
+        </div>
     </div>
 
     <div class="stack">
         <div class="card">
-            <h2>Set a value</h2>
-            <form th:action="@{/kv}" method="post">
+            <h2>Track a price</h2>
+            <form th:action="@{/items}" method="post">
                 <div>
-                    <label for="key">Key</label>
-                    <input id="key" name="key" type="text" placeholder="session:alpha" maxlength="64" required>
+                    <label for="id">Item id</label>
+                    <input id="id" name="id" type="text" placeholder="headphones:mx5" maxlength="64" required>
                     <div class="hint">Allowed: letters, numbers, ., -, _, :</div>
                 </div>
                 <div>
-                    <label for="value">Value</label>
-                    <textarea id="value" name="value" placeholder="Paste JSON, tokens, or config" maxlength="2000" required></textarea>
+                    <label for="name">Item name</label>
+                    <input id="name" name="name" type="text" placeholder="Sony WH-1000XM5" maxlength="120" required>
                 </div>
                 <div>
-                    <label for="ttlSeconds">TTL seconds (optional)</label>
-                    <input id="ttlSeconds" name="ttlSeconds" type="number" min="1" placeholder="3600">
+                    <label for="url">Product URL (optional)</label>
+                    <input id="url" name="url" type="url" placeholder="https://store.example.com/item">
                 </div>
                 <div>
-                    <button type="submit">Store value</button>
+                    <label for="targetPrice">Target price</label>
+                    <input id="targetPrice" name="targetPrice" type="number" min="0.01" step="0.01" th:value="${defaultTarget}" required>
+                </div>
+                <div>
+                    <label for="currentPrice">Current price</label>
+                    <input id="currentPrice" name="currentPrice" type="number" min="0.01" step="0.01" th:value="${defaultCurrent}" required>
+                </div>
+                <div>
+                    <button type="submit">Track item</button>
                 </div>
             </form>
         </div>
@@ -74,28 +102,64 @@
         <div th:if="${message}" class="message" th:text="${message}"></div>
 
         <div class="card">
-            <h2>Stored entries</h2>
-            <div th:if="${#lists.isEmpty(entries)}" class="empty">No entries yet. Store one above to see it here.</div>
-            <table th:if="${!#lists.isEmpty(entries)}">
+            <h2>Deals below target</h2>
+            <div th:if="${#lists.isEmpty(alerts)}" class="empty">No deals yet. Update a price to trigger alerts.</div>
+            <table th:if="${!#lists.isEmpty(alerts)}">
                 <thead>
                 <tr>
-                    <th>Key</th>
-                    <th>Value</th>
+                    <th>Item</th>
+                    <th>Target</th>
+                    <th>Current</th>
                     <th>Updated</th>
-                    <th>Expires</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="item : ${alerts}">
+                    <td>
+                        <span class="pill deal" th:text="${item.id}">id</span>
+                        <div th:text="${item.name}">name</div>
+                    </td>
+                    <td th:text="${item.targetPrice}">0.00</td>
+                    <td th:text="${item.currentPrice}">0.00</td>
+                    <td th:text="${#temporals.format(item.updatedAt, 'yyyy-MM-dd HH:mm')}">2024-01-01 12:00</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h2>Tracked items</h2>
+            <div th:if="${#lists.isEmpty(items)}" class="empty">No tracked items yet. Add one above.</div>
+            <table th:if="${!#lists.isEmpty(items)}">
+                <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Target</th>
+                    <th>Current</th>
+                    <th>Last update</th>
                     <th>Actions</th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="entry : ${entries}">
+                <tr th:each="item : ${items}">
                     <td>
-                        <span class="pill" th:text="${entry.key}">key</span>
+                        <span class="pill" th:text="${item.id}">id</span>
+                        <div th:text="${item.name}">name</div>
+                        <div th:if="${item.url}">
+                            <a class="url" th:href="${item.url}" th:text="${item.url}" target="_blank" rel="noreferrer">link</a>
+                        </div>
                     </td>
-                    <td th:text="${entry.value}">value</td>
-                    <td th:text="${#temporals.format(entry.updatedAt, 'yyyy-MM-dd HH:mm')}" >2024-01-01 12:00</td>
-                    <td th:text="${entry.expiresAt == null ? 'Never' : #temporals.format(entry.expiresAt, 'yyyy-MM-dd HH:mm')}">Never</td>
+                    <td th:text="${item.targetPrice}">0.00</td>
                     <td>
-                        <form class="delete" th:action="@{'/kv/' + ${entry.key} + '/delete'}" method="post">
+                        <span th:classappend="${item.belowTarget} ? 'pill deal' : 'pill miss'" th:text="${item.currentPrice}">0.00</span>
+                    </td>
+                    <td th:text="${#temporals.format(item.updatedAt, 'yyyy-MM-dd HH:mm')}">2024-01-01 12:00</td>
+                    <td>
+                        <form class="inline-form" th:action="@{'/items/' + ${item.id} + '/price'}" method="post">
+                            <input name="currentPrice" type="number" min="0.01" step="0.01" placeholder="New price" required>
+                            <button type="submit">Update</button>
+                        </form>
+                        <form class="delete" th:action="@{'/items/' + ${item.id} + '/delete'}" method="post" style="margin-top:8px;">
                             <button type="submit">Delete</button>
                         </form>
                     </td>

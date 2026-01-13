@@ -1,36 +1,40 @@
-# Key-Value Store POC
+# Price Tracker POC
 
-Spring Boot proof-of-concept for an in-memory key-value store with optional TTLs, a simple UI, and JSON endpoints.
+Spring Boot proof-of-concept for tracking target prices, logging updates, and flagging deals with a simple UI and JSON endpoints.
 
 ## Features
-- Store/update key-value pairs with optional expiration (TTL)
-- List entries and delete keys from the UI
-- JSON API for automation and scripts
-- In-memory map resets on restart
+- Track items with target and current price
+- Update prices manually to simulate checks
+- Deal list for items below target
+- In-memory store resets on restart
 
 ## Quick Start
 1. Ensure Java 17+ and Maven are installed.
 2. Run the app:
    ```bash
-   cd key-value-store-poc
+   cd price-tracker-poc
    mvn org.springframework.boot:spring-boot-maven-plugin:run
    ```
-3. Open `http://localhost:8084` for the UI.
+3. Open `http://localhost:8090` for the UI.
 
 ## Endpoints
-- `/` — UI to set values and list entries
-- `/kv` `POST` — Store a key (`key`, `value`, optional `ttlSeconds`)
-- `/kv/{key}/delete` `POST` — Delete a key
-- `/api/entries` `GET` — List all entries
-- `/api/entries/{key}` `GET` — Fetch one entry
-- `/api/entries` `POST` — Store entry (`key`, `value`, optional `ttlSeconds`)
-- `/api/entries/{key}` `DELETE` — Delete a key
+- `/` — UI to track items and update prices
+- `/items` `POST` — Track/update an item (`id`, `name`, optional `url`, `targetPrice`, `currentPrice`)
+- `/items/{id}/price` `POST` — Update current price
+- `/items/{id}/delete` `POST` — Delete an item
+- `/api/items` `POST` — Track/update item (JSON)
+- `/api/items` `GET` — List tracked items
+- `/api/items/{id}` `GET` — Fetch one item
+- `/api/items/{id}/price` `POST` — Update current price (JSON)
+- `/api/items/{id}` `DELETE` — Delete an item
+- `/api/alerts` `GET` — List items below target price
 
 ## Notes
-- Keys must use letters, numbers, `.`, `_`, `-`, or `:`.
-- TTL is in seconds; if omitted, the entry does not expire.
+- Item ids must use letters, numbers, `.`, `_`, `-`, or `:`.
+- Prices must be greater than zero.
+- URLs must start with `http://` or `https://` when provided.
 
 ## Technologies
 - Spring Boot 3.2 (web + Thymeleaf + validation)
 - Java 17
-- In-memory store (ConcurrentHashMap)
+- In-memory map (ConcurrentHashMap)

@@ -1,25 +1,26 @@
-# Improvements and Next Steps: Key-Value Store POC
+# Improvements and Next Steps: Price Tracker POC
 
 ## Core Behavior
-- Add persistence (H2/Postgres/Redis) and optional snapshots to disk.
-- Support conditional writes (compare-and-set) and batch operations.
-- Add namespaces or prefixes for multi-tenant use.
-- Make TTL refreshable or extendable with a touch endpoint.
+- Add scheduled background checks with configurable polling intervals.
+- Track price history and percentage drop from the initial price.
+- Support per-item currency and localization.
+- Allow separate alert thresholds (absolute and percent).
 
 ## API & UX
-- Add PATCH endpoint to update only TTL or value.
-- Provide pagination/search for large key sets.
-- Add JSON formatting / syntax highlighting in the UI.
+- Add bulk import/export (CSV or JSON) for tracked items.
+- Provide webhook or email notifications for deals.
+- Add tags and filtering by retailer or category.
+- Include sparkline charts for price history.
 
 ## Reliability & Ops
-- Add metrics (entry count, expirations) and a health endpoint.
-- Background sweeper for expired keys rather than lazy cleanup.
-- Dockerfile and CI workflow for build + smoke tests.
+- Persist items in a database or Redis for multi-instance deployments.
+- Add a cleanup task for stale items and soft deletes.
+- Add a Dockerfile and CI workflow.
 
 ## Security
-- Add auth tokens or basic auth to guard writes.
-- Rate limiting or quotas per client.
+- Restrict who can add/update/delete items with authentication.
+- Validate URLs with an allowlist of retailers.
 
 ## Testing
-- Unit tests for TTL expiration and key validation.
-- MVC tests for API endpoints and error handling.
+- Unit tests for price validation and alert logic.
+- MVC tests for API responses and error handling.
