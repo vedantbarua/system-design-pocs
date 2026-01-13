@@ -112,3 +112,14 @@ Prefix-based autocomplete with ranking and an in-memory index.
 4. Open `http://localhost:8089`
 
 See [search-autocomplete-system-poc/README.md](search-autocomplete-system-poc/README.md) for endpoints and usage.
+
+### Price Tracker POC
+Track target prices with a simple UI and JSON endpoints.
+
+#### How to Run
+1. Ensure Java 17+ and Maven are installed.
+2. Navigate to the project directory: `cd price-tracker-poc`
+3. Run: `mvn org.springframework.boot:spring-boot-maven-plugin:run`
+4. Open `http://localhost:8090`
+
+See [price-tracker-poc/README.md](price-tracker-poc/README.md) for endpoints and usage.
