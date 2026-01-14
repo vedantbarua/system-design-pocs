@@ -91,6 +91,17 @@ Snowflake-style unique ID generator with UI and JSON endpoints.
 
 See [unique-id-generator-in-distributed-systems-poc/README.md](unique-id-generator-in-distributed-systems-poc/README.md) for endpoints and usage.
 
+### Design Dropbox POC
+Dropbox-style workspace with folders, uploads, and share links.
+
+#### How to Run
+1. Ensure Java 17+ and Maven are installed.
+2. Navigate to the project directory: `cd design-dropbox-poc`
+3. Run: `mvn org.springframework.boot:spring-boot-maven-plugin:run`
+4. Open `http://localhost:8089`
+
+See [design-dropbox-poc/README.md](design-dropbox-poc/README.md) for endpoints and usage.
+
 ### Web Crawler POC
 Single-threaded web crawler with UI and JSON endpoints.
 

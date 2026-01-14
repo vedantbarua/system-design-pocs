@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Design Dropbox POC</title>
+    <style>
+        :root {
+            --ink: #0f172a;
+            --muted: #475569;
+            --accent: #1d4ed8;
+            --accent-dark: #1e40af;
+            --mint: #0f766e;
+            --bg: radial-gradient(circle at 80% 12%, rgba(191, 219, 254, 0.7), transparent 45%),
+                  radial-gradient(circle at 12% 20%, rgba(204, 251, 241, 0.6), transparent 55%),
+                  linear-gradient(160deg, #f8fafc 0%, #e2e8f0 100%);
+            --card: #ffffff;
+            --shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: "Archivo", "Segoe UI", sans-serif;
+            color: var(--ink);
+            background: var(--bg);
+        }
+        h1, h2 {
+            font-family: "Sora", "Trebuchet MS", sans-serif;
+        }
+        .page { max-width: 1200px; margin: 0 auto; padding: 32px 22px 64px; }
+        .hero {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 18px;
+            background: var(--card);
+            border-radius: 22px;
+            padding: 26px 28px;
+            box-shadow: var(--shadow);
+            animation: rise 0.6s ease;
+        }
+        .hero h1 { margin: 0 0 8px; font-size: 36px; }
+        .hero p { margin: 0; color: var(--muted); max-width: 540px; }
+        .pill {
+            align-self: flex-start;
+            background: #eff6ff;
+            color: #1e40af;
+            padding: 8px 14px;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 13px;
+        }
+        .meta {
+            margin-top: 12px;
+            font-size: 14px;
+            color: var(--muted);
+        }
+        .grid {
+            display: grid;
+            gap: 20px;
+            margin-top: 24px;
+        }
+        @media (min-width: 1000px) {
+            .grid { grid-template-columns: 0.8fr 1.2fr; }
+        }
+        .card {
+            background: var(--card);
+            border-radius: 18px;
+            padding: 22px 24px;
+            box-shadow: 0 14px 32px rgba(15, 23, 42, 0.08);
+            animation: rise 0.8s ease;
+        }
+        form { display: grid; gap: 14px; }
+        label { font-weight: 600; }
+        input[type="text"], input[type="number"], textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid #cbd5e1;
+            font-size: 15px;
+            font-family: inherit;
+        }
+        textarea { min-height: 110px; resize: vertical; }
+        input:focus, textarea:focus {
+            outline: 2px solid rgba(29, 78, 216, 0.3);
+            border-color: var(--accent);
+        }
+        button {
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        button:hover { background: var(--accent-dark); }
+        .message {
+            margin-top: 18px;
+            background: #dbeafe;
+            border-left: 4px solid #2563eb;
+            padding: 12px 14px;
+            border-radius: 10px;
+            color: #1e3a8a;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-top: 16px;
+        }
+        .stat {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 10px 12px;
+        }
+        .stat span { display: block; color: var(--muted); font-size: 12px; }
+        .stat strong { font-size: 18px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+        th, td { padding: 10px 8px; text-align: left; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
+        th { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            background: #e2e8f0;
+            color: #1e293b;
+        }
+        .badge.good { background: #dcfce7; color: #166534; }
+        .badge.warn { background: #fee2e2; color: #b91c1c; }
+        .muted { color: var(--muted); font-size: 12px; }
+        .empty { color: var(--muted); font-style: italic; }
+        .section { margin-top: 18px; }
+        .share-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 8px;
+            background: #f1f5f9;
+            font-size: 12px;
+            color: #0f172a;
+        }
+        @keyframes rise {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+    <header class="hero">
+        <div>
+            <h1>Design Dropbox POC</h1>
+            <p>Sketch a Dropbox-like workspace with folders, file uploads, and share links. Everything stays in memory.</p>
+            <div class="meta">
+                Defaults: max file size <span th:text="${defaults.maxFileSize}">50000</span> chars,
+                share TTL <span th:text="${defaults.defaultTtlMinutes}">60</span> minutes.
+            </div>
+        </div>
+        <div class="pill">UI + JSON API</div>
+    </header>
+
+    <div th:if="${message}" class="message" th:text="${message}"></div>
+
+    <div class="grid">
+        <section class="card">
+            <h2>Create workspace items</h2>
+
+            <div class="section">
+                <h3>Create folder</h3>
+                <form th:action="@{/folders}" method="post">
+                    <div>
+                        <label for="folderName">Folder name</label>
+                        <input id="folderName" name="name" type="text" placeholder="Design docs" required>
+                    </div>
+                    <div>
+                        <label for="folderParent">Parent folder id (optional)</label>
+                        <input id="folderParent" name="parentId" type="text" th:placeholder="${rootId}">
+                    </div>
+                    <div>
+                        <button type="submit">Create folder</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="section">
+                <h3>Upload file</h3>
+                <form th:action="@{/files}" method="post">
+                    <div>
+                        <label for="fileName">File name</label>
+                        <input id="fileName" name="name" type="text" placeholder="roadmap.md" required>
+                    </div>
+                    <div>
+                        <label for="fileContent">Content</label>
+                        <textarea id="fileContent" name="content" placeholder="Paste file content here" required></textarea>
+                    </div>
+                    <div>
+                        <label for="fileParent">Folder id (optional)</label>
+                        <input id="fileParent" name="parentId" type="text" th:placeholder="${rootId}">
+                    </div>
+                    <div>
+                        <button type="submit">Upload file</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="section">
+                <h3>Create share link</h3>
+                <form th:action="@{/shares}" method="post">
+                    <div>
+                        <label for="shareFile">File id</label>
+                        <input id="shareFile" name="fileId" type="text" placeholder="fil-1" required>
+                    </div>
+                    <div>
+                        <label for="shareTtl">TTL minutes (optional)</label>
+                        <input id="shareTtl" name="ttlMinutes" type="number" min="1" th:placeholder="${defaults.defaultTtlMinutes}">
+                    </div>
+                    <div>
+                        <button type="submit">Generate link</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Workspace snapshot</h2>
+            <div class="stats">
+                <div class="stat">
+                    <span>Folders</span>
+                    <strong th:text="${folders.size()}">0</strong>
+                </div>
+                <div class="stat">
+                    <span>Files</span>
+                    <strong th:text="${files.size()}">0</strong>
+                </div>
+                <div class="stat">
+                    <span>Share links</span>
+                    <strong th:text="${shares.size()}">0</strong>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Folders</h3>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Name</th>
+                        <th>Parent</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="folder : ${folders}">
+                        <td th:text="${folder.id}">fld-1</td>
+                        <td th:text="${folder.name}">Root</td>
+                        <td th:text="${folder.parentId != null ? folder.parentId : '-'}">-</td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div th:if="${folders.isEmpty()}" class="empty">No folders yet.</div>
+            </div>
+
+            <div class="section">
+                <h3>Files</h3>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Name</th>
+                        <th>Folder</th>
+                        <th>Size</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="file : ${files}">
+                        <td th:text="${file.id}">fil-1</td>
+                        <td>
+                            <div th:text="${file.name}">roadmap.md</div>
+                            <div class="muted" th:text="${file.updatedAt}"></div>
+                        </td>
+                        <td th:text="${file.parentId}">root</td>
+                        <td th:text="${file.size}">0</td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div th:if="${files.isEmpty()}" class="empty">No files yet.</div>
+            </div>
+
+            <div class="section">
+                <h3>Share links</h3>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Token</th>
+                        <th>File</th>
+                        <th>Expires</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="link : ${shares}">
+                        <td>
+                            <span class="share-link" th:text="${link.token}">token</span>
+                        </td>
+                        <td th:text="${link.fileId}">fil-1</td>
+                        <td>
+                            <span class="badge" th:classappend="${link.expiresAt != null && link.expiresAt.isAfter(T(java.time.Instant).now())} ? ' good' : ' warn'"
+                                  th:text="${link.expiresAt}">-</span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div th:if="${shares.isEmpty()}" class="empty">No share links yet.</div>
+            </div>
+        </section>
+    </div>
+</div>
+</body>
+</html>
