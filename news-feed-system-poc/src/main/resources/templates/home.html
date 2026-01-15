@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>News Feed System POC</title>
+    <style>
+        :root {
+            --ink: #0b1d2a;
+            --muted: #52636f;
+            --accent: #1f6f8b;
+            --accent-2: #f08a4b;
+            --card: #ffffff;
+            --border: #dde5ec;
+            --bg: radial-gradient(circle at 12% 18%, rgba(31, 111, 139, 0.16), transparent 45%),
+                  radial-gradient(circle at 82% 12%, rgba(240, 138, 75, 0.18), transparent 38%),
+                  #f4f7fb;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: "Space Grotesk", "Trebuchet MS", system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--ink);
+        }
+        h1, h2, h3 { margin: 0; }
+        p { margin: 0; color: var(--muted); }
+        a { color: var(--accent); text-decoration: none; }
+        .page { max-width: 1200px; margin: 0 auto; padding: 34px 22px 60px; }
+        .hero {
+            background: linear-gradient(135deg, #ffffff, #fef6ef);
+            border: 1px solid #f3d6c2;
+            border-radius: 18px;
+            padding: 22px 26px;
+            box-shadow: 0 18px 48px rgba(11, 29, 42, 0.08);
+        }
+        .hero h1 { letter-spacing: -0.03em; font-size: 32px; }
+        .hero span { color: var(--accent-2); }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 18px;
+            margin-top: 22px;
+        }
+        .card {
+            background: var(--card);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            padding: 20px 22px;
+            box-shadow: 0 10px 28px rgba(11, 29, 42, 0.06);
+            animation: fadeUp 0.5s ease;
+        }
+        .card h2 { font-size: 20px; margin-bottom: 10px; }
+        form { display: grid; gap: 12px; }
+        label { font-weight: 600; font-size: 14px; }
+        input[type="text"], textarea, select {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid #cfd8e1;
+            font-size: 14px;
+            background: #f7f9fc;
+        }
+        textarea { min-height: 90px; resize: vertical; }
+        input:focus, textarea:focus, select:focus {
+            outline: 2px solid rgba(31, 111, 139, 0.2);
+            border-color: var(--accent);
+            background: #fff;
+        }
+        button {
+            border: none;
+            border-radius: 10px;
+            padding: 11px 14px;
+            font-weight: 700;
+            cursor: pointer;
+            background: var(--accent);
+            color: #fff;
+        }
+        button:hover { background: #16556b; }
+        .message {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            color: #92400e;
+            padding: 12px 14px;
+            border-radius: 12px;
+            margin-top: 16px;
+        }
+        .feed-list { display: grid; gap: 12px; margin-top: 12px; }
+        .feed-item {
+            border-radius: 14px;
+            border: 1px solid #e3e8ee;
+            padding: 12px 14px;
+            background: #fffaf6;
+        }
+        .feed-item strong { color: var(--ink); }
+        .meta { font-size: 12px; color: var(--muted); margin-top: 6px; }
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: #eff6ff;
+            color: #1e3a8a;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .muted { color: var(--muted); font-style: italic; }
+        .inline { display: flex; gap: 8px; flex-wrap: wrap; }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+    <div class="hero">
+        <h1>News Feed <span>System</span> POC</h1>
+        <p>Lightweight timeline builder with users, follows, and time-ordered posts. Everything stays in memory.</p>
+    </div>
+
+    <div th:if="${message}" class="message" th:text="${message}"></div>
+
+    <div class="grid">
+        <section class="card">
+            <h2>Create a user</h2>
+            <form th:action="@{/users}" method="post" th:object="${createUserRequest}">
+                <div>
+                    <label for="name">Name</label>
+                    <input id="name" type="text" th:field="*{name}" placeholder="Ava, Dev, Priya" minlength="2" maxlength="40" required>
+                </div>
+                <button type="submit">Add user</button>
+            </form>
+        </section>
+
+        <section class="card">
+            <h2>Follow someone</h2>
+            <form th:action="@{/follow}" method="post" th:object="${followUserRequest}">
+                <div>
+                    <label for="followerId">Follower</label>
+                    <select id="followerId" th:field="*{followerId}" required>
+                        <option value="" disabled selected>Select a user</option>
+                        <option th:each="user : ${users}" th:value="${user.id}" th:text="${user.name}"></option>
+                    </select>
+                </div>
+                <div>
+                    <label for="followeeId">Followee</label>
+                    <select id="followeeId" th:field="*{followeeId}" required>
+                        <option value="" disabled selected>Select a user</option>
+                        <option th:each="user : ${users}" th:value="${user.id}" th:text="${user.name}"></option>
+                    </select>
+                </div>
+                <button type="submit">Create follow</button>
+            </form>
+        </section>
+
+        <section class="card">
+            <h2>Publish a post</h2>
+            <form th:action="@{/posts}" method="post" th:object="${createPostRequest}">
+                <div>
+                    <label for="authorId">Author</label>
+                    <select id="authorId" th:field="*{authorId}" required>
+                        <option value="" disabled selected>Select a user</option>
+                        <option th:each="user : ${users}" th:value="${user.id}" th:text="${user.name}"></option>
+                    </select>
+                </div>
+                <div>
+                    <label for="content">Post</label>
+                    <textarea id="content" th:field="*{content}" placeholder="Share a launch update, a thought, a link..." maxlength="280" required></textarea>
+                </div>
+                <button type="submit">Publish</button>
+            </form>
+        </section>
+
+        <section class="card">
+            <h2>Feed viewer</h2>
+            <form th:action="@{/}" method="get">
+                <div>
+                    <label for="userId">Feed for user</label>
+                    <select id="userId" name="userId">
+                        <option th:if="${selectedUser == null}" value="" selected>Select a user</option>
+                        <option th:each="user : ${users}" th:value="${user.id}" th:text="${user.name}" th:selected="${selectedUser != null and user.id == selectedUser.id}"></option>
+                    </select>
+                </div>
+                <button type="submit">Load feed</button>
+            </form>
+
+            <div th:if="${selectedUser != null}" style="margin-top: 16px;">
+                <div class="inline">
+                    <span class="pill" th:text="'User #' + ${selectedUser.id}">User #1001</span>
+                    <span class="pill" th:text="${selectedUser.name}">Ava</span>
+                </div>
+                <p style="margin-top: 8px;">Following:</p>
+                <div class="inline" style="margin-top: 6px;">
+                    <span th:if="${#lists.isEmpty(following)}" class="muted">No follows yet.</span>
+                    <span th:each="followed : ${following}" class="pill" th:text="${followed.name}"></span>
+                </div>
+            </div>
+
+            <div class="feed-list" th:if="${selectedUser != null}">
+                <div th:if="${#lists.isEmpty(feedEntries)}" class="muted">No posts yet. Create one to see it here.</div>
+                <div class="feed-item" th:each="entry : ${feedEntries}">
+                    <strong th:text="${entry.author.name}">Ava</strong>
+                    <p th:text="${entry.post.content}">Post content</p>
+                    <div class="meta" th:text="${#temporals.format(entry.post.createdAt, 'yyyy-MM-dd HH:mm')} + ' | Post #' + ${entry.post.id}">2024-01-01 10:00 | Post #5001</div>
+                </div>
+            </div>
+
+            <div th:if="${selectedUser == null}" class="muted" style="margin-top: 12px;">Create a user to start building a feed.</div>
+        </section>
+    </div>
+</div>
+</body>
+</html>

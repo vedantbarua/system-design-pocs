@@ -134,3 +134,14 @@ Track target prices with a simple UI and JSON endpoints.
 4. Open `http://localhost:8090`
 
 See [price-tracker-poc/README.md](price-tracker-poc/README.md) for endpoints and usage.
+
+### News Feed System POC
+News feed timeline with users, follow graph, and posts.
+
+#### How to Run
+1. Ensure you have Java 17+ and Maven installed.
+2. Navigate to the project directory: `cd news-feed-system-poc`
+3. Run: `mvn org.springframework.boot:spring-boot-maven-plugin:run`
+4. Open `http://localhost:8091`
+
+See [news-feed-system-poc/README.md](news-feed-system-poc/README.md) for endpoints and usage.
