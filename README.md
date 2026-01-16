@@ -145,3 +145,14 @@ News feed timeline with users, follow graph, and posts.
 4. Open `http://localhost:8091`
 
 See [news-feed-system-poc/README.md](news-feed-system-poc/README.md) for endpoints and usage.
+
+### Strava POC
+Activity feed with workout summaries and pace tracking.
+
+#### How to Run
+1. Ensure you have Java 17+ and Maven installed.
+2. Navigate to the project directory: `cd strava-poc`
+3. Run: `mvn org.springframework.boot:spring-boot-maven-plugin:run`
+4. Open `http://localhost:8092`
+
+See [strava-poc/README.md](strava-poc/README.md) for endpoints and usage.
