@@ -156,3 +156,14 @@ Activity feed with workout summaries and pace tracking.
 4. Open `http://localhost:8092`
 
 See [strava-poc/README.md](strava-poc/README.md) for endpoints and usage.
+
+### Local Delivery Service POC
+Dispatch simulator with orders, drivers, and status updates.
+
+#### How to Run
+1. Ensure Java 17+ and Maven are installed.
+2. Navigate to the project directory: `cd local-delivery-service-poc`
+3. Run: `mvn org.springframework.boot:spring-boot-maven-plugin:run`
+4. Open `http://localhost:8093`
+
+See [local-delivery-service-poc/README.md](local-delivery-service-poc/README.md) for endpoints and usage.
