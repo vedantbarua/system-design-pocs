@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Facebook News Feed POC</title>
+    <style>
+        :root {
+            --ink: #0b1524;
+            --muted: #5a6b7c;
+            --brand: #1877f2;
+            --brand-dark: #0f5dc6;
+            --accent: #ffb347;
+            --surface: #ffffff;
+            --surface-2: #f3f6fb;
+            --border: #e3e9f2;
+            --shadow: 0 18px 45px rgba(14, 30, 62, 0.12);
+            --bg: radial-gradient(circle at 15% 10%, rgba(24, 119, 242, 0.12), transparent 50%),
+                  radial-gradient(circle at 85% 15%, rgba(255, 179, 71, 0.15), transparent 42%),
+                  linear-gradient(160deg, #f6f9ff 0%, #fef6f0 100%);
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: "Figtree", "Helvetica Neue", sans-serif;
+            background: var(--bg);
+            color: var(--ink);
+        }
+        h1, h2, h3 { margin: 0; }
+        p { margin: 0; color: var(--muted); }
+        a { color: var(--brand); text-decoration: none; }
+        .page {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 32px 20px 60px;
+            display: grid;
+            gap: 22px;
+        }
+        .hero {
+            background: linear-gradient(120deg, #ffffff 0%, #eff6ff 60%, #fef1e4 100%);
+            border: 1px solid #dbe7f8;
+            border-radius: 22px;
+            padding: 24px 26px;
+            box-shadow: var(--shadow);
+            display: grid;
+            gap: 10px;
+        }
+        .hero-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(24, 119, 242, 0.12);
+            color: var(--brand-dark);
+            border-radius: 999px;
+            padding: 4px 12px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+        .hero h1 {
+            font-size: 32px;
+            letter-spacing: -0.03em;
+        }
+        .hero span { color: var(--brand); }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+            gap: 18px;
+        }
+        .card {
+            background: var(--surface);
+            border-radius: 18px;
+            border: 1px solid var(--border);
+            padding: 20px 22px;
+            box-shadow: 0 14px 30px rgba(12, 26, 54, 0.08);
+            animation: rise 0.45s ease both;
+        }
+        .card h2 {
+            font-size: 19px;
+            margin-bottom: 10px;
+        }
+        .hint {
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 12px;
+        }
+        form {
+            display: grid;
+            gap: 12px;
+        }
+        label {
+            font-weight: 600;
+            font-size: 13px;
+        }
+        input[type="text"], textarea, select {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: 1px solid #cfd8e3;
+            font-size: 14px;
+            background: var(--surface-2);
+        }
+        textarea { min-height: 92px; resize: vertical; }
+        input:focus, textarea:focus, select:focus {
+            outline: 2px solid rgba(24, 119, 242, 0.25);
+            border-color: var(--brand);
+            background: #fff;
+        }
+        button {
+            border: none;
+            border-radius: 12px;
+            padding: 10px 14px;
+            font-weight: 700;
+            cursor: pointer;
+            background: var(--brand);
+            color: #fff;
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+        button:hover {
+            background: var(--brand-dark);
+            transform: translateY(-1px);
+        }
+        .message {
+            background: #fff4cc;
+            border: 1px solid #f5c060;
+            color: #8a5200;
+            padding: 12px 14px;
+            border-radius: 14px;
+        }
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: #e7f0ff;
+            color: #10408b;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .inline { display: flex; gap: 8px; flex-wrap: wrap; }
+        .feed-list { display: grid; gap: 12px; margin-top: 14px; }
+        .feed-item {
+            border-radius: 16px;
+            border: 1px solid #e2e9f3;
+            padding: 14px 16px;
+            background: #ffffff;
+        }
+        .feed-item strong { color: var(--ink); }
+        .meta {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 6px;
+        }
+        .muted { color: var(--muted); font-style: italic; }
+        .timeline {
+            display: grid;
+            gap: 10px;
+            background: var(--surface-2);
+            border-radius: 14px;
+            padding: 12px;
+            border: 1px solid var(--border);
+        }
+        @keyframes rise {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+    <section class="hero">
+        <div class="hero-title">
+            <span class="badge">Feed POC</span>
+            <h1>Facebook <span>News Feed</span></h1>
+        </div>
+        <p>Prototype a social timeline with followers, posts, and a curated feed. Everything is stored in memory.</p>
+    </section>
+
+    <div th:if="${message}" class="message" th:text="${message}"></div>
+
+    <div class="grid">
+        <section class="card">
+            <h2>Create a user</h2>
+            <p class="hint">Set up a profile to publish updates and follow others.</p>
+            <form th:action="@{/users}" method="post" th:object="${createUserRequest}">
+                <div>
+                    <label for="name">Name</label>
+                    <input id="name" type="text" th:field="*{name}" placeholder="Jordan, Lina, Mateo" minlength="2" maxlength="40" required>
+                </div>
+                <button type="submit">Add user</button>
+            </form>
+        </section>
+
+        <section class="card">
+            <h2>Follow someone</h2>
+            <p class="hint">Build the social graph to shape the feed.</p>
+            <form th:action="@{/follow}" method="post" th:object="${followUserRequest}">
+                <div>
+                    <label for="followerId">Follower</label>
+                    <select id="followerId" th:field="*{followerId}" required>
+                        <option value="" disabled selected>Select a user</option>
+                        <option th:each="user : ${users}" th:value="${user.id}" th:text="${user.name}"></option>
+                    </select>
+                </div>
+                <div>
+                    <label for="followeeId">Followee</label>
+                    <select id="followeeId" th:field="*{followeeId}" required>
+                        <option value="" disabled selected>Select a user</option>
+                        <option th:each="user : ${users}" th:value="${user.id}" th:text="${user.name}"></option>
+                    </select>
+                </div>
+                <button type="submit">Create follow</button>
+            </form>
+        </section>
+
+        <section class="card">
+            <h2>Publish a post</h2>
+            <p class="hint">Short status update or link drop (280 chars).</p>
+            <form th:action="@{/posts}" method="post" th:object="${createPostRequest}">
+                <div>
+                    <label for="authorId">Author</label>
+                    <select id="authorId" th:field="*{authorId}" required>
+                        <option value="" disabled selected>Select a user</option>
+                        <option th:each="user : ${users}" th:value="${user.id}" th:text="${user.name}"></option>
+                    </select>
+                </div>
+                <div>
+                    <label for="content">Post</label>
+                    <textarea id="content" th:field="*{content}" placeholder="Share a launch, a thought, or a photo caption..." maxlength="280" required></textarea>
+                </div>
+                <button type="submit">Publish</button>
+            </form>
+        </section>
+
+        <section class="card">
+            <h2>Feed viewer</h2>
+            <p class="hint">Pick a user to see their timeline.</p>
+            <form th:action="@{/}" method="get">
+                <div>
+                    <label for="userId">Feed for user</label>
+                    <select id="userId" name="userId">
+                        <option th:if="${selectedUser == null}" value="" selected>Select a user</option>
+                        <option th:each="user : ${users}" th:value="${user.id}" th:text="${user.name}" th:selected="${selectedUser != null and user.id == selectedUser.id}"></option>
+                    </select>
+                </div>
+                <button type="submit">Load feed</button>
+            </form>
+
+            <div th:if="${selectedUser != null}" class="timeline" style="margin-top: 14px;">
+                <div class="inline">
+                    <span class="pill" th:text="'User #' + ${selectedUser.id}">User #1001</span>
+                    <span class="pill" th:text="${selectedUser.name}">Jordan</span>
+                </div>
+                <div>
+                    <p>Following:</p>
+                    <div class="inline" style="margin-top: 6px;">
+                        <span th:if="${#lists.isEmpty(following)}" class="muted">No follows yet.</span>
+                        <span th:each="followed : ${following}" class="pill" th:text="${followed.name}"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="feed-list" th:if="${selectedUser != null}">
+                <div th:if="${#lists.isEmpty(feedEntries)}" class="muted">No posts yet. Create one to see it here.</div>
+                <div class="feed-item" th:each="entry : ${feedEntries}">
+                    <strong th:text="${entry.author.name}">Jordan</strong>
+                    <p th:text="${entry.post.content}">Post content</p>
+                    <div class="meta" th:text="${#temporals.format(entry.post.createdAt, 'yyyy-MM-dd HH:mm')} + ' | Post #' + ${entry.post.id}">2024-01-01 10:00 | Post #5001</div>
+                </div>
+            </div>
+
+            <div th:if="${selectedUser == null}" class="muted" style="margin-top: 12px;">Create a user to start building a feed.</div>
+        </section>
+    </div>
+</div>
+</body>
+</html>
