@@ -146,6 +146,17 @@ News feed timeline with users, follow graph, and posts.
 
 See [news-feed-system-poc/README.md](news-feed-system-poc/README.md) for endpoints and usage.
 
+### Facebook News Feed POC
+Facebook-style news feed with users, follows, and time-ordered posts.
+
+#### How to Run
+1. Ensure Java 17+ and Maven are installed.
+2. Navigate to the project directory: `cd facebook-news-feed-poc`
+3. Run: `mvn org.springframework.boot:spring-boot-maven-plugin:run`
+4. Open `http://localhost:8094`
+
+See [facebook-news-feed-poc/README.md](facebook-news-feed-poc/README.md) for endpoints and usage.
+
 ### Strava POC
 Activity feed with workout summaries and pace tracking.
 
