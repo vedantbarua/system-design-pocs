@@ -189,3 +189,14 @@ Local discovery app with businesses and reviews.
 4. Open `http://localhost:8095`
 
 See [yelp-poc/README.md](yelp-poc/README.md) for details.
+
+### Payment System POC
+Payment gateway flow with authorization, capture, refunds, idempotency, and event tracking.
+
+#### How to Run
+1. Ensure Java 17+ and Maven are installed.
+2. Navigate to the project directory: `cd payment-system-poc`
+3. Run: `mvn org.springframework.boot:spring-boot-maven-plugin:run`
+4. Open `http://localhost:8088`
+
+See [payment-system-poc/README.md](payment-system-poc/README.md) for endpoints and usage.

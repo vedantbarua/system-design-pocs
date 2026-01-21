@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Payment System POC</title>
+    <style>
+        :root {
+            --ink: #111827;
+            --muted: #475569;
+            --accent: #be123c;
+            --accent-dark: #9f1239;
+            --accent-soft: rgba(190, 18, 60, 0.12);
+            --success: #047857;
+            --warning: #b45309;
+            --card: #ffffff;
+            --bg: radial-gradient(circle at 20% 20%, rgba(255, 237, 213, 0.7), transparent 50%),
+                  radial-gradient(circle at 80% 10%, rgba(219, 234, 254, 0.7), transparent 45%),
+                  linear-gradient(160deg, #f8fafc 0%, #e2e8f0 100%);
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: "Source Sans 3", "Segoe UI", sans-serif;
+            color: var(--ink);
+            background: var(--bg);
+        }
+        h1, h2, h3 {
+            font-family: "Space Grotesk", "Trebuchet MS", sans-serif;
+            margin: 0 0 10px;
+        }
+        .page {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 32px 22px 70px;
+        }
+        .hero {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 18px;
+            background: var(--card);
+            border-radius: 24px;
+            padding: 28px 30px;
+            box-shadow: 0 20px 50px rgba(15, 23, 42, 0.12);
+            animation: rise 0.6s ease;
+        }
+        .hero p {
+            margin: 0;
+            color: var(--muted);
+            max-width: 520px;
+        }
+        .pill {
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: #fee2e2;
+            color: #7f1d1d;
+            font-weight: 700;
+            font-size: 12px;
+            letter-spacing: 0.04em;
+        }
+        .meta {
+            margin-top: 10px;
+            font-size: 14px;
+            color: var(--muted);
+        }
+        .message {
+            margin-top: 18px;
+            background: #fef3c7;
+            border-left: 4px solid var(--warning);
+            padding: 12px 14px;
+            border-radius: 10px;
+            color: #92400e;
+        }
+        .grid {
+            display: grid;
+            gap: 20px;
+            margin-top: 24px;
+        }
+        @media (min-width: 980px) {
+            .grid.split {
+                grid-template-columns: 1.1fr 0.9fr;
+            }
+            .grid.double {
+                grid-template-columns: 1.3fr 0.7fr;
+            }
+        }
+        .card {
+            background: var(--card);
+            border-radius: 18px;
+            padding: 22px 24px;
+            box-shadow: 0 16px 35px rgba(15, 23, 42, 0.08);
+            animation: rise 0.75s ease;
+        }
+        form { display: grid; gap: 12px; }
+        label { font-weight: 700; font-size: 14px; }
+        input[type="text"], input[type="number"], select {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid #cbd5e1;
+            font-size: 15px;
+            background: #fff;
+        }
+        input:focus, select:focus {
+            outline: 2px solid rgba(190, 18, 60, 0.2);
+            border-color: var(--accent);
+        }
+        .row {
+            display: grid;
+            gap: 12px;
+        }
+        @media (min-width: 640px) {
+            .row.two { grid-template-columns: repeat(2, 1fr); }
+        }
+        .inline {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: var(--muted);
+        }
+        button {
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        button:hover { background: var(--accent-dark); }
+        .secondary button {
+            background: #0f172a;
+        }
+        .secondary button:hover {
+            background: #020617;
+        }
+        .warn button {
+            background: #f97316;
+        }
+        .warn button:hover {
+            background: #ea580c;
+        }
+        .stats {
+            display: grid;
+            gap: 12px;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        }
+        .stat {
+            background: #f8fafc;
+            border-radius: 14px;
+            padding: 12px 14px;
+        }
+        .stat span { display: block; color: var(--muted); font-size: 12px; }
+        .stat strong { font-size: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td {
+            padding: 10px 8px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 14px;
+        }
+        th {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--muted);
+        }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 8px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            background: #e2e8f0;
+            color: #0f172a;
+        }
+        .badge.success { background: #ecfdf5; color: #047857; }
+        .badge.warn { background: #fff7ed; color: #c2410c; }
+        .badge.fail { background: #fee2e2; color: #b91c1c; }
+        .highlight {
+            background: var(--accent-soft);
+        }
+        .events {
+            display: grid;
+            gap: 12px;
+        }
+        .event {
+            padding: 12px 14px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border-left: 4px solid #94a3b8;
+        }
+        .event strong { display: block; }
+        .empty {
+            color: var(--muted);
+            font-style: italic;
+        }
+        @keyframes rise {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+    <header class="hero">
+        <div>
+            <h1>Payment System POC</h1>
+            <p>Simulate a payment gateway flow with authorization, capture, refunds, idempotency, and event tracking.</p>
+            <div class="meta">In-memory store - resets on restart - currencies: <span th:text="${#strings.listJoin(currencies, ', ')}"></span></div>
+        </div>
+        <div class="pill">UI + JSON API</div>
+    </header>
+
+    <div th:if="${message}" class="message" th:text="${message}"></div>
+
+    <div class="grid split">
+        <section class="card">
+            <h2>Create a payment</h2>
+            <form th:action="@{/payments}" method="post">
+                <div class="row two">
+                    <div>
+                        <label for="merchantId">Merchant ID</label>
+                        <input id="merchantId" name="merchantId" type="text" placeholder="merchant:alpha" required>
+                    </div>
+                    <div>
+                        <label for="customerId">Customer ID</label>
+                        <input id="customerId" name="customerId" type="text" placeholder="customer:42" required>
+                    </div>
+                </div>
+                <div class="row two">
+                    <div>
+                        <label for="amount">Amount</label>
+                        <input id="amount" name="amount" type="number" min="0.01" step="0.01" placeholder="49.99" required>
+                    </div>
+                    <div>
+                        <label for="currency">Currency</label>
+                        <select id="currency" name="currency">
+                            <option th:each="currency : ${currencies}" th:value="${currency}" th:text="${currency}"></option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row two">
+                    <div>
+                        <label for="paymentMethod">Payment Method</label>
+                        <input id="paymentMethod" name="paymentMethod" type="text" placeholder="card:visa" required>
+                    </div>
+                    <div>
+                        <label for="idempotencyKey">Idempotency Key (optional)</label>
+                        <input id="idempotencyKey" name="idempotencyKey" type="text" placeholder="cart-2024-01">
+                    </div>
+                </div>
+                <div class="row two">
+                    <label class="inline">
+                        <input type="checkbox" name="captureNow" value="true"> Capture immediately
+                    </label>
+                    <label class="inline">
+                        <input type="checkbox" name="simulateFailure" value="true"> Simulate issuer decline
+                    </label>
+                </div>
+                <button type="submit">Authorize payment</button>
+            </form>
+        </section>
+
+        <section class="card">
+            <h2>Summary</h2>
+            <div class="stats" th:with="stats=${stats}">
+                <div class="stat">
+                    <span>Total payments</span>
+                    <strong th:text="${stats.totalPayments}">0</strong>
+                </div>
+                <div class="stat">
+                    <span>Authorized</span>
+                    <strong th:text="${stats.authorizedCount}">0</strong>
+                </div>
+                <div class="stat">
+                    <span>Captured</span>
+                    <strong th:text="${stats.capturedCount}">0</strong>
+                </div>
+                <div class="stat">
+                    <span>Refunded</span>
+                    <strong th:text="${stats.refundedCount}">0</strong>
+                </div>
+                <div class="stat">
+                    <span>Failed</span>
+                    <strong th:text="${stats.failedCount}">0</strong>
+                </div>
+                <div class="stat">
+                    <span>Captured volume</span>
+                    <strong th:text="${stats.capturedAmount}">0</strong>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 18px;">Actions</h3>
+            <form th:action="@{/payments/capture}" method="post">
+                <label for="actionPaymentId">Payment ID</label>
+                <input id="actionPaymentId" name="paymentId" type="text" placeholder="pay_x1y2z3" required>
+                <div class="row two">
+                    <div class="secondary">
+                        <button type="submit">Capture</button>
+                    </div>
+                </div>
+            </form>
+            <form th:action="@{/payments/refund}" method="post">
+                <label for="refundPaymentId">Payment ID</label>
+                <input id="refundPaymentId" name="paymentId" type="text" placeholder="pay_x1y2z3" required>
+                <div class="row two">
+                    <div class="warn">
+                        <button type="submit">Refund</button>
+                    </div>
+                </div>
+            </form>
+        </section>
+    </div>
+
+    <div class="grid double">
+        <section class="card">
+            <h2>Recent payments</h2>
+            <div th:if="${#lists.isEmpty(payments)}" class="empty">No payments yet. Create one to see it here.</div>
+            <table th:if="${!#lists.isEmpty(payments)}">
+                <thead>
+                <tr>
+                    <th>Payment</th>
+                    <th>Merchant</th>
+                    <th>Customer</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="payment : ${payments}"
+                    th:classappend="${highlightPaymentId} == ${payment.id} ? 'highlight'">
+                    <td>
+                        <div th:text="${payment.id}"></div>
+                        <small th:if="${payment.idempotencyKey}" th:text="${payment.idempotencyKey}"></small>
+                    </td>
+                    <td th:text="${payment.merchantId}"></td>
+                    <td th:text="${payment.customerId}"></td>
+                    <td th:text="${payment.currency + ' ' + payment.amount}"></td>
+                    <td>
+                        <span class="badge" th:classappend="${payment.status.name() == 'CAPTURED'} ? ' success' : (${payment.status.name() == 'FAILED'} ? ' fail' : (${payment.status.name() == 'REFUNDED'} ? ' warn' : ''))"
+                              th:text="${payment.status}"></span>
+                    </td>
+                    <td th:text="${payment.createdAt}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="card">
+            <h2>Event stream</h2>
+            <div th:if="${#lists.isEmpty(events)}" class="empty">No events yet.</div>
+            <div class="events" th:if="${!#lists.isEmpty(events)}">
+                <div class="event" th:each="event : ${events}">
+                    <strong th:text="${event.type + ' - ' + event.paymentId}"></strong>
+                    <span th:text="${event.message}"></span>
+                    <div class="meta" th:text="${event.createdAt}"></div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+</body>
+</html>
