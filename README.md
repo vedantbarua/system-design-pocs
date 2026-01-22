@@ -102,6 +102,17 @@ Dropbox-style workspace with folders, uploads, and share links.
 
 See [design-dropbox-poc/README.md](design-dropbox-poc/README.md) for endpoints and usage.
 
+### Google Docs POC
+Google Docs-style collaboration with versions, comments, and roles.
+
+#### How to Run
+1. Ensure Java 17+ and Maven are installed.
+2. Navigate to the project directory: `cd google-docs-poc`
+3. Run: `mvn org.springframework.boot:spring-boot-maven-plugin:run`
+4. Open `http://localhost:8096`
+
+See [google-docs-poc/README.md](google-docs-poc/README.md) for endpoints and usage.
+
 ### Web Crawler POC
 Single-threaded web crawler with UI and JSON endpoints.
 
