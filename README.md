@@ -201,6 +201,17 @@ Local discovery app with businesses and reviews.
 
 See [yelp-poc/README.md](yelp-poc/README.md) for details.
 
+### Tinder POC
+Swipe-style matchmaking with profiles, likes, and matches.
+
+#### How to Run
+1. Ensure you have Java 17+ and Maven installed.
+2. Navigate to the project directory: `cd tinder-poc`
+3. Run: `mvn org.springframework.boot:spring-boot-maven-plugin:run`
+4. Open `http://localhost:8097`
+
+See [tinder-poc/README.md](tinder-poc/README.md) for details.
+
 ### Payment System POC
 Payment gateway flow with authorization, capture, refunds, idempotency, and event tracking.
 

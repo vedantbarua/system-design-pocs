@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Matches • Tinder POC</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background: radial-gradient(circle at top, #fef2f2 0%, #f8fafc 55%, #ffffff 100%);
+        }
+        .match-card {
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 20px;
+            padding: 18px 20px;
+            background: #fff;
+            box-shadow: 0 12px 24px rgba(15, 23, 42, 0.06);
+        }
+        .summary-card {
+            border: 0;
+            border-radius: 16px;
+            box-shadow: 0 18px 32px rgba(15, 23, 42, 0.08);
+        }
+    </style>
+</head>
+<body>
+<div class="container py-5">
+    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
+        <div>
+            <h1 class="display-6 fw-bold">Matches</h1>
+            <p class="text-secondary mb-0">Your newest connections, ready to chat.</p>
+        </div>
+        <a class="btn btn-outline-dark btn-lg" href="/">Back to deck</a>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card summary-card p-3">
+                <div class="text-uppercase text-secondary small">Total Matches</div>
+                <div class="fs-3 fw-semibold" th:text="${summary.matches}">2</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card summary-card p-3">
+                <div class="text-uppercase text-secondary small">Likes</div>
+                <div class="fs-3 fw-semibold" th:text="${summary.likes}">4</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card summary-card p-3">
+                <div class="text-uppercase text-secondary small">Super likes</div>
+                <div class="fs-3 fw-semibold" th:text="${summary.superLikes}">1</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex flex-column gap-3" th:if="${!matches.isEmpty()}">
+        <div class="match-card" th:each="match : ${matches}">
+            <div class="d-flex flex-column flex-md-row justify-content-between gap-3">
+                <div>
+                    <div class="fw-semibold" th:text="${match.profile.name}">Avery</div>
+                    <div class="text-secondary" th:text="${match.profile.occupation}">Product designer</div>
+                    <div class="text-secondary small" th:text="${match.lastMessage}">Message preview</div>
+                </div>
+                <div class="text-md-end">
+                    <div class="badge bg-dark" th:text="${match.profile.compatibilityPercent + '% compatible'}">92% compatible</div>
+                    <div class="text-secondary small mt-2" th:text="${match.matchedLabel}">Matched 2h ago</div>
+                    <a class="btn btn-link px-0" th:href="@{'/profile/' + ${match.profile.id}}">View profile</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="alert alert-light" th:if="${matches.isEmpty()}">
+        No matches yet. Swipe a little more to find new connections.
+    </div>
+</div>
+</body>
+</html>

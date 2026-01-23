@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>New Profile • Tinder POC</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background: radial-gradient(circle at top, #fdf2f8 0%, #f8fafc 55%, #ffffff 100%);
+        }
+        .card-form {
+            border: 0;
+            border-radius: 20px;
+            box-shadow: 0 18px 32px rgba(15, 23, 42, 0.08);
+        }
+        .form-label {
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+<div class="container py-5">
+    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
+        <div>
+            <h1 class="display-6 fw-bold">Add a new profile</h1>
+            <p class="text-secondary mb-0">Seed the deck with someone new.</p>
+        </div>
+        <a class="btn btn-outline-dark btn-lg" href="/">Back to deck</a>
+    </div>
+
+    <div class="card card-form p-4">
+        <form th:action="@{/profiles}" th:object="${profileForm}" method="post">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label" for="name">Name</label>
+                    <input class="form-control" id="name" type="text" th:field="*{name}" placeholder="Avery Patel">
+                    <div class="text-danger small" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Name error</div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label" for="age">Age</label>
+                    <input class="form-control" id="age" type="number" th:field="*{age}" min="18" max="99">
+                    <div class="text-danger small" th:if="${#fields.hasErrors('age')}" th:errors="*{age}">Age error</div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label" for="vibe">Profile vibe</label>
+                    <select class="form-select" id="vibe" th:field="*{vibe}">
+                        <option th:each="vibe : ${vibes}" th:value="${vibe}" th:text="${vibe.label}"></option>
+                    </select>
+                    <div class="text-danger small" th:if="${#fields.hasErrors('vibe')}" th:errors="*{vibe}">Vibe error</div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="city">City</label>
+                    <input class="form-control" id="city" type="text" th:field="*{city}" placeholder="San Francisco">
+                    <div class="text-danger small" th:if="${#fields.hasErrors('city')}" th:errors="*{city}">City error</div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="occupation">Occupation</label>
+                    <input class="form-control" id="occupation" type="text" th:field="*{occupation}" placeholder="Product designer">
+                    <div class="text-danger small" th:if="${#fields.hasErrors('occupation')}" th:errors="*{occupation}">Occupation error</div>
+                </div>
+                <div class="col-12">
+                    <label class="form-label" for="bio">Bio</label>
+                    <textarea class="form-control" id="bio" rows="2" th:field="*{bio}" placeholder="A quick intro"></textarea>
+                    <div class="text-danger small" th:if="${#fields.hasErrors('bio')}" th:errors="*{bio}">Bio error</div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="prompt">Prompt</label>
+                    <input class="form-control" id="prompt" type="text" th:field="*{prompt}" placeholder="Two truths and a lie">
+                    <div class="text-danger small" th:if="${#fields.hasErrors('prompt')}" th:errors="*{prompt}">Prompt error</div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="promptAnswer">Prompt answer</label>
+                    <input class="form-control" id="promptAnswer" type="text" th:field="*{promptAnswer}" placeholder="I can juggle, I hate sushi, I speak three languages">
+                    <div class="text-danger small" th:if="${#fields.hasErrors('promptAnswer')}" th:errors="*{promptAnswer}">Prompt answer error</div>
+                </div>
+                <div class="col-12">
+                    <label class="form-label" for="interests">Interests (comma-separated)</label>
+                    <input class="form-control" id="interests" type="text" th:field="*{interests}" placeholder="Design, Hiking, Matcha">
+                    <div class="text-danger small" th:if="${#fields.hasErrors('interests')}" th:errors="*{interests}">Interests error</div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="distanceKm">Distance (km)</label>
+                    <input class="form-control" id="distanceKm" type="number" min="1" max="200" th:field="*{distanceKm}">
+                    <div class="text-danger small" th:if="${#fields.hasErrors('distanceKm')}" th:errors="*{distanceKm}">Distance error</div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="lastActiveMinutes">Last active (minutes)</label>
+                    <input class="form-control" id="lastActiveMinutes" type="number" min="0" max="1440" th:field="*{lastActiveMinutes}">
+                    <div class="text-danger small" th:if="${#fields.hasErrors('lastActiveMinutes')}" th:errors="*{lastActiveMinutes}">Last active error</div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="compatibilityPercent">Compatibility (%)</label>
+                    <input class="form-control" id="compatibilityPercent" type="number" min="40" max="99" th:field="*{compatibilityPercent}">
+                    <div class="text-danger small" th:if="${#fields.hasErrors('compatibilityPercent')}" th:errors="*{compatibilityPercent}">Compatibility error</div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-check mt-2">
+                        <input class="form-check-input" id="verified" type="checkbox" th:field="*{verified}">
+                        <label class="form-check-label" for="verified">Verified profile</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-check mt-2">
+                        <input class="form-check-input" id="likesYou" type="checkbox" th:field="*{likesYou}">
+                        <label class="form-check-label" for="likesYou">This profile already likes you</label>
+                    </div>
+                </div>
+                <div class="col-12 d-flex gap-2">
+                    <button class="btn btn-dark btn-lg" type="submit">Create profile</button>
+                    <a class="btn btn-outline-dark btn-lg" href="/">Cancel</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Profile • Tinder POC</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background: radial-gradient(circle at top, #fdf2f8 0%, #f8fafc 55%, #ffffff 100%);
+        }
+        .profile-card {
+            border-radius: 24px;
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            box-shadow: 0 20px 45px rgba(15, 23, 42, 0.12);
+            overflow: hidden;
+        }
+        .profile-hero {
+            height: 220px;
+            display: flex;
+            align-items: flex-end;
+            padding: 20px;
+            color: #fff;
+        }
+        .vibe-golden { background: linear-gradient(135deg, #f97316, #facc15); }
+        .vibe-midnight { background: linear-gradient(135deg, #0f172a, #6366f1); }
+        .vibe-coastal { background: linear-gradient(135deg, #14b8a6, #38bdf8); }
+        .vibe-bloom { background: linear-gradient(135deg, #f43f5e, #fb7185); }
+        .vibe-urban { background: linear-gradient(135deg, #1f2937, #a855f7); }
+        .vibe-lavender { background: linear-gradient(135deg, #a78bfa, #f9a8d4); }
+        .badge-soft {
+            background: rgba(15, 23, 42, 0.08);
+            color: #0f172a;
+            border-radius: 999px;
+            padding: 4px 10px;
+            font-size: 12px;
+        }
+        .summary-card {
+            border: 0;
+            border-radius: 16px;
+            box-shadow: 0 18px 32px rgba(15, 23, 42, 0.08);
+        }
+        .action-btn {
+            border-radius: 999px;
+            padding: 10px 18px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+<div class="container py-5">
+    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
+        <div>
+            <h1 class="display-6 fw-bold">Profile Details</h1>
+            <p class="text-secondary mb-0">Dive deeper before you swipe.</p>
+        </div>
+        <a class="btn btn-outline-dark btn-lg" href="/">Back to deck</a>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="profile-card bg-white">
+                <div class="profile-hero" th:classappend="' ' + ${profile.vibe.cssClass}">
+                    <div>
+                        <div class="badge bg-dark" th:text="${profile.vibe.label}">Golden hour</div>
+                        <h2 class="fw-semibold mt-2" th:text="${profile.name + ', ' + profile.age}">Avery, 27</h2>
+                        <div class="small" th:text="${profile.occupation + ' • ' + profile.city}">Designer • SF</div>
+                    </div>
+                </div>
+                <div class="p-4">
+                    <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+                        <span class="badge bg-light text-dark border" th:text="${profile.distanceLabel}">3 km away</span>
+                        <span class="badge bg-light text-dark border" th:text="${profile.lastActiveLabel}">Active now</span>
+                        <span class="badge bg-primary" th:if="${profile.verified}">Verified</span>
+                        <span class="badge bg-success" th:if="${profile.likesYou}">Likes you</span>
+                        <span class="badge bg-dark" th:text="${profile.compatibilityPercent + '% compatible'}">92% compatible</span>
+                    </div>
+                    <p class="text-secondary" th:text="${profile.bio}">Bio goes here.</p>
+                    <div class="bg-light rounded-4 p-3 mb-3">
+                        <div class="text-uppercase text-secondary small" th:text="${profile.prompt}">Prompt</div>
+                        <div class="fw-semibold" th:text="${profile.promptAnswer}">Prompt answer</div>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2 mb-4" th:if="${!profile.interests.isEmpty()}">
+                        <span class="badge-soft" th:each="interest : ${profile.interests}" th:text="${interest}">Design</span>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2">
+                        <form action="/swipe" method="post">
+                            <input type="hidden" name="profileId" th:value="${profile.id}">
+                            <input type="hidden" name="decision" value="DISLIKE">
+                            <button class="btn btn-outline-secondary action-btn" type="submit">Nope</button>
+                        </form>
+                        <form action="/swipe" method="post">
+                            <input type="hidden" name="profileId" th:value="${profile.id}">
+                            <input type="hidden" name="decision" value="SUPERLIKE">
+                            <button class="btn btn-outline-primary action-btn" type="submit">Super like</button>
+                        </form>
+                        <form action="/swipe" method="post">
+                            <input type="hidden" name="profileId" th:value="${profile.id}">
+                            <input type="hidden" name="decision" value="LIKE">
+                            <button class="btn btn-dark action-btn" type="submit">Like</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="row g-3 mb-4">
+                <div class="col-6">
+                    <div class="card summary-card p-3">
+                        <div class="text-uppercase text-secondary small">Remaining</div>
+                        <div class="fs-4 fw-semibold" th:text="${summary.remainingProfiles}">4</div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="card summary-card p-3">
+                        <div class="text-uppercase text-secondary small">Matches</div>
+                        <div class="fs-4 fw-semibold" th:text="${summary.matches}">2</div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <h2 class="h5 mb-3">Latest matches</h2>
+                <div class="d-flex flex-column gap-3" th:if="${!matches.isEmpty()}">
+                    <div class="p-3 bg-white rounded-4 border" th:each="match : ${matches}">
+                        <div class="fw-semibold" th:text="${match.profile.name}">Avery</div>
+                        <div class="text-secondary small" th:text="${match.lastMessage}">Message</div>
+                    </div>
+                </div>
+                <div class="alert alert-light" th:if="${matches.isEmpty()}">No matches yet.</div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
