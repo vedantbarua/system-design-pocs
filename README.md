@@ -222,3 +222,14 @@ Payment gateway flow with authorization, capture, refunds, idempotency, and even
 4. Open `http://localhost:8088`
 
 See [payment-system-poc/README.md](payment-system-poc/README.md) for endpoints and usage.
+
+### Online Auction POC
+Auction listings with bids, reserve pricing, and close actions.
+
+#### How to Run
+1. Ensure you have Java 17+ and Maven installed.
+2. Navigate to the project directory: `cd online-auction-poc`
+3. Run: `mvn org.springframework.boot:spring-boot-maven-plugin:run`
+4. Open `http://localhost:8098`
+
+See [online-auction-poc/README.md](online-auction-poc/README.md) for endpoints and usage.
