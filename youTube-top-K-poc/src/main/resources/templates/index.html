@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>YouTube Top-K POC</title>
+    <style>
+        :root {
+            --ink: #111827;
+            --muted: #4b5563;
+            --accent: #ef4444;
+            --accent-dark: #b91c1c;
+            --accent-soft: #fee2e2;
+            --teal: #0f766e;
+            --bg: radial-gradient(circle at 15% 20%, rgba(190, 242, 100, 0.35), transparent 45%),
+                  radial-gradient(circle at 80% 10%, rgba(252, 165, 165, 0.4), transparent 40%),
+                  linear-gradient(160deg, #fff7ed 0%, #f8fafc 100%);
+            --card: #ffffff;
+            --chip: #ecfdf3;
+            --shadow: 0 20px 48px rgba(15, 23, 42, 0.12);
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: "Space Grotesk", "Segoe UI", sans-serif;
+            background: var(--bg);
+            color: var(--ink);
+        }
+        h1, h2 {
+            font-family: "Playfair Display", "Georgia", serif;
+        }
+        .page { max-width: 1180px; margin: 0 auto; padding: 32px 22px 60px; }
+        .hero {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 18px;
+            background: var(--card);
+            border-radius: 24px;
+            padding: 28px 30px;
+            box-shadow: var(--shadow);
+            animation: rise 0.6s ease;
+        }
+        .hero h1 { margin: 0 0 8px; font-size: 34px; }
+        .hero p { margin: 0; color: var(--muted); max-width: 540px; }
+        .pill {
+            align-self: flex-start;
+            background: var(--accent-soft);
+            color: var(--accent-dark);
+            padding: 8px 14px;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 13px;
+        }
+        .meta {
+            margin-top: 10px;
+            font-size: 14px;
+            color: var(--muted);
+        }
+        .grid {
+            display: grid;
+            gap: 20px;
+            margin-top: 24px;
+        }
+        @media (min-width: 980px) {
+            .grid { grid-template-columns: 1.1fr 0.9fr; }
+        }
+        .card {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 22px 24px;
+            box-shadow: 0 14px 32px rgba(15, 23, 42, 0.08);
+            animation: rise 0.8s ease;
+        }
+        form { display: grid; gap: 12px; }
+        label { font-weight: 600; }
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            font-size: 15px;
+        }
+        input:focus {
+            outline: 2px solid rgba(239, 68, 68, 0.2);
+            border-color: var(--accent);
+        }
+        button {
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        button:hover { background: var(--accent-dark); }
+        .ghost {
+            background: #fff;
+            color: var(--teal);
+            border: 1px solid rgba(15, 118, 110, 0.3);
+        }
+        .message {
+            margin-top: 18px;
+            background: #fef3c7;
+            border-left: 4px solid var(--accent);
+            padding: 12px 14px;
+            border-radius: 10px;
+            color: #92400e;
+        }
+        .tag {
+            display: inline-block;
+            padding: 6px 10px;
+            background: var(--chip);
+            border-radius: 999px;
+            font-size: 12px;
+            color: #0f766e;
+            font-weight: 600;
+        }
+        .list {
+            display: grid;
+            gap: 12px;
+            margin-top: 12px;
+        }
+        .list-item {
+            background: #fff7ed;
+            border-radius: 14px;
+            padding: 12px 14px;
+            display: grid;
+            gap: 6px;
+        }
+        .list-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .muted { color: var(--muted); font-size: 13px; }
+        .empty { color: var(--muted); font-style: italic; }
+        table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+        th, td { padding: 10px 8px; text-align: left; border-bottom: 1px solid #e5e7eb; }
+        th { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+        .score {
+            font-weight: 700;
+            color: var(--accent-dark);
+        }
+        .tags { display: flex; gap: 6px; flex-wrap: wrap; }
+        .helper {
+            font-size: 12px;
+            color: var(--muted);
+        }
+        @keyframes rise {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+    <header class="hero">
+        <div>
+            <h1>YouTube Top-K POC</h1>
+            <p>Rank videos by a simple engagement score and fetch the top-K list by tag. Update videos, record engagement, and inspect the live leaderboard.</p>
+            <div class="meta">
+                Score = views × <span th:text="${viewWeight}">1</span> + likes × <span th:text="${likeWeight}">4</span>.
+                Default limit: <span th:text="${defaultLimit}">5</span>.
+            </div>
+        </div>
+        <div class="pill">UI + JSON API</div>
+    </header>
+
+    <div th:if="${message}" class="message" th:text="${message}"></div>
+
+    <div class="grid">
+        <section class="card">
+            <h2>Top-K leaderboard</h2>
+            <form th:action="@{/top}" method="post">
+                <div>
+                    <label for="tag">Tag filter</label>
+                    <input id="tag" name="tag" type="text" placeholder="e.g. travel" maxlength="24" th:value="${tag}">
+                    <div class="helper">Leave blank for all tags.</div>
+                </div>
+                <div>
+                    <label for="limit">Limit</label>
+                    <input id="limit" name="limit" type="number" min="1" th:placeholder="${defaultLimit}" th:value="${limit}">
+                </div>
+                <div>
+                    <button type="submit">Get top videos</button>
+                </div>
+            </form>
+
+            <div th:if="${topVideos}" class="list">
+                <div th:if="${#lists.isEmpty(topVideos)}" class="empty">No videos ranked yet.</div>
+                <div th:each="entry : ${topVideos}" class="list-item">
+                    <div class="list-row">
+                        <strong th:text="${entry.rank} + '. ' + ${entry.title}">1. Tokyo Night Food Tour</strong>
+                        <span class="score" th:text="'Score ' + ${entry.score}">Score 1240</span>
+                    </div>
+                    <div class="list-row">
+                        <span class="muted" th:text="${entry.channel} + ' • ' + ${entry.views} + ' views • ' + ${entry.likes} + ' likes'">Street Eats</span>
+                        <span class="muted" th:text="${entry.updatedAt == null ? '' : 'Updated ' + #temporals.format(entry.updatedAt, 'yyyy-MM-dd HH:mm')}"></span>
+                    </div>
+                    <div class="tags" th:if="${!#lists.isEmpty(entry.tags)}">
+                        <span th:each="tag : ${entry.tags}" class="tag" th:text="${tag}">travel</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Add or update a video</h2>
+            <form th:action="@{/videos}" method="post">
+                <div>
+                    <label for="id">Video id</label>
+                    <input id="id" name="id" type="text" placeholder="vid-109" maxlength="40" required>
+                </div>
+                <div>
+                    <label for="title">Title</label>
+                    <input id="title" name="title" type="text" placeholder="Title" maxlength="120" required>
+                </div>
+                <div>
+                    <label for="channel">Channel</label>
+                    <input id="channel" name="channel" type="text" placeholder="Channel name" maxlength="60" required>
+                </div>
+                <div>
+                    <label for="tags">Tags</label>
+                    <input id="tags" name="tags" type="text" placeholder="comma-separated tags" maxlength="140">
+                    <div class="helper">Up to <span th:text="${maxTags}">6</span> tags.</div>
+                </div>
+                <div class="list-row">
+                    <div style="flex: 1;">
+                        <label for="views">Views</label>
+                        <input id="views" name="views" type="number" min="0" placeholder="0">
+                    </div>
+                    <div style="flex: 1;">
+                        <label for="likes">Likes</label>
+                        <input id="likes" name="likes" type="number" min="0" placeholder="0">
+                    </div>
+                </div>
+                <div>
+                    <button type="submit">Save video</button>
+                </div>
+            </form>
+        </section>
+    </div>
+
+    <div class="grid">
+        <section class="card">
+            <h2>Record engagement</h2>
+            <form th:action="@{/events}" method="post">
+                <div>
+                    <label for="eventId">Video id</label>
+                    <input id="eventId" name="id" type="text" placeholder="vid-101" maxlength="40" required>
+                </div>
+                <div class="list-row">
+                    <div style="flex: 1;">
+                        <label for="viewDelta">View delta</label>
+                        <input id="viewDelta" name="viewDelta" type="number" min="0" placeholder="100">
+                    </div>
+                    <div style="flex: 1;">
+                        <label for="likeDelta">Like delta</label>
+                        <input id="likeDelta" name="likeDelta" type="number" min="0" placeholder="10">
+                    </div>
+                </div>
+                <div>
+                    <button class="ghost" type="submit">Record engagement</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="card">
+            <h2>Current videos</h2>
+            <div th:if="${#lists.isEmpty(videos)}" class="empty">No videos stored yet.</div>
+            <table th:if="${!#lists.isEmpty(videos)}">
+                <thead>
+                <tr>
+                    <th>Video</th>
+                    <th>Channel</th>
+                    <th>Views</th>
+                    <th>Likes</th>
+                    <th>Tags</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="video : ${videos}">
+                    <td th:text="${video.title}">Tokyo Night Food Tour</td>
+                    <td th:text="${video.channel}">Street Eats</td>
+                    <td th:text="${video.views}">182000</td>
+                    <td th:text="${video.likes}">14500</td>
+                    <td>
+                        <span th:if="${#lists.isEmpty(video.tags)}" class="muted">—</span>
+                        <span th:if="${!#lists.isEmpty(video.tags)}" class="tags">
+                            <span th:each="tag : ${video.tags}" class="tag" th:text="${tag}">travel</span>
+                        </span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </section>
+    </div>
+</div>
+</body>
+</html>

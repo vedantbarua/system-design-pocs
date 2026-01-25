@@ -233,3 +233,14 @@ Auction listings with bids, reserve pricing, and close actions.
 4. Open `http://localhost:8098`
 
 See [online-auction-poc/README.md](online-auction-poc/README.md) for endpoints and usage.
+
+### YouTube Top-K POC
+Rank videos by engagement score and return top-K results with tag filtering.
+
+#### How to Run
+1. Ensure you have Java 17+ and Maven installed.
+2. Navigate to the project directory: `cd youTube-top-K-poc`
+3. Run: `mvn org.springframework.boot:spring-boot-maven-plugin:run`
+4. Open `http://localhost:8099`
+
+See [youTube-top-K-poc/README.md](youTube-top-K-poc/README.md) for endpoints and usage.
