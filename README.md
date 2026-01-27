@@ -244,3 +244,14 @@ Rank videos by engagement score and return top-K results with tag filtering.
 4. Open `http://localhost:8099`
 
 See [youTube-top-K-poc/README.md](youTube-top-K-poc/README.md) for endpoints and usage.
+
+### Netflix POC
+Streaming catalog with recommendations, watchlists, and playback tracking.
+
+#### How to Run
+1. Ensure you have Java 17+ and Maven installed.
+2. Navigate to the project directory: `cd netflix-poc`
+3. Run: `mvn org.springframework.boot:spring-boot-maven-plugin:run`
+4. Open `http://localhost:8100`
+
+See [netflix-poc/README.md](netflix-poc/README.md) for details.
