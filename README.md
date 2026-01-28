@@ -266,3 +266,14 @@ Problem tracker with attempts, outcomes, and difficulty filters.
 4. Open `http://localhost:8101`
 
 See [leetcode-poc/README.md](leetcode-poc/README.md) for details.
+
+### Ticketmaster POC
+Ticketing platform with event listings, tiers, holds, and checkout flow.
+
+#### How to Run
+1. Ensure you have Java 17+ and Maven installed.
+2. Navigate to the project directory: `cd ticketmaster-poc`
+3. Run: `mvn org.springframework.boot:spring-boot-maven-plugin:run`
+4. Open `http://localhost:8102`
+
+See [ticketmaster-poc/README.md](ticketmaster-poc/README.md) for details.
