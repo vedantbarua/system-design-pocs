@@ -277,3 +277,14 @@ Ticketing platform with event listings, tiers, holds, and checkout flow.
 4. Open `http://localhost:8102`
 
 See [ticketmaster-poc/README.md](ticketmaster-poc/README.md) for details.
+
+### Uber POC
+Ride-hailing dispatch with riders, drivers, trip requests, and matching.
+
+#### How to Run
+1. Ensure you have Java 17+ and Maven installed.
+2. Navigate to the project directory: `cd uber-poc`
+3. Run: `mvn org.springframework.boot:spring-boot-maven-plugin:run`
+4. Open `http://localhost:8103`
+
+See [uber-poc/README.md](uber-poc/README.md) for details.
