@@ -223,6 +223,17 @@ Payment gateway flow with authorization, capture, refunds, idempotency, and even
 
 See [payment-system-poc/README.md](payment-system-poc/README.md) for endpoints and usage.
 
+### Point of Sale POC
+POS workflow with catalog, cart, checkout, and sales history.
+
+#### How to Run
+1. Ensure you have Java 17+ and Maven installed.
+2. Navigate to the project directory: `cd point-of-sale-poc`
+3. Run: `mvn org.springframework.boot:spring-boot-maven-plugin:run`
+4. Open `http://localhost:8104`
+
+See [point-of-sale-poc/README.md](point-of-sale-poc/README.md) for endpoints and usage.
+
 ### Online Auction POC
 Auction listings with bids, reserve pricing, and close actions.
 
