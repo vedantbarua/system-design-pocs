@@ -299,3 +299,15 @@ Ride-hailing dispatch with riders, drivers, trip requests, and matching.
 4. Open `http://localhost:8103`
 
 See [uber-poc/README.md](uber-poc/README.md) for details.
+
+### Ad Click Aggregator POC
+Ad click ingestion + aggregation service with a React UI.
+
+#### How to Run
+1. Ensure you have Java 17+ and Maven installed.
+2. Navigate to the project directory: `cd ad-click-aggregator-poc`
+3. Run backend: `mvn spring-boot:run`
+4. In another terminal: `cd frontend && npm install && npm run dev`
+5. Open `http://localhost:5173`
+
+See [ad-click-aggregator-poc/README.md](ad-click-aggregator-poc/README.md) for details.
