@@ -311,3 +311,15 @@ Ad click ingestion + aggregation service with a React UI.
 5. Open `http://localhost:5173`
 
 See [ad-click-aggregator-poc/README.md](ad-click-aggregator-poc/README.md) for details.
+
+### Stock Exchange / Matching Engine POC
+Low-latency matching engine with sequenced ring buffer, REST ingestion, and WebSocket market data.
+
+#### How to Run
+1. Ensure Java 17+ and Maven are installed.
+2. Navigate to the project directory: `cd stock-exchange-poc/backend`
+3. Run: `mvn spring-boot:run`
+4. In another terminal: `cd ../frontend && npm install && npm start`
+5. Open `http://localhost:3000`
+
+See [stock-exchange-poc/README.md](stock-exchange-poc/README.md) for details.

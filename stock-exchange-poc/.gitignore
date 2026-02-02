@@ -1,0 +1,33 @@
+# Java / Maven
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.log
+hs_err_pid*
+replay_pid*
+
+# Node / CRA
+node_modules/
+build/
+dist/
+.cache/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS / Editor
+.DS_Store
+.idea/
+.vscode/
+*.iml
+
+target/
+node_modules
+
+# Env / Secrets
+.env
+.env.local
+.env.*.local
