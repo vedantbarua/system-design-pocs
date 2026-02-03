@@ -30,9 +30,7 @@ replay_pid*
 
 *.orginal
 
-
-
 target/
-
+node_modules/
 
 *.DS_Store

@@ -1,0 +1,137 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Collaborative Whiteboard POC API",
+    "version": "0.1.0",
+    "description": "In-memory collaborative whiteboard backend."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8110"
+    }
+  ],
+  "paths": {
+    "/api/health": {
+      "get": {
+        "summary": "Health check",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": { "type": "boolean" },
+                    "uptime": { "type": "number" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/boards/{id}": {
+      "get": {
+        "summary": "Fetch board state",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Board state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Board"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/boards/{id}/clear": {
+      "post": {
+        "summary": "Clear a board",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cleared",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": { "type": "boolean" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Point": {
+        "type": "object",
+        "properties": {
+          "x": { "type": "number" },
+          "y": { "type": "number" }
+        },
+        "required": ["x", "y"]
+      },
+      "Stroke": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "points": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/Point" }
+          },
+          "color": { "type": "string" },
+          "width": { "type": "number" },
+          "author": { "type": "string" },
+          "createdAt": { "type": "number" }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "color": { "type": "string" }
+        }
+      },
+      "Board": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "strokes": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/Stroke" }
+          },
+          "users": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/User" }
+          }
+        }
+      }
+    }
+  }
+}

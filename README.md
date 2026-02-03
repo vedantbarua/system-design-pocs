@@ -323,3 +323,14 @@ Low-latency matching engine with sequenced ring buffer, REST ingestion, and WebS
 5. Open `http://localhost:3000`
 
 See [stock-exchange-poc/README.md](stock-exchange-poc/README.md) for details.
+
+### Collaborative Whiteboard POC
+Realtime collaborative canvas with WebSocket sync and a React UI.
+
+#### How to Run
+1. Navigate to the project directory: `cd collaborative-whiteboard-poc/backend`
+2. Run: `npm install && npm run dev`
+3. In another terminal: `cd ../frontend && npm install && npm run dev`
+4. Open `http://localhost:5174`
+
+See [collaborative-whiteboard-poc/README.md](collaborative-whiteboard-poc/README.md) for details.

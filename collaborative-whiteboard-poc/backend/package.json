@@ -1,0 +1,17 @@
+{
+  "name": "collaborative-whiteboard-backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Collaborative whiteboard backend (Express + WebSocket, in-memory)",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "swagger-ui-express": "^5.0.0",
+    "ws": "^8.17.0"
+  }
+}
