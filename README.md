@@ -334,3 +334,14 @@ Realtime collaborative canvas with WebSocket sync and a React UI.
 4. Open `http://localhost:5174`
 
 See [collaborative-whiteboard-poc/README.md](collaborative-whiteboard-poc/README.md) for details.
+
+### Notification System POC
+Multi-channel notification engine with priority queues, per-provider rate limits, and template rendering.
+
+#### How to Run
+1. Navigate to the project directory: `cd notification-system-poc/backend`
+2. Run: `npm install && npm run dev`
+3. In another terminal: `cd ../frontend && npm install && npm run dev`
+4. Open `http://localhost:5178`
+
+See [notification-system-poc/README.md](notification-system-poc/README.md) for details.
