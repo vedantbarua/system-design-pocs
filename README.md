@@ -345,3 +345,14 @@ Multi-channel notification engine with priority queues, per-provider rate limits
 4. Open `http://localhost:5178`
 
 See [notification-system-poc/README.md](notification-system-poc/README.md) for details.
+
+### Distributed Job Scheduler POC
+Cron-as-a-Service with leader election, timing wheel scheduling, and sharded job store.
+
+#### How to Run
+1. Navigate to the project directory: `cd distributed-job-scheduler-poc/backend`
+2. Run: `npm install && npm run dev`
+3. In another terminal: `cd ../frontend && npm install && npm run dev`
+4. Open `http://localhost:5179`
+
+See [distributed-job-scheduler-poc/README.md](distributed-job-scheduler-poc/README.md) for details.
