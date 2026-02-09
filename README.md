@@ -356,3 +356,28 @@ Cron-as-a-Service with leader election, timing wheel scheduling, and sharded job
 4. Open `http://localhost:5179`
 
 See [distributed-job-scheduler-poc/README.md](distributed-job-scheduler-poc/README.md) for details.
+
+### Distributed Log Monitoring and Alerting System POC
+Trading log pipeline with transformation, filtering, and alert observers.
+
+#### How to Run
+1. Navigate to the project directory: `cd distributed-log-monitoring-and-alerting-system-poc/server`
+2. Run server: `mvn spring-boot:run`
+3. In another terminal: `cd ../client && npm install && npm run dev`
+4. Open `http://localhost:5173`
+
+See [distributed-log-monitoring-and-alerting-system-poc/README.md](distributed-log-monitoring-and-alerting-system-poc/README.md) for details.
+
+### Real-Time Kanban-Style Dashboard POC
+Live task board where Spring Boot broadcasts updates to all connected React clients.
+
+#### How to Run
+1. Navigate to the project directory: `cd real-time-kanban-poc/backend`
+2. Run backend: `mvn org.springframework.boot:spring-boot-maven-plugin:run`
+3. In another terminal: `cd ../frontend && npm install && npm start`
+4. Open `http://localhost:3000`
+
+See [real-time-kanban-poc/README.md](real-time-kanban-poc/README.md) for details.
+
+### Trading Log POC
+Placeholder folder (no implementation yet).
