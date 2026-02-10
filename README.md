@@ -379,5 +379,17 @@ Live task board where Spring Boot broadcasts updates to all connected React clie
 
 See [real-time-kanban-poc/README.md](real-time-kanban-poc/README.md) for details.
 
+### Sprint Retrospective POC
+Retro board for capturing notes, voting on signals, and tracking action items.
+
+#### How to Run
+1. Ensure Java 17+ and Maven are installed.
+2. Navigate to the project directory: `cd sprint-retrospective-poc/backend`
+3. Run backend: `mvn spring-boot:run`
+4. In another terminal: `cd ../frontend && npm install && npm start`
+5. Open `http://localhost:3000`
+
+See [sprint-retrospective-poc/README.md](sprint-retrospective-poc/README.md) for details.
+
 ### Trading Log POC
 Placeholder folder (no implementation yet).

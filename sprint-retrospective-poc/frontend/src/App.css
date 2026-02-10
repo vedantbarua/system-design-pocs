@@ -1,0 +1,254 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap");
+
+:root {
+  color-scheme: light;
+  font-family: "Space Grotesk", system-ui, sans-serif;
+  --ink: #0f172a;
+  --muted: #5b6475;
+  --surface: #ffffff;
+  --primary: #0f766e;
+  --accent: #f97316;
+  --soft: #e2e8f0;
+  --shadow: 0 24px 60px rgba(15, 23, 42, 0.15);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(circle at top, #fef3c7, transparent 55%),
+    radial-gradient(circle at 20% 20%, rgba(14, 116, 144, 0.16), transparent 45%),
+    linear-gradient(120deg, #f8fafc 0%, #f1f5f9 70%, #fffbeb 100%);
+  color: var(--ink);
+}
+
+.app {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 36px 24px 80px;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.eyebrow {
+  font-family: "IBM Plex Mono", monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 12px;
+  color: var(--accent);
+  margin: 0 0 8px;
+}
+
+.hero h1 {
+  font-size: clamp(28px, 4vw, 42px);
+  margin: 0 0 8px;
+}
+
+.subhead {
+  margin: 0;
+  color: var(--muted);
+  font-size: 16px;
+}
+
+.hero-card {
+  background: var(--surface);
+  border-radius: 20px;
+  padding: 18px 20px;
+  box-shadow: var(--shadow);
+  display: grid;
+  gap: 12px;
+}
+
+.hero-card strong {
+  display: block;
+  font-size: 18px;
+}
+
+.label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.panel {
+  background: var(--surface);
+  border-radius: 18px;
+  padding: 20px;
+  box-shadow: var(--shadow);
+  margin-bottom: 24px;
+}
+
+.panel h2,
+.panel h3 {
+  margin-top: 0;
+}
+
+.split {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.select-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+select,
+input {
+  border-radius: 10px;
+  border: 1px solid var(--soft);
+  padding: 10px 12px;
+  font-size: 14px;
+  width: 100%;
+}
+
+button {
+  border: none;
+  background: var(--primary);
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button.disabled,
+button:disabled {
+  background: #cbd5f5;
+  cursor: not-allowed;
+}
+
+button.done {
+  background: #16a34a;
+}
+
+.inline-form {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.grid-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+.board-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+.items {
+  display: grid;
+  gap: 12px;
+}
+
+.item {
+  border: 1px solid var(--soft);
+  border-radius: 14px;
+  padding: 12px;
+  display: grid;
+  gap: 10px;
+}
+
+.item p {
+  margin: 0 0 6px;
+  font-weight: 500;
+}
+
+.meta {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.item-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.item-actions .votes {
+  background: #f1f5f9;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+.action-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+}
+
+.summary strong {
+  font-size: 20px;
+}
+
+.top-items {
+  margin-top: 16px;
+  display: grid;
+  gap: 12px;
+}
+
+.top-item {
+  padding: 12px;
+  border-radius: 14px;
+  background: #f8fafc;
+  border: 1px solid var(--soft);
+}
+
+.pill {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--primary);
+}
+
+.empty {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.toast {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  background: #111827;
+  color: #fff;
+  padding: 12px 16px;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+}
+
+@media (max-width: 720px) {
+  .select-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .inline-form {
+    grid-template-columns: 1fr;
+  }
+}
