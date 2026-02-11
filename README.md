@@ -391,5 +391,17 @@ Retro board for capturing notes, voting on signals, and tracking action items.
 
 See [sprint-retrospective-poc/README.md](sprint-retrospective-poc/README.md) for details.
 
+### Confluence POC
+Confluence-style knowledge hub with spaces, pages, comments, and search.
+
+#### How to Run
+1. Ensure Java 17+ and Maven are installed.
+2. Navigate to the project directory: `cd confluence-poc/backend`
+3. Run backend: `mvn spring-boot:run`
+4. In another terminal: `cd ../frontend && npm install && npm run dev`
+5. Open `http://localhost:5175`
+
+See [confluence-poc/README.md](confluence-poc/README.md) for details.
+
 ### Trading Log POC
 Placeholder folder (no implementation yet).
