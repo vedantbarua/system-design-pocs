@@ -179,6 +179,18 @@ Activity feed with workout summaries and pace tracking.
 
 See [strava-poc/README.md](strava-poc/README.md) for endpoints and usage.
 
+### Workout Tracker POC
+Workout and meal logging with calorie balance and a React UI.
+
+#### How to Run
+1. Ensure Java 17+ and Maven are installed.
+2. Navigate to the project directory: `cd workout-tracker-poc`
+3. Run backend: `mvn spring-boot:run`
+4. In another terminal: `cd frontend && npm install && npm run dev`
+5. Open `http://localhost:5173`
+
+See [workout-tracker-poc/README.md](workout-tracker-poc/README.md) for details.
+
 ### Local Delivery Service POC
 Dispatch simulator with orders, drivers, and status updates.
 
