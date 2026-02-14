@@ -369,6 +369,18 @@ Cron-as-a-Service with leader election, timing wheel scheduling, and sharded job
 
 See [distributed-job-scheduler-poc/README.md](distributed-job-scheduler-poc/README.md) for details.
 
+### Fault-Tolerant Leader Election POC
+Simplified Raft-style leader election with heartbeat pulses and failover in real time.
+
+#### How to Run
+1. Ensure Java 17+ and Maven are installed.
+2. Navigate to the project directory: `cd fault-tolerant-leader-election-poc/backend`
+3. Run backend: `mvn spring-boot:run`
+4. In another terminal: `cd ../frontend && npm install && npm start`
+5. Open `http://localhost:3000`
+
+See [fault-tolerant-leader-election-poc/README.md](fault-tolerant-leader-election-poc/README.md) for details.
+
 ### Distributed Log Monitoring and Alerting System POC
 Trading log pipeline with transformation, filtering, and alert observers.
 
