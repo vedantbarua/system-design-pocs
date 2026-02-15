@@ -191,6 +191,18 @@ Workout and meal logging with calorie balance and a React UI.
 
 See [workout-tracker-poc/README.md](workout-tracker-poc/README.md) for details.
 
+### Online Shopping POC
+Amazon-style shopping flow with catalog browsing, cart management, and checkout.
+
+#### How to Run
+1. Ensure Java 17+ and Maven are installed.
+2. Navigate to the project directory: `cd online-shopping-poc`
+3. Run backend: `mvn spring-boot:run`
+4. In another terminal: `cd frontend && npm install && npm run dev`
+5. Open `http://localhost:5173`
+
+See [online-shopping-poc/README.md](online-shopping-poc/README.md) for details.
+
 ### Local Delivery Service POC
 Dispatch simulator with orders, drivers, and status updates.
 
