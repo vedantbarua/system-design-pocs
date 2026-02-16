@@ -451,5 +451,17 @@ Confluence-style knowledge hub with spaces, pages, comments, and search.
 
 See [confluence-poc/README.md](confluence-poc/README.md) for details.
 
+### Flight Tracking POC
+Flight operations console with live tracking, ETAs, and status updates.
+
+#### How to Run
+1. Ensure Java 17+ and Maven are installed.
+2. Navigate to the project directory: `cd flight-tracking-poc`
+3. Run backend: `mvn spring-boot:run`
+4. In another terminal: `cd frontend && npm install && npm run dev`
+5. Open `http://localhost:5173`
+
+See [flight-tracking-poc/README.md](flight-tracking-poc/README.md) for details.
+
 ### Trading Log POC
 Placeholder folder (no implementation yet).
