@@ -203,6 +203,18 @@ Amazon-style shopping flow with catalog browsing, cart management, and checkout.
 
 See [online-shopping-poc/README.md](online-shopping-poc/README.md) for details.
 
+### Backmarket POC
+Refurbished marketplace with condition grades, warranty coverage, and trade-in quotes.
+
+#### How to Run
+1. Ensure Java 17+ and Maven are installed.
+2. Navigate to the project directory: `cd backmarket-poc`
+3. Run backend: `mvn spring-boot:run`
+4. In another terminal: `cd frontend && npm install && npm run dev`
+5. Open `http://localhost:5173`
+
+See [backmarket-poc/README.md](backmarket-poc/README.md) for details.
+
 ### Local Delivery Service POC
 Dispatch simulator with orders, drivers, and status updates.
 
