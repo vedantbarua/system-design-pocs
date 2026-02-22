@@ -37,6 +37,28 @@ export default function App() {
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [loadingFlights, setLoadingFlights] = useState(false);
+  const [traceId, setTraceId] = useState("");
+
+  const createTraceId = () => {
+    if (window.crypto?.randomUUID) {
+      return window.crypto.randomUUID().replace(/-/g, "");
+    }
+    return Array.from({ length: 32 }, () => Math.floor(Math.random() * 16).toString(16)).join("");
+  };
+
+  const fetchWithTrace = async (url, options = {}) => {
+    const nextTraceId = createTraceId();
+    const response = await fetch(url, {
+      ...options,
+      headers: {
+        ...(options.headers || {}),
+        "X-Trace-ID": nextTraceId
+      }
+    });
+    const responseTraceId = response.headers.get("x-trace-id") || nextTraceId;
+    setTraceId(responseTraceId);
+    return response;
+  };
 
   const airportMap = useMemo(() => {
     const map = new Map();
@@ -51,7 +73,7 @@ export default function App() {
 
   useEffect(() => {
     const loadAirports = async () => {
-      const response = await fetch(`${API_BASE}/airports`);
+      const response = await fetchWithTrace(`${API_BASE}/airports`);
       const data = await response.json();
       setAirports(data);
     };
@@ -65,7 +87,7 @@ export default function App() {
       const params = new URLSearchParams();
       if (query.trim()) params.set("query", query.trim());
       if (statusFilter !== "ALL") params.set("status", statusFilter);
-      const response = await fetch(`${API_BASE}/flights?${params.toString()}`, {
+      const response = await fetchWithTrace(`${API_BASE}/flights?${params.toString()}`, {
         signal: controller.signal
       });
       const data = await response.json();
@@ -86,7 +108,7 @@ export default function App() {
     if (!selectedId) return;
     let active = true;
     const loadTrack = async () => {
-      const response = await fetch(`${API_BASE}/flights/${selectedId}/track`);
+      const response = await fetchWithTrace(`${API_BASE}/flights/${selectedId}/track`);
       const data = await response.json();
       if (active) {
         setTrack(data);
@@ -133,6 +155,10 @@ export default function App() {
           <div>
             <span className="metric-label">Next update</span>
             <h2>5s</h2>
+          </div>
+          <div>
+            <span className="metric-label">Trace ID</span>
+            <p className="trace-id">{traceId || "--"}</p>
           </div>
         </div>
       </header>
