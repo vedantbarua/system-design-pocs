@@ -1,0 +1,31 @@
+services:
+  redis:
+    image: redis:7.2-alpine
+    ports:
+      - "6379:6379"
+
+  dlm-app-1:
+    build: ./backend
+    environment:
+      PORT: "8081"
+      DLM_REDIS_HOST: "redis"
+      DLM_REDIS_PORT: "6379"
+      DLM_LOCK_TTL_MS: "1500"
+      DLM_INSTANCE_ID: "app-1"
+    depends_on:
+      - redis
+    ports:
+      - "8081:8081"
+
+  dlm-app-2:
+    build: ./backend
+    environment:
+      PORT: "8082"
+      DLM_REDIS_HOST: "redis"
+      DLM_REDIS_PORT: "6379"
+      DLM_LOCK_TTL_MS: "1500"
+      DLM_INSTANCE_ID: "app-2"
+    depends_on:
+      - redis
+    ports:
+      - "8082:8082"
