@@ -1,0 +1,262 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap");
+
+:root {
+  color-scheme: light;
+  --bg: #f5f1ea;
+  --bg-2: #fefcf8;
+  --ink: #151515;
+  --ink-subtle: #4e4e55;
+  --accent: #e2734a;
+  --accent-2: #3b6ea5;
+  --card: #fff9f0;
+  --stroke: #d8cdc3;
+  --danger: #cf3a2b;
+  --warn: #f2b84b;
+  --ok: #2f8f4e;
+  font-family: "Space Grotesk", system-ui, sans-serif;
+  background: radial-gradient(circle at top, #fff7eb 0%, #f1e6da 55%, #efe1d4 100%);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+}
+
+.app {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 48px 24px 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.hero {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  font-size: 12px;
+  color: var(--accent-2);
+  font-weight: 600;
+}
+
+h1 {
+  font-size: clamp(2.4rem, 4vw, 3.6rem);
+  margin: 8px 0;
+}
+
+.subtitle {
+  max-width: 560px;
+  color: var(--ink-subtle);
+  margin: 0;
+}
+
+.hero-card {
+  background: linear-gradient(135deg, rgba(226, 115, 74, 0.18), rgba(59, 110, 165, 0.2));
+  padding: 20px 24px;
+  border-radius: 18px;
+  border: 1px solid rgba(59, 110, 165, 0.2);
+  min-width: 200px;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.value {
+  font-size: 24px;
+  margin: 6px 0;
+}
+
+.meta {
+  font-size: 13px;
+  color: var(--ink-subtle);
+  margin: 4px 0;
+}
+
+.grid {
+  display: grid;
+  gap: 24px;
+}
+
+.grid.two {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.grid.three {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.card {
+  background: var(--card);
+  border-radius: 18px;
+  padding: 20px;
+  border: 1px solid var(--stroke);
+  box-shadow: 0 12px 30px rgba(20, 20, 20, 0.08);
+}
+
+.card h2 {
+  margin-top: 0;
+}
+
+.row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.row.between {
+  justify-content: space-between;
+}
+
+.route-list,
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.route {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--bg-2);
+  border: 1px solid rgba(21, 21, 21, 0.05);
+}
+
+.pill {
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(59, 110, 165, 0.18);
+  color: var(--accent-2);
+  font-weight: 600;
+}
+
+button {
+  border: none;
+  border-radius: 999px;
+  padding: 10px 18px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: "Space Grotesk", sans-serif;
+}
+
+button.primary {
+  background: var(--accent);
+  color: white;
+}
+
+button.ghost {
+  background: transparent;
+  border: 1px solid var(--stroke);
+}
+
+input,
+select,
+textarea {
+  border-radius: 10px;
+  border: 1px solid var(--stroke);
+  padding: 10px 12px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 13px;
+  background: white;
+  width: 100%;
+}
+
+input[type="range"] {
+  padding: 0;
+  width: 100%;
+}
+
+.status {
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.status.ok {
+  background: rgba(47, 143, 78, 0.2);
+  color: var(--ok);
+}
+
+.status.warn {
+  background: rgba(242, 184, 75, 0.25);
+  color: #8a5d00;
+}
+
+.status.danger {
+  background: rgba(207, 58, 43, 0.2);
+  color: var(--danger);
+}
+
+.breaker {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.code {
+  background: #151515;
+  color: #f7f2ea;
+  padding: 16px;
+  border-radius: 12px;
+  font-size: 12px;
+  overflow-x: auto;
+  min-height: 140px;
+}
+
+.error {
+  background: rgba(207, 58, 43, 0.15);
+  border: 1px solid rgba(207, 58, 43, 0.3);
+  padding: 12px 16px;
+  border-radius: 12px;
+  color: var(--danger);
+}
+
+.chaos {
+  border-top: 1px dashed var(--stroke);
+  padding-top: 16px;
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.switch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+@media (max-width: 720px) {
+  .hero {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
