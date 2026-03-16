@@ -259,6 +259,18 @@ Payment gateway flow with authorization, capture, refunds, idempotency, and even
 
 See [payment-system-poc/README.md](payment-system-poc/README.md) for endpoints and usage.
 
+### Saga Pattern Orchestrator POC
+RabbitMQ-backed checkout saga with inventory reservation, payment, shipping, and compensating transactions.
+
+#### How to Run
+1. Ensure Java 17+, Maven, and Docker are installed.
+2. Navigate to the project directory: `cd saga-pattern-orchestrator-poc`
+3. Start RabbitMQ: `docker compose up -d`
+4. Run: `mvn spring-boot:run`
+5. Open `http://localhost:8106`
+
+See [saga-pattern-orchestrator-poc/README.md](saga-pattern-orchestrator-poc/README.md) for details.
+
 ### Point of Sale POC
 POS workflow with catalog, cart, checkout, and sales history.
 
