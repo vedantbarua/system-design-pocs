@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saga Pattern Orchestrator POC</title>
+    <style>
+        :root {
+            --bg: #f4efe6;
+            --panel: rgba(255, 252, 247, 0.92);
+            --ink: #182026;
+            --muted: #58636f;
+            --line: rgba(24, 32, 38, 0.12);
+            --accent: #d95d39;
+            --accent-soft: rgba(217, 93, 57, 0.12);
+            --success: #2c7a4b;
+            --warn: #c38b15;
+            --danger: #b42318;
+            --shadow: 0 24px 60px rgba(24, 32, 38, 0.12);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at top left, rgba(217, 93, 57, 0.14), transparent 28%),
+                radial-gradient(circle at top right, rgba(44, 122, 75, 0.16), transparent 30%),
+                linear-gradient(180deg, #fbf8f2 0%, var(--bg) 100%);
+            min-height: 100vh;
+        }
+
+        .shell {
+            width: min(1180px, calc(100% - 32px));
+            margin: 0 auto;
+            padding: 32px 0 48px;
+        }
+
+        .hero {
+            display: grid;
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+
+        .eyebrow {
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            font-size: 0.74rem;
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        h1 {
+            margin: 0;
+            font-family: "Space Grotesk", "IBM Plex Sans", sans-serif;
+            font-size: clamp(2rem, 5vw, 4rem);
+            line-height: 0.94;
+            max-width: 10ch;
+        }
+
+        .subtitle {
+            margin: 0;
+            max-width: 64ch;
+            color: var(--muted);
+            font-size: 1.05rem;
+            line-height: 1.6;
+        }
+
+        .flow {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .flow span {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            padding: 10px 14px;
+            border-radius: 999px;
+            box-shadow: var(--shadow);
+            font-size: 0.92rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 360px 1fr;
+            gap: 18px;
+        }
+
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 22px 22px 8px;
+        }
+
+        .panel-header h2,
+        .panel-header h3 {
+            margin: 0;
+            font-family: "Space Grotesk", "IBM Plex Sans", sans-serif;
+        }
+
+        .panel-body {
+            padding: 0 22px 22px;
+        }
+
+        form {
+            display: grid;
+            gap: 14px;
+        }
+
+        label {
+            display: grid;
+            gap: 6px;
+            font-size: 0.9rem;
+            color: var(--muted);
+        }
+
+        input,
+        select {
+            width: 100%;
+            border: 1px solid var(--line);
+            background: #fff;
+            border-radius: 14px;
+            padding: 12px 14px;
+            font: inherit;
+            color: var(--ink);
+        }
+
+        .toggle {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 12px 14px;
+            color: var(--ink);
+            background: #fff;
+        }
+
+        button {
+            border: 0;
+            border-radius: 14px;
+            padding: 14px 18px;
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+            background: var(--accent);
+            color: white;
+        }
+
+        .note {
+            background: var(--accent-soft);
+            border-radius: 18px;
+            padding: 14px 16px;
+            color: var(--ink);
+            font-size: 0.92rem;
+            line-height: 1.5;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+
+        .metric {
+            padding: 18px;
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .metric strong {
+            display: block;
+            font-family: "Space Grotesk", "IBM Plex Sans", sans-serif;
+            font-size: 1.8rem;
+            margin-top: 8px;
+        }
+
+        .tables {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 18px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.92rem;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 12px 10px;
+            border-bottom: 1px solid var(--line);
+            vertical-align: top;
+        }
+
+        th {
+            color: var(--muted);
+            font-weight: 600;
+        }
+
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border-radius: 999px;
+            padding: 6px 10px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            background: rgba(24, 32, 38, 0.07);
+        }
+
+        .status.completed { color: var(--success); background: rgba(44, 122, 75, 0.12); }
+        .status.compensated { color: var(--warn); background: rgba(195, 139, 21, 0.16); }
+        .status.failed { color: var(--danger); background: rgba(180, 35, 24, 0.12); }
+        .status.active { color: var(--accent); background: rgba(217, 93, 57, 0.14); }
+
+        .timeline {
+            display: grid;
+            gap: 10px;
+        }
+
+        .event {
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 14px;
+            background: rgba(255, 255, 255, 0.84);
+        }
+
+        .event small {
+            display: block;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+
+        .message {
+            margin-bottom: 18px;
+            padding: 14px 16px;
+            border-radius: 16px;
+            background: rgba(44, 122, 75, 0.12);
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        @media (max-width: 980px) {
+            .grid,
+            .tables,
+            .cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="shell">
+    <section class="hero">
+        <div class="eyebrow">Distributed Transactions</div>
+        <h1>Saga Orchestrator</h1>
+        <p class="subtitle">
+            Reserve stock, charge the card, and ship the package through RabbitMQ. If payment fails,
+            the orchestrator emits a compensating command that un-reserves inventory and closes the saga as compensated.
+        </p>
+        <div class="flow">
+            <span>Reserve Stock</span>
+            <span>Charge Card</span>
+            <span>Ship Package</span>
+            <span>Compensate on Failure</span>
+        </div>
+    </section>
+
+    <div th:if="${message}" class="message" th:text="${message}"></div>
+
+    <section class="grid">
+        <div class="panel">
+            <div class="panel-header">
+                <h2>Run Checkout</h2>
+            </div>
+            <div class="panel-body">
+                <form method="post" action="/checkouts">
+                    <label>
+                        Customer ID
+                        <input type="text" name="customerId" value="cust-101" required>
+                    </label>
+                    <label>
+                        SKU
+                        <select name="sku">
+                            <option th:each="item : ${inventory}" th:value="${item.key}" th:text="${item.key + ' (' + item.value + ' left)'}"></option>
+                        </select>
+                    </label>
+                    <label>
+                        Quantity
+                        <input type="number" min="1" name="quantity" value="1" required>
+                    </label>
+                    <label>
+                        Amount
+                        <input type="number" min="1" step="0.01" name="amount" value="149.99" required>
+                    </label>
+                    <label class="toggle">
+                        <input type="checkbox" name="simulatePaymentFailure" value="true">
+                        Simulate card failure and trigger compensation
+                    </label>
+                    <button type="submit">Start Saga</button>
+                </form>
+                <div class="note">
+                    RabbitMQ must be reachable on <code>localhost:5672</code>. Use the included
+                    <code>docker-compose.yml</code> if you do not already have a broker running.
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <div class="cards">
+                <div class="metric">
+                    <div>Total Sagas</div>
+                    <strong th:text="${metrics.totalSagas}">0</strong>
+                </div>
+                <div class="metric">
+                    <div>Completed</div>
+                    <strong th:text="${metrics.completedSagas}">0</strong>
+                </div>
+                <div class="metric">
+                    <div>Compensated</div>
+                    <strong th:text="${metrics.compensatedSagas}">0</strong>
+                </div>
+            </div>
+
+            <div class="tables">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3>Inventory + Sagas</h3>
+                    </div>
+                    <div class="panel-body">
+                        <table>
+                            <thead>
+                            <tr>
+                                <th>Saga</th>
+                                <th>Status</th>
+                                <th>Flow</th>
+                                <th>Failure</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="saga : ${sagas}">
+                                <td>
+                                    <strong th:text="${saga.orderId}">order-1</strong><br>
+                                    <small th:text="${saga.sagaId + ' • ' + saga.sku + ' x' + saga.quantity}">saga</small>
+                                </td>
+                                <td>
+                                    <span th:classappend="${saga.statusClass}" class="status" th:text="${saga.status}">STARTED</span>
+                                </td>
+                                <td th:text="${saga.stockStep + ' / ' + saga.paymentStep + ' / ' + saga.shippingStep + ' / ' + saga.compensationStep}">flow</td>
+                                <td th:text="${saga.failureReason == null ? '—' : saga.failureReason}">—</td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(sagas)}">
+                                <td colspan="4">No sagas started yet.</td>
+                            </tr>
+                            </tbody>
+                        </table>
+
+                        <table style="margin-top: 18px;">
+                            <thead>
+                            <tr>
+                                <th>SKU</th>
+                                <th>Available</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="item : ${inventory}">
+                                <td th:text="${item.key}">SKU</td>
+                                <td th:text="${item.value}">0</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3>Event Timeline</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="timeline">
+                            <div th:each="event : ${events}" class="event">
+                                <small th:text="${event.occurredAt + ' • ' + event.routingKey}">time</small>
+                                <strong th:text="${event.type}">EVENT</strong>
+                                <div th:text="${event.summary}">summary</div>
+                            </div>
+                            <div th:if="${#lists.isEmpty(events)}" class="event">
+                                No events published yet.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+</body>
+</html>
