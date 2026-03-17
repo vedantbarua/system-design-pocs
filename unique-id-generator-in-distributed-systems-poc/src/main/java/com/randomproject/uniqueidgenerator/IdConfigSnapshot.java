@@ -5,11 +5,13 @@ import java.time.Instant;
 public record IdConfigSnapshot(
         long epochMillis,
         Instant epochInstant,
+        int timestampBits,
         int nodeBits,
         int sequenceBits,
         int maxNodeId,
         int maxSequence,
         int defaultNodeId,
-        int maxBatch
+        int maxBatch,
+        long maxBackwardDriftMillis
 ) {
 }

@@ -6,8 +6,10 @@ public record IdGeneration(
         long id,
         int nodeId,
         int sequence,
+        long relativeTimestamp,
         long timestamp,
         Instant timestampInstant,
-        long epochMillis
+        long epochMillis,
+        IdBitLayout bitLayout
 ) {
 }

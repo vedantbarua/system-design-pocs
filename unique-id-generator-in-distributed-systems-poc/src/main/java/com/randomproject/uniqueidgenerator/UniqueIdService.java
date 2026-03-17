@@ -5,9 +5,11 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.LongSupplier;
 
 @Service
 public class UniqueIdService {
@@ -21,13 +23,28 @@ public class UniqueIdService {
     private final int defaultNodeId;
     private final int nodeShift;
     private final int timestampShift;
+    private final int timestampBits;
+    private final long maxBackwardDriftMillis;
+    private final LongSupplier timeSource;
 
     public UniqueIdService(
             @Value("${id.epoch-millis:1704067200000}") long epochMillis,
             @Value("${id.node-bits:10}") int nodeBits,
             @Value("${id.sequence-bits:12}") int sequenceBits,
             @Value("${id.max-batch:20}") int maxBatch,
-            @Value("${id.default-node-id:0}") int defaultNodeId) {
+            @Value("${id.default-node-id:0}") int defaultNodeId,
+            @Value("${id.max-backward-drift-millis:5}") long maxBackwardDriftMillis) {
+        this(epochMillis, nodeBits, sequenceBits, maxBatch, defaultNodeId, maxBackwardDriftMillis, System::currentTimeMillis);
+    }
+
+    UniqueIdService(
+            long epochMillis,
+            int nodeBits,
+            int sequenceBits,
+            int maxBatch,
+            int defaultNodeId,
+            long maxBackwardDriftMillis,
+            LongSupplier timeSource) {
         if (nodeBits <= 0 || sequenceBits <= 0) {
             throw new IllegalArgumentException("Node bits and sequence bits must be positive.");
         }
@@ -43,11 +60,17 @@ public class UniqueIdService {
         this.defaultNodeId = defaultNodeId;
         this.nodeShift = sequenceBits;
         this.timestampShift = nodeBits + sequenceBits;
+        this.timestampBits = 63 - nodeBits - sequenceBits;
+        this.maxBackwardDriftMillis = maxBackwardDriftMillis;
+        this.timeSource = timeSource;
         if (defaultNodeId < 0 || defaultNodeId > maxNodeId) {
             throw new IllegalArgumentException("Default node id must be between 0 and " + maxNodeId + ".");
         }
         if (maxBatch <= 0) {
             throw new IllegalArgumentException("Max batch must be at least 1.");
+        }
+        if (maxBackwardDriftMillis < 0) {
+            throw new IllegalArgumentException("Max backward drift must be non-negative.");
         }
     }
 
@@ -55,12 +78,14 @@ public class UniqueIdService {
         return new IdConfigSnapshot(
                 epochMillis,
                 Instant.ofEpochMilli(epochMillis),
+                timestampBits,
                 nodeBits,
                 sequenceBits,
                 maxNodeId,
                 maxSequence,
                 defaultNodeId,
-                maxBatch);
+                maxBatch,
+                maxBackwardDriftMillis);
     }
 
     public synchronized List<IdGeneration> generate(Integer nodeId, Integer count) {
@@ -75,6 +100,28 @@ public class UniqueIdService {
         return results;
     }
 
+    public synchronized SimulationResult simulate(List<Integer> nodeIds, Integer idsPerNode) {
+        List<Integer> resolvedNodeIds = normalizeNodeIds(nodeIds);
+        int resolvedCount = normalizeCount(idsPerNode);
+        List<IdGeneration> results = new java.util.ArrayList<>(resolvedNodeIds.size() * resolvedCount);
+        for (int i = 0; i < resolvedCount; i++) {
+            for (int nodeId : resolvedNodeIds) {
+                NodeState state = nodes.computeIfAbsent(nodeId, NodeState::new);
+                results.add(toGeneration(nextId(state), nodeId));
+            }
+        }
+        boolean unique = results.stream().map(IdGeneration::id).distinct().count() == results.size();
+        boolean monotonic = isStrictlyIncreasing(results);
+        return new SimulationResult(
+                resolvedNodeIds,
+                resolvedCount,
+                results.size(),
+                unique,
+                monotonic,
+                Instant.now(),
+                results);
+    }
+
     public synchronized IdDecodeResult decode(long id) {
         if (id < 0) {
             throw new IllegalArgumentException("ID must be non-negative.");
@@ -83,7 +130,15 @@ public class UniqueIdService {
         long timestamp = timestampPart + epochMillis;
         int nodeId = (int) ((id >> nodeShift) & maxNodeId);
         int sequence = (int) (id & maxSequence);
-        return new IdDecodeResult(id, nodeId, sequence, timestamp, Instant.ofEpochMilli(timestamp), epochMillis);
+        return new IdDecodeResult(
+                id,
+                nodeId,
+                sequence,
+                timestampPart,
+                timestamp,
+                Instant.ofEpochMilli(timestamp),
+                epochMillis,
+                bitLayout(id));
     }
 
     public synchronized List<NodeSnapshot> nodes() {
@@ -93,26 +148,54 @@ public class UniqueIdService {
                         state.nodeId,
                         state.lastTimestamp,
                         state.lastTimestamp > 0 ? Instant.ofEpochMilli(state.lastTimestamp) : null,
+                        state.lastObservedTimestamp,
+                        state.lastObservedTimestamp > 0 ? Instant.ofEpochMilli(state.lastObservedTimestamp) : null,
                         state.sequence,
-                        state.generatedCount))
+                        state.generatedCount,
+                        state.clockRegressionEvents,
+                        state.lastDriftMillis))
                 .toList();
     }
 
     private IdGeneration toGeneration(long id, int nodeId) {
-        long timestamp = ((id >> timestampShift) + epochMillis);
+        long relativeTimestamp = id >> timestampShift;
+        long timestamp = relativeTimestamp + epochMillis;
         int sequence = (int) (id & maxSequence);
-        return new IdGeneration(id, nodeId, sequence, timestamp, Instant.ofEpochMilli(timestamp), epochMillis);
+        return new IdGeneration(
+                id,
+                nodeId,
+                sequence,
+                relativeTimestamp,
+                timestamp,
+                Instant.ofEpochMilli(timestamp),
+                epochMillis,
+                bitLayout(id));
     }
 
     private long nextId(NodeState state) {
-        long current = System.currentTimeMillis();
+        long observed = timeSource.getAsLong();
+        if (observed < epochMillis) {
+            throw new IllegalArgumentException("Clock is before the configured epoch. Refusing to generate id.");
+        }
+        state.lastObservedTimestamp = observed;
+        long current = observed;
         if (current < state.lastTimestamp) {
-            throw new IllegalArgumentException("Clock moved backwards. Refusing to generate id.");
+            long drift = state.lastTimestamp - current;
+            if (drift > maxBackwardDriftMillis) {
+                throw new IllegalArgumentException(
+                        "Clock moved backwards by " + drift + " ms. Max allowed drift is " + maxBackwardDriftMillis + " ms.");
+            }
+            state.clockRegressionEvents++;
+            state.lastDriftMillis = drift;
+            current = state.lastTimestamp;
+        } else {
+            state.lastDriftMillis = 0;
         }
         if (current == state.lastTimestamp) {
             state.sequence = (state.sequence + 1) & maxSequence;
             if (state.sequence == 0) {
                 current = waitNextMillis(state.lastTimestamp);
+                state.lastObservedTimestamp = current;
             }
         } else {
             state.sequence = 0;
@@ -124,11 +207,25 @@ public class UniqueIdService {
     }
 
     private long waitNextMillis(long lastTimestamp) {
-        long current = System.currentTimeMillis();
+        long current = timeSource.getAsLong();
         while (current <= lastTimestamp) {
-            current = System.currentTimeMillis();
+            current = timeSource.getAsLong();
         }
         return current;
+    }
+
+    private List<Integer> normalizeNodeIds(List<Integer> nodeIds) {
+        if (nodeIds == null || nodeIds.isEmpty()) {
+            throw new IllegalArgumentException("At least one node id is required.");
+        }
+        LinkedHashSet<Integer> uniqueNodeIds = new LinkedHashSet<>();
+        for (Integer nodeId : nodeIds) {
+            uniqueNodeIds.add(normalizeNodeId(nodeId));
+        }
+        if (uniqueNodeIds.size() != nodeIds.size()) {
+            throw new IllegalArgumentException("Simulation node ids must be unique.");
+        }
+        return List.copyOf(uniqueNodeIds);
     }
 
     private int normalizeNodeId(Integer nodeId) {
@@ -150,11 +247,38 @@ public class UniqueIdService {
         return resolved;
     }
 
+    private boolean isStrictlyIncreasing(List<IdGeneration> generations) {
+        long previous = Long.MIN_VALUE;
+        for (IdGeneration generation : generations) {
+            if (generation.id() <= previous) {
+                return false;
+            }
+            previous = generation.id();
+        }
+        return true;
+    }
+
+    private IdBitLayout bitLayout(long id) {
+        String fullBinary = Long.toBinaryString(id);
+        String padded = "0".repeat(63 - fullBinary.length()) + fullBinary;
+        int nodeStart = timestampBits;
+        int sequenceStart = timestampBits + nodeBits;
+        return new IdBitLayout(
+                padded,
+                padded.substring(0, nodeStart),
+                padded.substring(nodeStart, sequenceStart),
+                padded.substring(sequenceStart));
+    }
+
     private static class NodeState {
         private final int nodeId;
         private long lastTimestamp;
+        private long lastObservedTimestamp;
         private int sequence;
         private long generatedCount;
+        private long clockRegressionEvents;
+        private long lastDriftMillis;
+
         private NodeState(int nodeId) {
             this.nodeId = nodeId;
         }
