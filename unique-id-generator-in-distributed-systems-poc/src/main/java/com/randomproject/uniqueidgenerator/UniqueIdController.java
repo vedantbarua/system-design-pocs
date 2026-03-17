@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 public class UniqueIdController {
@@ -44,6 +46,23 @@ public class UniqueIdController {
             List<IdGeneration> ids = service.generate(nodeId, count);
             redirectAttributes.addFlashAttribute("generated", ids);
             redirectAttributes.addFlashAttribute("message", "Generated " + ids.size() + " ids.");
+        } catch (IllegalArgumentException ex) {
+            redirectAttributes.addFlashAttribute("message", ex.getMessage());
+        }
+        return "redirect:/";
+    }
+
+    @PostMapping("/simulate")
+    public String simulate(@RequestParam("nodeIds") String nodeIds,
+                           @RequestParam(value = "idsPerNode", required = false) Integer idsPerNode,
+                           RedirectAttributes redirectAttributes) {
+        try {
+            List<Integer> parsedNodeIds = parseNodeIds(nodeIds);
+            SimulationResult simulation = service.simulate(parsedNodeIds, idsPerNode);
+            redirectAttributes.addFlashAttribute("simulation", simulation);
+            redirectAttributes.addFlashAttribute(
+                    "message",
+                    "Simulated " + simulation.totalGenerated() + " ids across " + simulation.nodeIds().size() + " nodes.");
         } catch (IllegalArgumentException ex) {
             redirectAttributes.addFlashAttribute("message", ex.getMessage());
         }
@@ -86,6 +105,16 @@ public class UniqueIdController {
         }
     }
 
+    @PostMapping("/api/simulate")
+    @ResponseBody
+    public ResponseEntity<SimulationResult> apiSimulate(@Valid @RequestBody SimulationRequest request) {
+        try {
+            return ResponseEntity.ok(service.simulate(request.nodeIds(), request.idsPerNode()));
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
     @GetMapping("/api/nodes")
     @ResponseBody
     public List<NodeSnapshot> apiNodes() {
@@ -96,5 +125,20 @@ public class UniqueIdController {
     @ResponseBody
     public IdConfigSnapshot apiConfig() {
         return service.configSnapshot();
+    }
+
+    private List<Integer> parseNodeIds(String nodeIds) {
+        if (nodeIds == null || nodeIds.isBlank()) {
+            throw new IllegalArgumentException("Provide at least one node id.");
+        }
+        try {
+            return Arrays.stream(nodeIds.split(","))
+                    .map(String::trim)
+                    .filter(value -> !value.isEmpty())
+                    .map(Integer::valueOf)
+                    .collect(Collectors.toList());
+        } catch (NumberFormatException ex) {
+            throw new IllegalArgumentException("Node ids must be comma-separated integers.");
+        }
     }
 }
