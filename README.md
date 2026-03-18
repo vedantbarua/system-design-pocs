@@ -91,6 +91,17 @@ Snowflake-style unique ID generator with UI and JSON endpoints.
 
 See [unique-id-generator-in-distributed-systems-poc/README.md](unique-id-generator-in-distributed-systems-poc/README.md) for endpoints and usage.
 
+### Distributed Cache POC
+Redis-cluster-style cache with sharding, replication, failover, TTL, and LRU eviction.
+
+#### How to Run
+1. Ensure Java 17+ and Maven are installed.
+2. Navigate to the project directory: `cd distributed-cache-poc`
+3. Run: `mvn org.springframework.boot:spring-boot-maven-plugin:run`
+4. Open `http://localhost:8107`
+
+See [distributed-cache-poc/README.md](distributed-cache-poc/README.md) for endpoints and usage.
+
 ### Design Dropbox POC
 Dropbox-style workspace with folders, uploads, and share links.
 
