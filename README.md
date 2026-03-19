@@ -102,6 +102,17 @@ Redis-cluster-style cache with sharding, replication, failover, TTL, and LRU evi
 
 See [distributed-cache-poc/README.md](distributed-cache-poc/README.md) for endpoints and usage.
 
+### Message Queue POC
+Kafka-style queue with topics, partitions, consumer-group offsets, retries, replay, and a DLQ.
+
+#### How to Run
+1. Ensure Java 17+ and Maven are installed.
+2. Navigate to the project directory: `cd message-queue-poc`
+3. Run: `mvn org.springframework.boot:spring-boot-maven-plugin:run`
+4. Open `http://localhost:8111`
+
+See [message-queue-poc/README.md](message-queue-poc/README.md) for endpoints and usage.
+
 ### Design Dropbox POC
 Dropbox-style workspace with folders, uploads, and share links.
 

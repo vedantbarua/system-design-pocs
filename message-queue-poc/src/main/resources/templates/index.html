@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Message Queue POC</title>
+    <style>
+        :root {
+            --bg: #f3efe6;
+            --panel: rgba(255, 252, 247, 0.92);
+            --ink: #1a1712;
+            --muted: #62594d;
+            --accent: #0e6b5b;
+            --accent-2: #da6b2f;
+            --line: #d6ccbb;
+            --danger: #a03528;
+            --shadow: 0 14px 32px rgba(41, 29, 18, 0.12);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Georgia, "Times New Roman", serif;
+            color: var(--ink);
+            background:
+                    radial-gradient(circle at top left, rgba(218, 107, 47, 0.15), transparent 28%),
+                    radial-gradient(circle at top right, rgba(14, 107, 91, 0.2), transparent 32%),
+                    linear-gradient(180deg, #f7f2e8 0%, var(--bg) 100%);
+        }
+
+        .page {
+            width: min(1360px, calc(100% - 32px));
+            margin: 0 auto;
+            padding: 32px 0 48px;
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr;
+            gap: 20px;
+            align-items: start;
+            margin-bottom: 24px;
+        }
+
+        .hero-card,
+        .panel {
+            background: var(--panel);
+            border: 1px solid rgba(99, 87, 71, 0.18);
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .hero-card {
+            padding: 28px;
+        }
+
+        .eyebrow {
+            margin: 0 0 10px;
+            color: var(--accent);
+            font-size: 0.85rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        h1, h2, h3 {
+            margin: 0;
+            font-weight: 600;
+        }
+
+        h1 {
+            font-size: clamp(2rem, 3vw, 3.2rem);
+            line-height: 1.02;
+        }
+
+        .subhead {
+            margin: 14px 0 0;
+            max-width: 58ch;
+            color: var(--muted);
+            line-height: 1.55;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .stat {
+            padding: 18px;
+        }
+
+        .stat strong {
+            display: block;
+            font-size: 1.8rem;
+            margin-bottom: 6px;
+        }
+
+        .stat span {
+            color: var(--muted);
+            font-size: 0.92rem;
+        }
+
+        .message {
+            margin-bottom: 18px;
+            padding: 14px 16px;
+            border-radius: 14px;
+            background: rgba(14, 107, 91, 0.1);
+            border: 1px solid rgba(14, 107, 91, 0.18);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(12, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .panel {
+            padding: 20px;
+        }
+
+        .span-4 { grid-column: span 4; }
+        .span-5 { grid-column: span 5; }
+        .span-6 { grid-column: span 6; }
+        .span-7 { grid-column: span 7; }
+        .span-8 { grid-column: span 8; }
+        .span-12 { grid-column: span 12; }
+
+        form {
+            display: grid;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        label {
+            display: grid;
+            gap: 6px;
+            color: var(--muted);
+            font-size: 0.95rem;
+        }
+
+        input, textarea, button {
+            font: inherit;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px 13px;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: #fffdfa;
+            color: var(--ink);
+        }
+
+        textarea {
+            min-height: 110px;
+            resize: vertical;
+        }
+
+        .row-2 {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .row-4 {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        button {
+            padding: 12px 16px;
+            border: 0;
+            border-radius: 999px;
+            background: var(--ink);
+            color: #f8f2ea;
+            cursor: pointer;
+        }
+
+        button.secondary {
+            background: var(--accent-2);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 14px;
+            font-size: 0.95rem;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 10px 8px;
+            border-bottom: 1px solid rgba(99, 87, 71, 0.12);
+            vertical-align: top;
+        }
+
+        th {
+            color: var(--muted);
+            font-weight: 600;
+        }
+
+        .pill {
+            display: inline-block;
+            padding: 4px 9px;
+            border-radius: 999px;
+            background: rgba(14, 107, 91, 0.1);
+            color: var(--accent);
+            font-size: 0.84rem;
+        }
+
+        .pill.warn {
+            background: rgba(218, 107, 47, 0.12);
+            color: var(--accent-2);
+        }
+
+        .pill.danger {
+            background: rgba(160, 53, 40, 0.12);
+            color: var(--danger);
+        }
+
+        .mono {
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+            font-size: 0.9rem;
+        }
+
+        .stack {
+            display: grid;
+            gap: 14px;
+        }
+
+        .events {
+            display: grid;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .event {
+            padding: 12px 14px;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.72);
+            border: 1px solid rgba(99, 87, 71, 0.14);
+        }
+
+        .event small {
+            color: var(--muted);
+        }
+
+        .controls {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .controls form {
+            display: inline-grid;
+            gap: 6px;
+            margin: 0;
+        }
+
+        .controls button {
+            padding: 8px 12px;
+        }
+
+        @media (max-width: 980px) {
+            .hero,
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .span-4,
+            .span-5,
+            .span-6,
+            .span-7,
+            .span-8,
+            .span-12 {
+                grid-column: span 1;
+            }
+
+            .stats,
+            .row-2,
+            .row-4 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+    <section class="hero">
+        <div class="hero-card">
+            <p class="eyebrow">Message Queue POC</p>
+            <h1>Topics, partitions, offsets, retries, and replay in one process.</h1>
+            <p class="subhead">
+                This queue models ordered partitions, consumer groups with independent offsets, at-least-once delivery,
+                redelivery on failure, and a dead-letter path once max delivery attempts are exhausted.
+            </p>
+        </div>
+        <div class="stats">
+            <div class="hero-card stat">
+                <strong th:text="${snapshot.topicCount}">0</strong>
+                <span>Topics</span>
+            </div>
+            <div class="hero-card stat">
+                <strong th:text="${snapshot.groupCount}">0</strong>
+                <span>Consumer groups</span>
+            </div>
+            <div class="hero-card stat">
+                <strong th:text="${snapshot.queuedMessageCount}">0</strong>
+                <span>Stored messages</span>
+            </div>
+            <div class="hero-card stat">
+                <strong th:text="${snapshot.deadLetterCount}">0</strong>
+                <span>DLQ entries</span>
+            </div>
+        </div>
+    </section>
+
+    <div th:if="${message}" class="message" th:text="${message}"></div>
+
+    <section class="grid">
+        <article class="panel span-4">
+            <h2>Create Topic</h2>
+            <form method="post" action="/topics">
+                <label>
+                    Topic
+                    <input name="topic" placeholder="orders"/>
+                </label>
+                <label>
+                    Partitions
+                    <input name="partitions" type="number" min="1" th:attr="max=${config.maxPartitions}" th:value="${config.defaultPartitionCount}"/>
+                </label>
+                <button type="submit">Create topic</button>
+            </form>
+        </article>
+
+        <article class="panel span-8">
+            <h2>Publish Message</h2>
+            <form method="post" action="/messages/publish">
+                <div class="row-4">
+                    <label>
+                        Topic
+                        <input name="topic" placeholder="orders"/>
+                    </label>
+                    <label>
+                        Key
+                        <input name="key" placeholder="order:123"/>
+                    </label>
+                    <label>
+                        Partition
+                        <input name="partition" type="number" min="0" placeholder="optional"/>
+                    </label>
+                    <label>
+                        Strategy
+                        <input value="Explicit partition overrides key hash; blank key uses round robin." disabled/>
+                    </label>
+                </div>
+                <label>
+                    Payload
+                    <textarea name="payload" placeholder="{&quot;event&quot;:&quot;OrderPlaced&quot;,&quot;orderId&quot;:&quot;123&quot;}"></textarea>
+                </label>
+                <button type="submit" class="secondary">Publish</button>
+            </form>
+        </article>
+
+        <article class="panel span-5">
+            <h2>Poll Consumer Group</h2>
+            <form method="post" action="/consumers/poll">
+                <div class="row-2">
+                    <label>
+                        Topic
+                        <input name="topic" placeholder="orders"/>
+                    </label>
+                    <label>
+                        Group ID
+                        <input name="groupId" placeholder="billing-worker"/>
+                    </label>
+                </div>
+                <label>
+                    Max Messages
+                    <input name="maxMessages" type="number" min="1" max="16" value="3"/>
+                </label>
+                <button type="submit">Poll</button>
+            </form>
+
+            <div th:if="${pollResult}" class="stack" style="margin-top: 16px;">
+                <div>
+                    <span class="pill" th:text="${'Delivered ' + pollResult.deliveredCount}">Delivered 0</span>
+                    <span class="pill warn" th:text="${'Lag ' + pollResult.totalLag}">Lag 0</span>
+                </div>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Partition</th>
+                        <th>Offset</th>
+                        <th>Attempt</th>
+                        <th>Payload</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="messageItem : ${pollResult.messages}">
+                        <td th:text="${messageItem.partition}">0</td>
+                        <td class="mono" th:text="${messageItem.offset}">0</td>
+                        <td>
+                            <span class="pill" th:classappend="${messageItem.redelivery} ? ' warn' : ''"
+                                  th:text="${messageItem.deliveryAttempt}"></span>
+                        </td>
+                        <td class="mono" th:text="${messageItem.payload}">payload</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </article>
+
+        <article class="panel span-7">
+            <h2>Delivery Controls</h2>
+            <div class="row-2">
+                <form method="post" action="/consumers/ack">
+                    <label>
+                        Topic
+                        <input name="topic" placeholder="orders"/>
+                    </label>
+                    <label>
+                        Group ID
+                        <input name="groupId" placeholder="billing-worker"/>
+                    </label>
+                    <div class="row-2">
+                        <label>
+                            Partition
+                            <input name="partition" type="number" min="0"/>
+                        </label>
+                        <label>
+                            Offset
+                            <input name="offset" type="number" min="0"/>
+                        </label>
+                    </div>
+                    <button type="submit">Ack offset</button>
+                </form>
+
+                <form method="post" action="/consumers/retry">
+                    <label>
+                        Topic
+                        <input name="topic" placeholder="orders"/>
+                    </label>
+                    <label>
+                        Group ID
+                        <input name="groupId" placeholder="billing-worker"/>
+                    </label>
+                    <div class="row-2">
+                        <label>
+                            Partition
+                            <input name="partition" type="number" min="0"/>
+                        </label>
+                        <label>
+                            Offset
+                            <input name="offset" type="number" min="0"/>
+                        </label>
+                    </div>
+                    <label>
+                        Reason
+                        <input name="reason" placeholder="downstream-timeout"/>
+                    </label>
+                    <button type="submit" class="secondary">Retry or DLQ</button>
+                </form>
+            </div>
+
+            <form method="post" action="/consumers/reset">
+                <div class="row-4">
+                    <label>
+                        Topic
+                        <input name="topic" placeholder="orders"/>
+                    </label>
+                    <label>
+                        Group ID
+                        <input name="groupId" placeholder="billing-worker"/>
+                    </label>
+                    <label>
+                        Partition
+                        <input name="partition" type="number" min="0"/>
+                    </label>
+                    <label>
+                        Next Offset
+                        <input name="nextOffset" type="number" min="0"/>
+                    </label>
+                </div>
+                <button type="submit">Reset offset for replay</button>
+            </form>
+        </article>
+
+        <article class="panel span-7">
+            <h2>Topics and Partitions</h2>
+            <div class="stack" th:if="${#lists.isEmpty(snapshot.topics)}">
+                <p>No topics yet. Create one to start publishing.</p>
+            </div>
+            <div class="stack" th:each="topicItem : ${snapshot.topics}">
+                <div>
+                    <h3 th:text="${topicItem.topic}">orders</h3>
+                    <p class="subhead" th:text="${topicItem.totalMessages + ' total messages across ' + topicItem.partitions + ' partitions.'}"></p>
+                </div>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Partition</th>
+                        <th>End Offset</th>
+                        <th>Messages</th>
+                        <th>Recent Offsets</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="partitionItem : ${topicItem.partitionViews}">
+                        <td class="mono" th:text="${partitionItem.partition}">0</td>
+                        <td class="mono" th:text="${partitionItem.nextOffset}">0</td>
+                        <td th:text="${partitionItem.messageCount}">0</td>
+                        <td>
+                            <span th:if="${#lists.isEmpty(partitionItem.recentMessages)}" class="pill">empty</span>
+                            <div class="stack" th:each="messageItem : ${partitionItem.recentMessages}">
+                                <span class="mono" th:text="${'offset ' + messageItem.offset + ' | ' + (messageItem.key ?: 'no-key') + ' | ' + messageItem.payloadPreview}"></span>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </article>
+
+        <article class="panel span-5">
+            <h2>Consumer Groups</h2>
+            <div class="stack" th:if="${#lists.isEmpty(snapshot.consumerGroups)}">
+                <p>No consumer groups yet. Poll a topic to register one.</p>
+            </div>
+            <div class="stack" th:each="groupItem : ${snapshot.consumerGroups}">
+                <div>
+                    <h3 th:text="${groupItem.groupId + ' @ ' + groupItem.topic}">billing-worker @ orders</h3>
+                    <div class="controls">
+                        <span class="pill warn" th:text="${'Lag ' + groupItem.totalLag}">Lag 0</span>
+                        <span class="pill" th:text="${'Inflight ' + groupItem.inflightCount}">Inflight 0</span>
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Partition</th>
+                        <th>Cursor</th>
+                        <th>End</th>
+                        <th>Lag</th>
+                        <th>In flight</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="lagItem : ${groupItem.partitionLags}">
+                        <td class="mono" th:text="${lagItem.partition}">0</td>
+                        <td class="mono" th:text="${lagItem.nextOffset}">0</td>
+                        <td class="mono" th:text="${lagItem.endOffset}">0</td>
+                        <td th:text="${lagItem.lag}">0</td>
+                        <td>
+                            <span th:if="${lagItem.inflightMessage == null}" class="pill">none</span>
+                            <span th:if="${lagItem.inflightMessage != null}" class="mono"
+                                  th:text="${'offset ' + lagItem.inflightMessage.offset + ' / attempt ' + lagItem.inflightMessage.deliveryAttempt}"></span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </article>
+
+        <article class="panel span-6">
+            <h2>Dead-Letter Queue</h2>
+            <table th:if="${!#lists.isEmpty(snapshot.deadLetters)}">
+                <thead>
+                <tr>
+                    <th>Topic</th>
+                    <th>Group</th>
+                    <th>Partition</th>
+                    <th>Offset</th>
+                    <th>Attempts</th>
+                    <th>Reason</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="entry : ${snapshot.deadLetters}">
+                    <td th:text="${entry.topic}">orders</td>
+                    <td th:text="${entry.groupId}">billing-worker</td>
+                    <td class="mono" th:text="${entry.partition}">0</td>
+                    <td class="mono" th:text="${entry.offset}">0</td>
+                    <td th:text="${entry.deliveryAttempts}">3</td>
+                    <td th:text="${entry.reason}">consumer-error</td>
+                </tr>
+                </tbody>
+            </table>
+            <p th:if="${#lists.isEmpty(snapshot.deadLetters)}">No DLQ entries yet.</p>
+        </article>
+
+        <article class="panel span-6">
+            <h2>Recent Events</h2>
+            <div class="events" th:if="${!#lists.isEmpty(snapshot.events)}">
+                <div class="event" th:each="event : ${snapshot.events}">
+                    <div class="controls">
+                        <span class="pill" th:text="${event.type}">publish</span>
+                        <small th:text="${#temporals.format(event.at, 'yyyy-MM-dd HH:mm:ss')}">timestamp</small>
+                    </div>
+                    <div th:text="${event.message}" style="margin-top: 6px;"></div>
+                </div>
+            </div>
+            <p th:if="${#lists.isEmpty(snapshot.events)}">No events yet.</p>
+        </article>
+    </section>
+</div>
+</body>
+</html>
