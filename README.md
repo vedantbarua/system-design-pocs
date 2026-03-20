@@ -510,4 +510,12 @@ Flight operations console with live tracking, ETAs, and status updates.
 See [flight-tracking-poc/README.md](flight-tracking-poc/README.md) for details.
 
 ### Trading Log POC
-Placeholder folder (no implementation yet).
+Trading blotter with executions, marked positions, P&L, and lightweight risk alerts.
+
+#### How to Run
+1. Ensure Java 17+ and Maven are installed.
+2. Navigate to the project directory: `cd resilient-flow-poc`
+3. Run: `mvn org.springframework.boot:spring-boot-maven-plugin:run`
+4. Open `http://localhost:8108`
+
+See [resilient-flow-poc/README.md](resilient-flow-poc/README.md) for details.
