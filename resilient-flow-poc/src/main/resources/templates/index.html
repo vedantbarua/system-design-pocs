@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Trading Log POC</title>
+    <style>
+        :root {
+            --ink: #14213d;
+            --muted: #52627a;
+            --card: rgba(255, 255, 255, 0.9);
+            --line: rgba(20, 33, 61, 0.12);
+            --accent: #c2410c;
+            --accent-dark: #9a3412;
+            --gain: #166534;
+            --loss: #b91c1c;
+            --warn: #d97706;
+            --bg:
+                radial-gradient(circle at top left, rgba(251, 191, 36, 0.25), transparent 34%),
+                radial-gradient(circle at top right, rgba(14, 165, 233, 0.16), transparent 28%),
+                linear-gradient(160deg, #fff8ed 0%, #eef4ff 48%, #f8fafc 100%);
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+            color: var(--ink);
+            background: var(--bg);
+        }
+        h1, h2, h3 {
+            margin: 0 0 10px;
+            font-family: "Space Grotesk", "Avenir Next", sans-serif;
+        }
+        .page {
+            max-width: 1320px;
+            margin: 0 auto;
+            padding: 30px 20px 60px;
+        }
+        .hero {
+            display: grid;
+            gap: 18px;
+            background: linear-gradient(135deg, rgba(20, 33, 61, 0.96), rgba(30, 64, 175, 0.9));
+            color: white;
+            border-radius: 28px;
+            padding: 30px;
+            box-shadow: 0 24px 60px rgba(20, 33, 61, 0.28);
+            animation: lift 0.55s ease;
+        }
+        @media (min-width: 900px) {
+            .hero {
+                grid-template-columns: 1.15fr 0.85fr;
+                align-items: end;
+            }
+        }
+        .hero p {
+            margin: 0;
+            color: rgba(255, 255, 255, 0.82);
+            max-width: 620px;
+        }
+        .chip-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 16px;
+        }
+        .chip {
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.12);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        .summary-grid {
+            display: grid;
+            gap: 12px;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        }
+        .summary-card {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            border-radius: 18px;
+            padding: 14px 16px;
+            backdrop-filter: blur(10px);
+        }
+        .summary-card span {
+            display: block;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.72);
+        }
+        .summary-card strong {
+            display: block;
+            margin-top: 6px;
+            font-size: 24px;
+        }
+        .message {
+            margin-top: 18px;
+            background: rgba(255, 247, 237, 0.95);
+            border: 1px solid rgba(217, 119, 6, 0.28);
+            color: #9a3412;
+            padding: 12px 14px;
+            border-radius: 14px;
+        }
+        .grid {
+            display: grid;
+            gap: 20px;
+            margin-top: 22px;
+        }
+        @media (min-width: 980px) {
+            .grid.main {
+                grid-template-columns: 0.95fr 1.25fr;
+            }
+        }
+        .stack {
+            display: grid;
+            gap: 20px;
+        }
+        .card {
+            background: var(--card);
+            border-radius: 24px;
+            padding: 22px 24px;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 18px 50px rgba(20, 33, 61, 0.08);
+            animation: lift 0.7s ease;
+        }
+        .card p {
+            color: var(--muted);
+            margin: 0 0 16px;
+        }
+        form {
+            display: grid;
+            gap: 12px;
+        }
+        .row {
+            display: grid;
+            gap: 12px;
+        }
+        @media (min-width: 640px) {
+            .row.two {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+            .row.three {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+        input, select {
+            width: 100%;
+            padding: 11px 12px;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            font-size: 15px;
+            background: white;
+            color: var(--ink);
+        }
+        input:focus, select:focus {
+            outline: 2px solid rgba(194, 65, 12, 0.18);
+            border-color: rgba(194, 65, 12, 0.4);
+        }
+        button {
+            border: none;
+            border-radius: 12px;
+            padding: 12px 14px;
+            font-weight: 700;
+            color: white;
+            background: var(--accent);
+            cursor: pointer;
+            transition: transform 0.16s ease, background 0.16s ease;
+        }
+        button:hover {
+            background: var(--accent-dark);
+            transform: translateY(-1px);
+        }
+        .secondary button {
+            background: #1d4ed8;
+        }
+        .secondary button:hover {
+            background: #1e40af;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            text-align: left;
+            padding: 11px 8px;
+            border-bottom: 1px solid rgba(20, 33, 61, 0.08);
+            font-size: 14px;
+            vertical-align: top;
+        }
+        th {
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+        .empty {
+            color: var(--muted);
+            font-style: italic;
+        }
+        .gain { color: var(--gain); font-weight: 700; }
+        .loss { color: var(--loss); font-weight: 700; }
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 5px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .tag-buy {
+            background: rgba(22, 101, 52, 0.12);
+            color: var(--gain);
+        }
+        .tag-sell {
+            background: rgba(185, 28, 28, 0.12);
+            color: var(--loss);
+        }
+        .alert-list {
+            display: grid;
+            gap: 12px;
+        }
+        .alert {
+            border-left: 4px solid var(--warn);
+            background: rgba(255, 251, 235, 0.85);
+            padding: 12px 14px;
+            border-radius: 14px;
+        }
+        .alert-critical {
+            border-left-color: var(--loss);
+            background: rgba(254, 242, 242, 0.94);
+        }
+        .alert-info {
+            border-left-color: #2563eb;
+            background: rgba(239, 246, 255, 0.94);
+        }
+        .subtle {
+            color: var(--muted);
+            font-size: 13px;
+        }
+        @keyframes lift {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+    <header class="hero">
+        <div>
+            <h1>Trading Log POC</h1>
+            <p>Capture executions, update marks, and monitor net positions, realized P&amp;L, unrealized P&amp;L, and alert thresholds from one in-memory console.</p>
+            <div class="chip-row">
+                <div class="chip">Trades</div>
+                <div class="chip">Positions</div>
+                <div class="chip">Marks</div>
+                <div class="chip">Alerts</div>
+            </div>
+        </div>
+        <div class="summary-grid">
+            <div class="summary-card">
+                <span>Total trades</span>
+                <strong th:text="${snapshot.summary.totalTrades}">0</strong>
+            </div>
+            <div class="summary-card">
+                <span>Open positions</span>
+                <strong th:text="${snapshot.summary.openPositions}">0</strong>
+            </div>
+            <div class="summary-card">
+                <span>Gross exposure</span>
+                <strong th:text="${'$' + snapshot.summary.grossExposure}">$0.00</strong>
+            </div>
+            <div class="summary-card">
+                <span>Total P&amp;L</span>
+                <strong th:text="${'$' + snapshot.summary.totalPnl}"
+                        th:classappend="${snapshot.summary.totalPnl.signum() >= 0 ? ' gain' : ' loss'}">$0.00</strong>
+            </div>
+        </div>
+    </header>
+
+    <div th:if="${message}" class="message" th:text="${message}"></div>
+
+    <div class="grid main">
+        <div class="stack">
+            <section class="card">
+                <h2>Log Trade</h2>
+                <p>Record a buy or sell execution. The service recalculates portfolio state on every write.</p>
+                <form th:action="@{/trades}" method="post">
+                    <div class="row three">
+                        <div>
+                            <label for="symbol">Symbol</label>
+                            <input id="symbol" name="symbol" type="text" placeholder="AAPL" required>
+                        </div>
+                        <div>
+                            <label for="side">Side</label>
+                            <select id="side" name="side">
+                                <option th:each="side : ${tradeSides}" th:value="${side}" th:text="${side}"></option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="quantity">Quantity</label>
+                            <input id="quantity" name="quantity" type="number" min="1" step="1" th:value="${defaultQuantity}" required>
+                        </div>
+                    </div>
+                    <div class="row three">
+                        <div>
+                            <label for="price">Price</label>
+                            <input id="price" name="price" type="number" min="0.01" step="0.01" th:value="${defaultTradePrice}" required>
+                        </div>
+                        <div>
+                            <label for="trader">Trader</label>
+                            <input id="trader" name="trader" type="text" placeholder="Vedant" required>
+                        </div>
+                        <div>
+                            <label for="venue">Venue</label>
+                            <input id="venue" name="venue" type="text" placeholder="NASDAQ">
+                        </div>
+                    </div>
+                    <button type="submit">Record trade</button>
+                </form>
+            </section>
+
+            <section class="card">
+                <h2>Update Market Price</h2>
+                <p>Marks drive unrealized P&amp;L and risk alerts. Leave symbols uppercase for consistency.</p>
+                <form th:action="@{/prices}" method="post" class="secondary">
+                    <div class="row two">
+                        <div>
+                            <label for="priceSymbol">Symbol</label>
+                            <input id="priceSymbol" name="symbol" type="text" placeholder="MSFT" required>
+                        </div>
+                        <div>
+                            <label for="marketPrice">Market Price</label>
+                            <input id="marketPrice" name="marketPrice" type="number" min="0.01" step="0.01" th:value="${defaultMarketPrice}" required>
+                        </div>
+                    </div>
+                    <button type="submit">Update mark</button>
+                </form>
+
+                <h3 style="margin-top: 18px;">Current marks</h3>
+                <div th:if="${#maps.isEmpty(snapshot.marketPrices)}" class="empty">No market prices set.</div>
+                <table th:if="${!#maps.isEmpty(snapshot.marketPrices)}">
+                    <thead>
+                    <tr>
+                        <th>Symbol</th>
+                        <th>Market Price</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="price : ${snapshot.marketPrices}">
+                        <td th:text="${price.key}">AAPL</td>
+                        <td th:text="${'$' + price.value}">$0.00</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="card">
+                <h2>Alerts</h2>
+                <p>Exposure, drawdown, and missing-mark checks are recalculated from the current book state.</p>
+                <div th:if="${#lists.isEmpty(snapshot.alerts)}" class="empty">No alerts fired.</div>
+                <div th:if="${!#lists.isEmpty(snapshot.alerts)}" class="alert-list">
+                    <div th:each="alert : ${snapshot.alerts}"
+                         class="alert"
+                         th:classappend="${alert.severity.name() == 'CRITICAL' ? ' alert-critical' : (alert.severity.name() == 'INFO' ? ' alert-info' : '')}">
+                        <strong th:text="${alert.severity + ' · ' + alert.symbol}">WARN · AAPL</strong>
+                        <div class="subtle" th:text="${alert.message}">Alert text</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div class="stack">
+            <section class="card">
+                <h2>Positions</h2>
+                <p>Average open price uses weighted average cost for both long and short inventory.</p>
+                <div th:if="${#lists.isEmpty(snapshot.positions)}" class="empty">No positions yet.</div>
+                <table th:if="${!#lists.isEmpty(snapshot.positions)}">
+                    <thead>
+                    <tr>
+                        <th>Symbol</th>
+                        <th>Net Qty</th>
+                        <th>Avg Open</th>
+                        <th>Market</th>
+                        <th>Exposure</th>
+                        <th>Realized</th>
+                        <th>Unrealized</th>
+                        <th>Total</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="position : ${snapshot.positions}">
+                        <td>
+                            <strong th:text="${position.symbol}">AAPL</strong>
+                            <div class="subtle" th:text="${'Buy ' + position.buyQuantity + ' / Sell ' + position.sellQuantity}">Buy / Sell</div>
+                        </td>
+                        <td th:text="${position.netQuantity}">0</td>
+                        <td th:text="${'$' + position.averageOpenPrice}">$0.00</td>
+                        <td th:text="${position.marketPrice == null ? 'N/A' : '$' + position.marketPrice}">N/A</td>
+                        <td th:text="${'$' + position.grossExposure}">$0.00</td>
+                        <td th:text="${'$' + position.realizedPnl}"
+                            th:classappend="${position.realizedPnl.signum() >= 0 ? ' gain' : ' loss'}">$0.00</td>
+                        <td th:text="${'$' + position.unrealizedPnl}"
+                            th:classappend="${position.unrealizedPnl.signum() >= 0 ? ' gain' : ' loss'}">$0.00</td>
+                        <td th:text="${'$' + position.totalPnl}"
+                            th:classappend="${position.totalPnl.signum() >= 0 ? ' gain' : ' loss'}">$0.00</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="card">
+                <h2>Execution Log</h2>
+                <p>Newest trades first. Notional is computed as price multiplied by quantity at ingest time.</p>
+                <div th:if="${#lists.isEmpty(snapshot.trades)}" class="empty">No trades recorded.</div>
+                <table th:if="${!#lists.isEmpty(snapshot.trades)}">
+                    <thead>
+                    <tr>
+                        <th>Trade</th>
+                        <th>Side</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Notional</th>
+                        <th>Trader</th>
+                        <th>Venue</th>
+                        <th>Executed</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="trade : ${snapshot.trades}">
+                        <td>
+                            <strong th:text="${trade.symbol}">AAPL</strong>
+                            <div class="subtle" th:text="${trade.id}">trade_1</div>
+                        </td>
+                        <td>
+                            <span class="tag"
+                                  th:classappend="${trade.side.name() == 'BUY' ? ' tag-buy' : ' tag-sell'}"
+                                  th:text="${trade.side}">BUY</span>
+                        </td>
+                        <td th:text="${trade.quantity}">0</td>
+                        <td th:text="${'$' + trade.price}">$0.00</td>
+                        <td th:text="${'$' + trade.notional}">$0.00</td>
+                        <td th:text="${trade.trader}">Vedant</td>
+                        <td th:text="${trade.venue.isBlank() ? 'Direct' : trade.venue}">NASDAQ</td>
+                        <td th:text="${trade.executedAt}">2026-03-20T00:00:00Z</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </section>
+        </div>
+    </div>
+</div>
+</body>
+</html>
