@@ -157,6 +157,17 @@ Prefix-based autocomplete with ranking and an in-memory index.
 
 See [search-autocomplete-system-poc/README.md](search-autocomplete-system-poc/README.md) for endpoints and usage.
 
+### Search Engine POC
+Sharded search engine with an inverted index, BM25-lite ranking, and shard fanout visibility.
+
+#### How to Run
+1. Ensure you have Java 17+ and Maven installed.
+2. Navigate to the project directory: `cd search-engine-poc`
+3. Run: `mvn org.springframework.boot:spring-boot-maven-plugin:run`
+4. Open `http://localhost:8122`
+
+See [search-engine-poc/README.md](search-engine-poc/README.md) for endpoints and usage.
+
 ### Price Tracker POC
 Track target prices with a simple UI and JSON endpoints.
 
