@@ -135,6 +135,17 @@ S3-style object storage with buckets, object versioning, multipart uploads, stor
 
 See [object-storage-poc/README.md](object-storage-poc/README.md) for endpoints and usage.
 
+### CDN POC
+CDN-style edge delivery with regional caches, origin fetches, TTL expiry, LRU eviction, and invalidation.
+
+#### How to Run
+1. Ensure Java 17+ and Maven are installed.
+2. Navigate to the project directory: `cd cdn-poc`
+3. Run: `mvn org.springframework.boot:spring-boot-maven-plugin:run`
+4. Open `http://localhost:8133`
+
+See [cdn-poc/README.md](cdn-poc/README.md) for endpoints and usage.
+
 ### Google Docs POC
 Google Docs-style collaboration with versions, comments, and roles.
 
