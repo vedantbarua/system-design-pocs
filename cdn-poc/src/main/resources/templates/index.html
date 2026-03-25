@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>CDN POC</title>
+    <style>
+        :root {
+            --ink: #12263a;
+            --muted: #52606d;
+            --accent: #c44536;
+            --accent-dark: #963126;
+            --sea: #124e66;
+            --bg: radial-gradient(circle at 85% 10%, rgba(255, 220, 180, 0.55), transparent 35%),
+                  radial-gradient(circle at 10% 15%, rgba(155, 218, 255, 0.4), transparent 40%),
+                  linear-gradient(180deg, #f5efe6 0%, #eaf1f7 100%);
+            --card: rgba(255, 255, 255, 0.93);
+            --shadow: 0 18px 42px rgba(18, 38, 58, 0.12);
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: "DM Sans", "Segoe UI", sans-serif;
+            color: var(--ink);
+            background: var(--bg);
+        }
+        h1, h2, h3 { font-family: "Manrope", "Avenir Next", sans-serif; margin-top: 0; }
+        .page { max-width: 1320px; margin: 0 auto; padding: 28px 22px 64px; }
+        .hero {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 18px;
+            padding: 28px;
+            border-radius: 24px;
+            background: var(--card);
+            box-shadow: var(--shadow);
+            animation: rise 0.55s ease;
+        }
+        .hero h1 { margin-bottom: 8px; font-size: 40px; }
+        .hero p { margin: 0; color: var(--muted); line-height: 1.5; max-width: 700px; }
+        .pill {
+            display: inline-flex;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: #ffe6de;
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 13px;
+        }
+        .callout {
+            background: #eff6fa;
+            border-radius: 16px;
+            padding: 14px 16px;
+            color: var(--sea);
+            font-size: 14px;
+            line-height: 1.45;
+        }
+        .message {
+            margin-top: 18px;
+            padding: 12px 14px;
+            border-radius: 12px;
+            background: #ffe6de;
+            color: #8f261c;
+            border-left: 4px solid var(--accent);
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 14px;
+            margin-top: 22px;
+        }
+        .stat, .card {
+            background: var(--card);
+            box-shadow: 0 14px 34px rgba(18, 38, 58, 0.08);
+            border-radius: 20px;
+            animation: rise 0.75s ease;
+        }
+        .stat { padding: 16px; }
+        .stat span { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+        .stat strong { display: block; margin-top: 8px; font-size: 28px; }
+        .grid { display: grid; gap: 20px; margin-top: 22px; }
+        @media (min-width: 1080px) { .grid { grid-template-columns: 0.95fr 1.05fr; } }
+        .card { padding: 22px 24px; }
+        .stack { display: grid; gap: 18px; }
+        .section { border-top: 1px solid #dde5ec; padding-top: 18px; }
+        .section:first-child { border-top: none; padding-top: 0; }
+        form { display: grid; gap: 12px; }
+        label { font-weight: 600; font-size: 14px; }
+        input[type="text"], input[type="number"], textarea, select {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: 1px solid #cad5df;
+            font-size: 14px;
+            font-family: inherit;
+            background: rgba(255, 255, 255, 0.95);
+        }
+        textarea { min-height: 95px; resize: vertical; }
+        input:focus, textarea:focus, select:focus {
+            outline: 2px solid rgba(196, 69, 54, 0.18);
+            border-color: var(--accent);
+        }
+        button {
+            width: fit-content;
+            padding: 11px 16px;
+            border: none;
+            border-radius: 12px;
+            background: var(--accent);
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        button:hover { background: var(--accent-dark); }
+        table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+        th, td {
+            padding: 10px 8px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: top;
+            font-size: 14px;
+        }
+        th {
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+        .badge {
+            display: inline-flex;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            background: #dcecf4;
+            color: var(--sea);
+        }
+        .badge.warn { background: #ffe6de; color: #8f261c; }
+        .small { color: var(--muted); font-size: 12px; }
+        .empty { color: var(--muted); font-style: italic; }
+        @keyframes rise {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @media (max-width: 960px) {
+            .hero { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+    <header class="hero">
+        <div>
+            <div class="pill">Origin + Edge + Invalidation</div>
+            <h1>CDN POC</h1>
+            <p>Publish assets to an origin, serve them from regional edge nodes, and watch cache hits, misses, evictions, and invalidations change over time. The goal is to model delivery behavior, not just store files.</p>
+        </div>
+        <div class="stack">
+            <div class="callout">
+                Defaults: edge capacity <strong th:text="${defaults.edgeCapacity}">4</strong> objects,
+                origin TTL <strong th:text="${defaults.defaultTtlSeconds}">60</strong> seconds.
+            </div>
+            <div class="callout">
+                Regions: <strong>NA</strong>, <strong>EU</strong>, <strong>APAC</strong>. A delivery request routes to the matching edge unless you pin a specific edge id.
+            </div>
+        </div>
+    </header>
+
+    <div th:if="${message}" class="message" th:text="${message}"></div>
+
+    <section class="stats">
+        <article class="stat"><span>Origin Assets</span><strong th:text="${assetCount}">0</strong></article>
+        <article class="stat"><span>Edges</span><strong th:text="${edgeCount}">0</strong></article>
+        <article class="stat"><span>Cache Entries</span><strong th:text="${cacheCount}">0</strong></article>
+    </section>
+
+    <div class="grid">
+        <section class="card stack">
+            <div class="section">
+                <h2>Publish origin asset</h2>
+                <form th:action="@{/origin/assets}" method="post">
+                    <div>
+                        <label for="path">Asset path</label>
+                        <input id="path" name="path" type="text" placeholder="/images/hero.txt" required>
+                    </div>
+                    <div>
+                        <label for="ttl">TTL seconds</label>
+                        <input id="ttl" name="cacheTtlSeconds" type="number" min="1" th:placeholder="${defaults.defaultTtlSeconds}">
+                    </div>
+                    <div>
+                        <label for="content">Content</label>
+                        <textarea id="content" name="content" placeholder="origin asset body" required></textarea>
+                    </div>
+                    <button type="submit">Publish to origin</button>
+                </form>
+            </div>
+
+            <div class="section">
+                <h2>Deliver through CDN</h2>
+                <form th:action="@{/deliver}" method="post">
+                    <div>
+                        <label for="deliverPath">Asset path</label>
+                        <input id="deliverPath" name="path" type="text" placeholder="/images/hero.txt" required>
+                    </div>
+                    <div>
+                        <label for="region">Client region</label>
+                        <select id="region" name="region">
+                            <option value="NA">NA</option>
+                            <option value="EU">EU</option>
+                            <option value="APAC">APAC</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="edgeId">Optional pinned edge id</label>
+                        <select id="edgeId" name="edgeId">
+                            <option value="">Auto route</option>
+                            <option value="edge-na-1">edge-na-1</option>
+                            <option value="edge-eu-1">edge-eu-1</option>
+                            <option value="edge-ap-1">edge-ap-1</option>
+                        </select>
+                    </div>
+                    <button type="submit">Deliver asset</button>
+                </form>
+            </div>
+
+            <div class="section">
+                <h2>Invalidate cache</h2>
+                <form th:action="@{/invalidate}" method="post">
+                    <div>
+                        <label for="invalidatePath">Exact path</label>
+                        <input id="invalidatePath" name="path" type="text" placeholder="/images/hero.txt">
+                    </div>
+                    <div>
+                        <label for="invalidatePrefix">Prefix</label>
+                        <input id="invalidatePrefix" name="prefix" type="text" placeholder="/images/">
+                    </div>
+                    <button type="submit">Invalidate</button>
+                </form>
+            </div>
+        </section>
+
+        <section class="card stack">
+            <div class="section">
+                <h2>Origin catalog</h2>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Path</th>
+                        <th>Version</th>
+                        <th>TTL</th>
+                        <th>Updated</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${assets.isEmpty()}"><td colspan="4" class="empty">No origin assets yet.</td></tr>
+                    <tr th:each="asset : ${assets}">
+                        <td>
+                            <strong th:text="${asset.path}">/images/hero.txt</strong>
+                            <div class="small" th:text="${asset.id}">ast-1</div>
+                        </td>
+                        <td th:text="${asset.version}">1</td>
+                        <td th:text="${asset.cacheTtlSeconds}">60</td>
+                        <td th:text="${asset.updatedAt}">time</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="section">
+                <h2>Edge health</h2>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Edge</th>
+                        <th>Capacity</th>
+                        <th>Hits</th>
+                        <th>Misses</th>
+                        <th>Origin fetches</th>
+                        <th>Evictions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="edge : ${edges}">
+                        <td>
+                            <strong th:text="${edge.edgeId}">edge-na-1</strong>
+                            <div class="small" th:text="${edge.region}">NA</div>
+                        </td>
+                        <td th:text="${edge.cachedObjects + ' / ' + edge.capacity}">0 / 4</td>
+                        <td th:text="${edge.hits}">0</td>
+                        <td th:text="${edge.misses}">0</td>
+                        <td th:text="${edge.originFetches}">0</td>
+                        <td th:text="${edge.evictions}">0</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="section">
+                <h2>Edge cache inventory</h2>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Edge</th>
+                        <th>Path</th>
+                        <th>Version</th>
+                        <th>Expires</th>
+                        <th>Hits</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${cacheEntries.isEmpty()}"><td colspan="5" class="empty">No cached assets yet.</td></tr>
+                    <tr th:each="entry : ${cacheEntries}">
+                        <td>
+                            <span class="badge" th:text="${entry.edgeId}">edge-na-1</span>
+                            <div class="small" th:text="${entry.region}">NA</div>
+                        </td>
+                        <td th:text="${entry.path}">/images/hero.txt</td>
+                        <td th:text="${entry.version}">1</td>
+                        <td th:text="${entry.expiresAt}">time</td>
+                        <td th:text="${entry.hitCount}">0</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+</div>
+</body>
+</html>
