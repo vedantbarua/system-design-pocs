@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Distributed Stream Processing POC</title>
+    <style>
+        :root {
+            --bg: #eef4f1;
+            --panel: rgba(251, 255, 253, 0.92);
+            --ink: #14211d;
+            --muted: #5a6b64;
+            --accent: #0f766e;
+            --accent-2: #c05621;
+            --line: #cfe0d8;
+            --shadow: 0 16px 36px rgba(20, 33, 29, 0.12);
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            color: var(--ink);
+            font-family: Georgia, "Times New Roman", serif;
+            background:
+                    radial-gradient(circle at top left, rgba(15, 118, 110, 0.16), transparent 28%),
+                    radial-gradient(circle at top right, rgba(192, 86, 33, 0.16), transparent 30%),
+                    linear-gradient(180deg, #f7fbf8 0%, var(--bg) 100%);
+        }
+        .page {
+            width: min(1380px, calc(100% - 32px));
+            margin: 0 auto;
+            padding: 30px 0 48px;
+        }
+        .hero, .grid { display: grid; gap: 18px; }
+        .hero {
+            grid-template-columns: 1.3fr 1fr;
+            margin-bottom: 22px;
+        }
+        .grid {
+            grid-template-columns: repeat(12, minmax(0, 1fr));
+        }
+        .panel, .hero-card {
+            background: var(--panel);
+            border: 1px solid rgba(90, 107, 100, 0.16);
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+        }
+        .hero-card, .panel { padding: 22px; }
+        .eyebrow {
+            margin: 0 0 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--accent);
+            font-size: 0.84rem;
+        }
+        h1, h2, h3 { margin: 0; }
+        h1 {
+            font-size: clamp(2.1rem, 3vw, 3.1rem);
+            line-height: 1.02;
+        }
+        .subhead {
+            margin: 12px 0 0;
+            color: var(--muted);
+            max-width: 62ch;
+            line-height: 1.55;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 12px;
+        }
+        .stat strong {
+            display: block;
+            font-size: 1.8rem;
+            margin-bottom: 6px;
+        }
+        .stat span { color: var(--muted); }
+        .span-4 { grid-column: span 4; }
+        .span-5 { grid-column: span 5; }
+        .span-6 { grid-column: span 6; }
+        .span-7 { grid-column: span 7; }
+        .span-8 { grid-column: span 8; }
+        .span-12 { grid-column: span 12; }
+        form { display: grid; gap: 10px; margin-top: 14px; }
+        label {
+            display: grid;
+            gap: 6px;
+            font-size: 0.95rem;
+            color: var(--muted);
+        }
+        input, button { font: inherit; }
+        input {
+            width: 100%;
+            padding: 12px 13px;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: #fff;
+            color: var(--ink);
+        }
+        button {
+            padding: 12px 16px;
+            border: 0;
+            border-radius: 999px;
+            background: var(--ink);
+            color: #f7fbf8;
+            cursor: pointer;
+        }
+        button.secondary { background: var(--accent-2); }
+        .row-2, .row-3, .row-4 {
+            display: grid;
+            gap: 10px;
+        }
+        .row-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .row-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .row-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 14px;
+            font-size: 0.95rem;
+        }
+        th, td {
+            text-align: left;
+            vertical-align: top;
+            padding: 10px 8px;
+            border-bottom: 1px solid rgba(90, 107, 100, 0.14);
+        }
+        th {
+            color: var(--muted);
+            font-weight: 600;
+        }
+        .message {
+            margin-bottom: 16px;
+            padding: 14px 16px;
+            border-radius: 14px;
+            background: rgba(15, 118, 110, 0.1);
+            border: 1px solid rgba(15, 118, 110, 0.16);
+        }
+        .stack { display: grid; gap: 14px; }
+        .mono {
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+            font-size: 0.9rem;
+        }
+        .pill {
+            display: inline-block;
+            padding: 4px 9px;
+            border-radius: 999px;
+            background: rgba(15, 118, 110, 0.1);
+            color: var(--accent);
+            font-size: 0.84rem;
+        }
+        .events { display: grid; gap: 10px; margin-top: 14px; }
+        .event {
+            padding: 12px 14px;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.72);
+            border: 1px solid rgba(90, 107, 100, 0.14);
+        }
+        .small { color: var(--muted); font-size: 0.92rem; }
+        @media (max-width: 1024px) {
+            .hero { grid-template-columns: 1fr; }
+            .span-4, .span-5, .span-6, .span-7, .span-8, .span-12 { grid-column: span 12; }
+            .stats, .row-4, .row-3, .row-2 { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+    <div th:if="${message}" class="message" th:text="${message}"></div>
+
+    <section class="hero">
+        <div class="hero-card">
+            <p class="eyebrow">Distributed Stream Processing</p>
+            <h1>Windowed operators with offset state, checkpoints, and replay.</h1>
+            <p class="subhead">
+                This POC models the mechanics after a message queue: source partitions, processor jobs with per-partition
+                cursors, tumbling windows, checkpoint snapshots, and deterministic replay from restored offsets.
+            </p>
+        </div>
+        <div class="stats">
+            <div class="panel stat">
+                <strong th:text="${snapshot.streamCount}">0</strong>
+                <span>Streams</span>
+            </div>
+            <div class="panel stat">
+                <strong th:text="${snapshot.jobCount}">0</strong>
+                <span>Jobs</span>
+            </div>
+            <div class="panel stat">
+                <strong th:text="${snapshot.checkpointCount}">0</strong>
+                <span>Checkpoints</span>
+            </div>
+            <div class="panel stat">
+                <strong th:text="${snapshot.totalEventCount}">0</strong>
+                <span>Source events</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="grid">
+        <div class="panel span-4">
+            <h2>Create Stream</h2>
+            <form method="post" action="/streams">
+                <label>Stream
+                    <input name="stream" placeholder="payments" required>
+                </label>
+                <div class="row-2">
+                    <label>Partitions
+                        <input name="partitions" type="number" min="1" max="8" th:placeholder="${config.defaultPartitions}">
+                    </label>
+                    <label>Window seconds
+                        <input name="windowSeconds" type="number" min="5" max="300" th:placeholder="${config.defaultWindowSeconds}">
+                    </label>
+                </div>
+                <button type="submit">Create stream</button>
+            </form>
+        </div>
+
+        <div class="panel span-4">
+            <h2>Publish Event</h2>
+            <form method="post" action="/events/publish">
+                <label>Stream
+                    <input name="stream" placeholder="payments" required>
+                </label>
+                <div class="row-3">
+                    <label>Key
+                        <input name="key" placeholder="merchant:12">
+                    </label>
+                    <label>Value
+                        <input name="value" type="number" placeholder="50" required>
+                    </label>
+                    <label>Partition
+                        <input name="partition" type="number" min="0" placeholder="optional">
+                    </label>
+                </div>
+                <label>Event time millis
+                    <input name="eventTimeMillis" type="number" min="0" placeholder="defaults to now">
+                </label>
+                <button type="submit">Publish event</button>
+            </form>
+        </div>
+
+        <div class="panel span-4">
+            <h2>Process Batch</h2>
+            <form method="post" action="/jobs/process">
+                <label>Stream
+                    <input name="stream" placeholder="payments" required>
+                </label>
+                <div class="row-2">
+                    <label>Job
+                        <input name="jobId" placeholder="fraud-aggregator" required>
+                    </label>
+                    <label>Max records
+                        <input name="maxRecords" type="number" min="1" max="64" placeholder="10">
+                    </label>
+                </div>
+                <button type="submit">Process</button>
+            </form>
+            <div th:if="${processResult}" class="small" style="margin-top: 12px;">
+                Last batch processed <strong th:text="${processResult.processedCount}">0</strong> record(s) with watermark
+                <span class="mono" th:text="${processResult.watermarkMillis}">0</span>.
+            </div>
+        </div>
+
+        <div class="panel span-5">
+            <h2>Create Checkpoint</h2>
+            <form method="post" action="/jobs/checkpoints">
+                <label>Stream
+                    <input name="stream" placeholder="payments" required>
+                </label>
+                <div class="row-2">
+                    <label>Job
+                        <input name="jobId" placeholder="fraud-aggregator" required>
+                    </label>
+                    <label>Checkpoint ID
+                        <input name="checkpointId" placeholder="before-backfill" required>
+                    </label>
+                </div>
+                <button type="submit">Save checkpoint</button>
+            </form>
+        </div>
+
+        <div class="panel span-7">
+            <h2>Replay / Restore</h2>
+            <form method="post" action="/jobs/replay">
+                <div class="row-4">
+                    <label>Stream
+                        <input name="stream" placeholder="payments" required>
+                    </label>
+                    <label>Job
+                        <input name="jobId" placeholder="fraud-aggregator" required>
+                    </label>
+                    <label>Partition
+                        <input name="partition" type="number" min="0" placeholder="required for offset reset">
+                    </label>
+                    <label>Next offset
+                        <input name="nextOffset" type="number" min="0" placeholder="required for offset reset">
+                    </label>
+                </div>
+                <div class="row-2">
+                    <label>Checkpoint ID
+                        <input name="checkpointId" placeholder="optional restore path">
+                    </label>
+                    <label>Clear state (use true or false)
+                        <input name="clearState" placeholder="false">
+                    </label>
+                </div>
+                <button class="secondary" type="submit">Replay</button>
+            </form>
+        </div>
+
+        <div class="panel span-12">
+            <h2>Streams</h2>
+            <div class="stack" th:if="${!snapshot.streams.isEmpty()}">
+                <div class="panel" th:each="stream : ${snapshot.streams}">
+                    <div style="display:flex; justify-content:space-between; gap:14px; flex-wrap:wrap;">
+                        <div>
+                            <h3 th:text="${stream.stream}">stream</h3>
+                            <p class="small">
+                                <span class="pill" th:text="${stream.partitions + ' partitions'}">3 partitions</span>
+                                <span class="pill" th:text="${stream.windowSeconds + 's windows'}">30s windows</span>
+                            </p>
+                        </div>
+                        <div class="small">
+                            Total events <strong th:text="${stream.totalEvents}">0</strong>
+                        </div>
+                    </div>
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Partition</th>
+                            <th>End offset</th>
+                            <th>Recent events</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="partition : ${stream.partitionViews}">
+                            <td class="mono" th:text="${'p' + partition.partition}">p0</td>
+                            <td class="mono" th:text="${partition.endOffset}">0</td>
+                            <td>
+                                <div th:if="${partition.recentEvents.isEmpty()}" class="small">No events yet.</div>
+                                <div th:each="event : ${partition.recentEvents}" class="small mono">
+                                    <span th:text="${event.offset}">0</span>
+                                    <span th:text="${event.key}">key</span>
+                                    <span th:text="${event.value}">0</span>
+                                    <span th:text="${event.eventTime}">time</span>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <p th:if="${snapshot.streams.isEmpty()}" class="small">Create a stream to start ingesting events.</p>
+        </div>
+
+        <div class="panel span-12">
+            <h2>Jobs</h2>
+            <div class="stack" th:if="${!snapshot.jobs.isEmpty()}">
+                <div class="panel" th:each="job : ${snapshot.jobs}">
+                    <div style="display:flex; justify-content:space-between; gap:14px; flex-wrap:wrap;">
+                        <div>
+                            <h3 th:text="${job.jobId + ' on ' + job.stream}">job</h3>
+                            <p class="small">
+                                <span class="pill" th:text="${job.windowSeconds + 's windows'}">30s windows</span>
+                                <span class="pill" th:text="${job.processedEvents + ' processed'}">0 processed</span>
+                            </p>
+                        </div>
+                        <div class="small mono" th:text="${'watermark=' + job.maxEventTimeMillis}">watermark=0</div>
+                    </div>
+
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Partition state</th>
+                            <th>Window aggregates</th>
+                            <th>Checkpoints</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>
+                                <div th:each="partition : ${job.partitions}" class="small mono">
+                                    <span th:text="${'p' + partition.partition}">p0</span>
+                                    <span th:text="${' next=' + partition.nextOffset}"> next=0</span>
+                                    <span th:text="${' lag=' + partition.lag}"> lag=0</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div th:if="${job.windows.isEmpty()}" class="small">No windows yet.</div>
+                                <div th:each="window : ${job.windows}" class="small mono">
+                                    <span th:text="${window.key}">key</span>
+                                    <span th:text="${window.windowStart}">start</span>
+                                    <span th:text="${' count=' + window.count}">count=0</span>
+                                    <span th:text="${' sum=' + window.sum}">sum=0</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div th:if="${job.checkpoints.isEmpty()}" class="small">No checkpoints saved.</div>
+                                <div th:each="checkpoint : ${job.checkpoints}" class="small mono">
+                                    <span th:text="${checkpoint.checkpointId}">checkpoint</span>
+                                    <span th:text="${' processed=' + checkpoint.processedEvents}">processed=0</span>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <p th:if="${snapshot.jobs.isEmpty()}" class="small">Jobs appear once a processor starts consuming from a stream.</p>
+        </div>
+
+        <div class="panel span-12">
+            <h2>Recent System Events</h2>
+            <div class="events" th:if="${!snapshot.events.isEmpty()}">
+                <div class="event" th:each="event : ${snapshot.events}">
+                    <strong th:text="${event.type}">type</strong>
+                    <div th:text="${event.message}">message</div>
+                    <div class="small" th:text="${event.at}">time</div>
+                </div>
+            </div>
+            <p th:if="${snapshot.events.isEmpty()}" class="small">No activity yet.</p>
+        </div>
+    </section>
+</div>
+</body>
+</html>

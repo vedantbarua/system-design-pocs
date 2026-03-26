@@ -113,6 +113,17 @@ Kafka-style queue with topics, partitions, consumer-group offsets, retries, repl
 
 See [message-queue-poc/README.md](message-queue-poc/README.md) for endpoints and usage.
 
+### Distributed Stream Processing POC
+Windowed stream processor with consumer state, checkpoints, and replay for backfills.
+
+#### How to Run
+1. Ensure Java 17+ and Maven are installed.
+2. Navigate to the project directory: `cd distributed-stream-processing-poc`
+3. Run: `mvn org.springframework.boot:spring-boot-maven-plugin:run`
+4. Open `http://localhost:8112`
+
+See [distributed-stream-processing-poc/README.md](distributed-stream-processing-poc/README.md) for endpoints and usage.
+
 ### Design Dropbox POC
 Dropbox-style workspace with folders, uploads, and share links.
 
