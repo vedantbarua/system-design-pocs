@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feature Flag / Config Service POC</title>
+    <style>
+        :root {
+            --bg: #efe8db;
+            --panel: rgba(255, 251, 244, 0.93);
+            --ink: #1f1a17;
+            --muted: #6b5f55;
+            --line: #d9ccbc;
+            --accent: #0f766e;
+            --accent-2: #b45309;
+            --danger: #b42318;
+            --shadow: 0 16px 36px rgba(58, 42, 27, 0.12);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            color: var(--ink);
+            font-family: Georgia, "Times New Roman", serif;
+            background:
+                    radial-gradient(circle at top left, rgba(180, 83, 9, 0.15), transparent 28%),
+                    radial-gradient(circle at top right, rgba(15, 118, 110, 0.18), transparent 32%),
+                    linear-gradient(180deg, #f8f2e8 0%, var(--bg) 100%);
+        }
+
+        .page {
+            width: min(1380px, calc(100% - 32px));
+            margin: 0 auto;
+            padding: 32px 0 48px;
+        }
+
+        .hero, .panel {
+            background: var(--panel);
+            border: 1px solid rgba(68, 54, 40, 0.14);
+            border-radius: 22px;
+            box-shadow: var(--shadow);
+        }
+
+        .hero {
+            padding: 28px;
+            display: grid;
+            grid-template-columns: 1.35fr 1fr;
+            gap: 18px;
+            margin-bottom: 22px;
+        }
+
+        h1, h2, h3 { margin: 0; }
+
+        h1 {
+            font-size: clamp(2.2rem, 3vw, 3.4rem);
+            line-height: 1.02;
+        }
+
+        .eyebrow {
+            margin: 0 0 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--accent);
+            font-size: 0.85rem;
+        }
+
+        .subhead {
+            margin: 14px 0 0;
+            max-width: 60ch;
+            color: var(--muted);
+            line-height: 1.55;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .stat, .panel {
+            padding: 20px;
+        }
+
+        .stat strong {
+            display: block;
+            font-size: 1.9rem;
+            margin-bottom: 4px;
+        }
+
+        .stat span, .muted {
+            color: var(--muted);
+        }
+
+        .message {
+            margin-bottom: 18px;
+            padding: 14px 16px;
+            border-radius: 14px;
+            background: rgba(15, 118, 110, 0.1);
+            border: 1px solid rgba(15, 118, 110, 0.2);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(12, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .span-4 { grid-column: span 4; }
+        .span-5 { grid-column: span 5; }
+        .span-6 { grid-column: span 6; }
+        .span-7 { grid-column: span 7; }
+        .span-8 { grid-column: span 8; }
+        .span-12 { grid-column: span 12; }
+
+        form {
+            display: grid;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        label {
+            display: grid;
+            gap: 6px;
+            color: var(--muted);
+            font-size: 0.95rem;
+        }
+
+        input, select, textarea, button {
+            font: inherit;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 13px;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: #fffdfa;
+            color: var(--ink);
+        }
+
+        textarea {
+            min-height: 110px;
+            resize: vertical;
+        }
+
+        .row-2 {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        button {
+            padding: 12px 16px;
+            border: 0;
+            border-radius: 999px;
+            background: var(--ink);
+            color: #f8f2ea;
+            cursor: pointer;
+        }
+
+        button.danger {
+            background: var(--danger);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 14px;
+            font-size: 0.94rem;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 10px 8px;
+            border-bottom: 1px solid rgba(68, 54, 40, 0.12);
+            vertical-align: top;
+        }
+
+        th {
+            color: var(--muted);
+            font-weight: 600;
+        }
+
+        .pill {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(15, 118, 110, 0.1);
+            color: var(--accent);
+            font-size: 0.83rem;
+        }
+
+        .pill.warn {
+            background: rgba(180, 83, 9, 0.12);
+            color: var(--accent-2);
+        }
+
+        code, pre {
+            font-family: "SFMono-Regular", Consolas, monospace;
+        }
+
+        pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        @media (max-width: 980px) {
+            .hero, .grid {
+                grid-template-columns: 1fr;
+            }
+            .span-4, .span-5, .span-6, .span-7, .span-8, .span-12 {
+                grid-column: auto;
+            }
+            .row-2, .stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+    <section class="hero">
+        <div>
+            <p class="eyebrow">Runtime Control Plane</p>
+            <h1>Feature Flags, Config, Cache Sync.</h1>
+            <p class="subhead">
+                Publish flags or config keys, target traffic by request attributes, gate with deterministic rollout percentages,
+                and simulate client-side local caches that sync from a versioned propagation log.
+            </p>
+        </div>
+        <div class="stats">
+            <div class="panel stat">
+                <strong th:text="${snapshot.currentVersion}">0</strong>
+                <span>Current version</span>
+            </div>
+            <div class="panel stat">
+                <strong th:text="${snapshot.definitionCount}">0</strong>
+                <span>Definitions</span>
+            </div>
+            <div class="panel stat">
+                <strong th:text="${snapshot.clientCount}">0</strong>
+                <span>Clients with cache</span>
+            </div>
+            <div class="panel stat">
+                <strong th:text="${snapshot.recentChangeCount}">0</strong>
+                <span>Recent propagation events</span>
+            </div>
+        </div>
+    </section>
+
+    <div th:if="${message}" class="message" th:text="${message}"></div>
+
+    <section class="grid">
+        <article class="panel span-6">
+            <p class="eyebrow">Publish</p>
+            <h2>Definition</h2>
+            <p class="muted">Rules format: <code>name|plan=premium,region=us|25|true</code></p>
+            <form method="post" action="/definitions">
+                <div class="row-2">
+                    <label>Key
+                        <input name="key" placeholder="checkout.redesign" required>
+                    </label>
+                    <label>Type
+                        <select name="type">
+                            <option value="FLAG">FLAG</option>
+                            <option value="CONFIG">CONFIG</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="row-2">
+                    <label>Owner
+                        <input name="owner" placeholder="growth-platform">
+                    </label>
+                    <label>Description
+                        <input name="description" placeholder="new checkout flow">
+                    </label>
+                </div>
+                <label>Default JSON value
+                    <textarea name="defaultValue" required>false</textarea>
+                </label>
+                <label>Rules, one per line
+                    <textarea name="ruleLines" placeholder="premium-us|plan=premium,region=us|25|true&#10;fr-copy|region=fr||&quot;Bonjour&quot;"></textarea>
+                </label>
+                <button type="submit">Publish Definition</button>
+            </form>
+        </article>
+
+        <article class="panel span-6">
+            <p class="eyebrow">Runtime</p>
+            <h2>Evaluate Or Sync</h2>
+            <form method="post" action="/evaluate">
+                <div class="row-2">
+                    <label>Key
+                        <input name="key" placeholder="checkout.redesign" required>
+                    </label>
+                    <label>Subject key
+                        <input name="subjectKey" placeholder="user-123" required>
+                    </label>
+                </div>
+                <label>Attributes
+                    <textarea name="attributesText" placeholder="plan=premium&#10;region=us"></textarea>
+                </label>
+                <button type="submit">Evaluate</button>
+            </form>
+
+            <form method="post" action="/clients/sync">
+                <div class="row-2">
+                    <label>Client ID
+                        <input name="clientId" placeholder="web-bff-1" required>
+                    </label>
+                    <label>Last known version
+                        <input name="lastKnownVersion" type="number" min="0" placeholder="0">
+                    </label>
+                </div>
+                <button type="submit">Sync Client Cache</button>
+            </form>
+
+            <form method="post" action="/definitions/delete">
+                <label>Delete key
+                    <input name="key" placeholder="legacy.banner">
+                </label>
+                <button class="danger" type="submit">Delete Definition</button>
+            </form>
+        </article>
+
+        <article class="panel span-12" th:if="${evaluationResult}">
+            <p class="eyebrow">Evaluation</p>
+            <h2>Latest evaluation result</h2>
+            <table>
+                <thead>
+                <tr>
+                    <th>Key</th>
+                    <th>Source</th>
+                    <th>Matched rule</th>
+                    <th>Version</th>
+                    <th>Value</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td th:text="${evaluationResult.key}">checkout.redesign</td>
+                    <td><span class="pill" th:text="${evaluationResult.source}">rule</span></td>
+                    <td th:text="${evaluationResult.matchedRule} ?: '-'">premium-us</td>
+                    <td th:text="${evaluationResult.version}">1</td>
+                    <td><pre th:text="${evaluationResult.value}">true</pre></td>
+                </tr>
+                </tbody>
+            </table>
+        </article>
+
+        <article class="panel span-12" th:if="${syncResult}">
+            <p class="eyebrow">Propagation</p>
+            <h2>Latest client sync</h2>
+            <table>
+                <thead>
+                <tr>
+                    <th>Client</th>
+                    <th>Version</th>
+                    <th>Mode</th>
+                    <th>Upserts</th>
+                    <th>Removed</th>
+                    <th>Cache entries</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td th:text="${syncResult.clientId}">web-bff-1</td>
+                    <td th:text="${syncResult.version}">3</td>
+                    <td><span class="pill warn" th:text="${syncResult.fullSnapshot} ? 'full snapshot' : 'incremental'">incremental</span></td>
+                    <td th:text="${syncResult.upserts.size()}">1</td>
+                    <td th:text="${syncResult.removedKeys.size()}">0</td>
+                    <td th:text="${syncResult.cache.size()}">1</td>
+                </tr>
+                </tbody>
+            </table>
+        </article>
+
+        <article class="panel span-8">
+            <p class="eyebrow">Definitions</p>
+            <h2>Published flags and config</h2>
+            <table>
+                <thead>
+                <tr>
+                    <th>Key</th>
+                    <th>Type</th>
+                    <th>Default</th>
+                    <th>Rules</th>
+                    <th>Version</th>
+                    <th>Owner</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="definition : ${snapshot.definitions}">
+                    <td th:text="${definition.key}">checkout.redesign</td>
+                    <td><span class="pill" th:text="${definition.type}">FLAG</span></td>
+                    <td><pre th:text="${definition.defaultValue}">false</pre></td>
+                    <td>
+                        <div th:each="rule : ${definition.rules}">
+                            <strong th:text="${rule.name}">premium-us</strong>
+                            <span class="muted" th:text="${rule.conditions}">plan=premium</span>
+                            <span class="muted" th:text="${rule.rolloutPercentage} != null ? ' | ' + rule.rolloutPercentage + '%' : ''"></span>
+                        </div>
+                    </td>
+                    <td th:text="${definition.version}">1</td>
+                    <td th:text="${definition.owner} ?: '-'">growth</td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(snapshot.definitions)}">
+                    <td colspan="6" class="muted">No definitions published yet.</td>
+                </tr>
+                </tbody>
+            </table>
+        </article>
+
+        <article class="panel span-4">
+            <p class="eyebrow">Changes</p>
+            <h2>Propagation log</h2>
+            <table>
+                <thead>
+                <tr>
+                    <th>Version</th>
+                    <th>Action</th>
+                    <th>Key</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="change : ${snapshot.changes}">
+                    <td th:text="${change.version}">3</td>
+                    <td th:text="${change.action}">UPSERT</td>
+                    <td th:text="${change.key}">checkout.redesign</td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(snapshot.changes)}">
+                    <td colspan="3" class="muted">No changes yet.</td>
+                </tr>
+                </tbody>
+            </table>
+        </article>
+
+        <article class="panel span-12">
+            <p class="eyebrow">Clients</p>
+            <h2>Local cache state</h2>
+            <table>
+                <thead>
+                <tr>
+                    <th>Client</th>
+                    <th>Cached version</th>
+                    <th>Entries</th>
+                    <th>Cache contents</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="client : ${snapshot.clients}">
+                    <td th:text="${client.clientId}">web-bff-1</td>
+                    <td th:text="${client.cachedVersion}">3</td>
+                    <td th:text="${client.cachedEntries}">1</td>
+                    <td>
+                        <div th:each="entry : ${client.cache}">
+                            <strong th:text="${entry.key}">checkout.redesign</strong>
+                            <span class="pill" th:text="${entry.type}">FLAG</span>
+                            <span class="muted" th:text="${' rules=' + entry.ruleCount}"></span>
+                            <pre th:text="${entry.defaultValue}">false</pre>
+                        </div>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(snapshot.clients)}">
+                    <td colspan="4" class="muted">No clients synced yet.</td>
+                </tr>
+                </tbody>
+            </table>
+        </article>
+    </section>
+</div>
+</body>
+</html>

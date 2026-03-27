@@ -157,6 +157,17 @@ CDN-style edge delivery with regional caches, origin fetches, TTL expiry, LRU ev
 
 See [cdn-poc/README.md](cdn-poc/README.md) for endpoints and usage.
 
+### Feature Flag / Config Service POC
+Feature flag and dynamic config control plane with targeting rules, rollout percentages, local cache sync, and versioned propagation.
+
+#### How to Run
+1. Ensure Java 17+ and Maven are installed.
+2. Navigate to the project directory: `cd feature-flag-config-poc`
+3. Run: `mvn org.springframework.boot:spring-boot-maven-plugin:run`
+4. Open `http://localhost:8134`
+
+See [feature-flag-config-poc/README.md](feature-flag-config-poc/README.md) for endpoints and usage.
+
 ### Google Docs POC
 Google Docs-style collaboration with versions, comments, and roles.
 
