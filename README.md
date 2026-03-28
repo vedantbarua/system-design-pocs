@@ -168,6 +168,17 @@ Feature flag and dynamic config control plane with targeting rules, rollout perc
 
 See [feature-flag-config-poc/README.md](feature-flag-config-poc/README.md) for endpoints and usage.
 
+### Distributed Tracing / Observability POC
+End-to-end tracing demo with span propagation across multiple services, detached traces when context breaks, and simple service latency summaries.
+
+#### How to Run
+1. Ensure Java 17+ and Maven are installed.
+2. Navigate to the project directory: `cd distributed-tracing-observability-poc`
+3. Run: `mvn org.springframework.boot:spring-boot-maven-plugin:run`
+4. Open `http://localhost:8135`
+
+See [distributed-tracing-observability-poc/README.md](distributed-tracing-observability-poc/README.md) for endpoints and usage.
+
 ### Google Docs POC
 Google Docs-style collaboration with versions, comments, and roles.
 
