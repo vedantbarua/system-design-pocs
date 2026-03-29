@@ -179,6 +179,17 @@ End-to-end tracing demo with span propagation across multiple services, detached
 
 See [distributed-tracing-observability-poc/README.md](distributed-tracing-observability-poc/README.md) for endpoints and usage.
 
+### Event Sourcing + CQRS POC
+Order workflow with immutable domain events, optimistic concurrency, snapshots, projection rebuilds, and idempotent commands.
+
+#### How to Run
+1. Ensure Java 17+ and Maven are installed.
+2. Navigate to the project directory: `cd event-sourcing-cqrs-poc`
+3. Run: `mvn org.springframework.boot:spring-boot-maven-plugin:run`
+4. Open `http://localhost:8136`
+
+See [event-sourcing-cqrs-poc/README.md](event-sourcing-cqrs-poc/README.md) for endpoints and usage.
+
 ### Google Docs POC
 Google Docs-style collaboration with versions, comments, and roles.
 
