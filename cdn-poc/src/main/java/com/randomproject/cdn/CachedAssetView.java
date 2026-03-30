@@ -9,5 +9,6 @@ public record CachedAssetView(
         int version,
         Instant cachedAt,
         Instant expiresAt,
-        long hitCount) {
+        long hitCount
+) {
 }

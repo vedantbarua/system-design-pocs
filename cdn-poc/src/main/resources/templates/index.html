@@ -133,7 +133,6 @@
             background: #dcecf4;
             color: var(--sea);
         }
-        .badge.warn { background: #ffe6de; color: #8f261c; }
         .small { color: var(--muted); font-size: 12px; }
         .empty { color: var(--muted); font-style: italic; }
         @keyframes rise {
@@ -258,7 +257,7 @@
                         </td>
                         <td th:text="${asset.version}">1</td>
                         <td th:text="${asset.cacheTtlSeconds}">60</td>
-                        <td th:text="${asset.updatedAt}">time</td>
+                        <td th:text="${#temporals.format(asset.updatedAt, 'yyyy-MM-dd HH:mm:ss')}">time</td>
                     </tr>
                     </tbody>
                 </table>
@@ -314,7 +313,7 @@
                         </td>
                         <td th:text="${entry.path}">/images/hero.txt</td>
                         <td th:text="${entry.version}">1</td>
-                        <td th:text="${entry.expiresAt}">time</td>
+                        <td th:text="${#temporals.format(entry.expiresAt, 'yyyy-MM-dd HH:mm:ss')}">time</td>
                         <td th:text="${entry.hitCount}">0</td>
                     </tr>
                     </tbody>

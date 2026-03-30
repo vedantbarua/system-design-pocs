@@ -5,14 +5,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import java.util.List;
 
 @Controller
 public class CdnController {
@@ -23,29 +19,26 @@ public class CdnController {
     }
 
     @GetMapping("/")
-    public String home(@RequestParam(value = "message", required = false) String message, Model model) {
-        List<OriginAsset> assets = service.listOriginAssets();
-        List<EdgeSummary> edges = service.listEdges();
-        List<CachedAssetView> cacheEntries = service.listCachedAssets();
+    public String home(String message, Model model) {
         model.addAttribute("message", message);
         model.addAttribute("defaults", service.defaults());
-        model.addAttribute("assets", assets);
-        model.addAttribute("edges", edges);
-        model.addAttribute("cacheEntries", cacheEntries);
-        model.addAttribute("assetCount", assets.size());
-        model.addAttribute("edgeCount", edges.size());
-        model.addAttribute("cacheCount", cacheEntries.size());
+        model.addAttribute("assets", service.listOriginAssets());
+        model.addAttribute("edges", service.listEdges());
+        model.addAttribute("cacheEntries", service.listCachedAssets());
+        model.addAttribute("assetCount", service.listOriginAssets().size());
+        model.addAttribute("edgeCount", service.listEdges().size());
+        model.addAttribute("cacheCount", service.listCachedAssets().size());
         return "index";
     }
 
     @PostMapping("/origin/assets")
-    public String publishAsset(@RequestParam("path") String path,
-                               @RequestParam("content") String content,
-                               @RequestParam(value = "cacheTtlSeconds", required = false) Integer cacheTtlSeconds,
+    public String publishAsset(String path,
+                               String content,
+                               Integer cacheTtlSeconds,
                                RedirectAttributes redirectAttributes) {
         try {
             OriginAsset asset = service.publishAsset(path, content, cacheTtlSeconds);
-            redirectAttributes.addAttribute("message", "Published origin asset " + asset.path() + " at version " + asset.version());
+            redirectAttributes.addAttribute("message", "Published " + asset.path() + " as version " + asset.version() + ".");
         } catch (IllegalArgumentException ex) {
             redirectAttributes.addAttribute("message", ex.getMessage());
         }
@@ -53,16 +46,17 @@ public class CdnController {
     }
 
     @PostMapping("/deliver")
-    public String deliver(@RequestParam("path") String path,
-                          @RequestParam(value = "region", required = false) String region,
-                          @RequestParam(value = "edgeId", required = false) String edgeId,
+    public String deliver(String path,
+                          String region,
+                          String edgeId,
                           RedirectAttributes redirectAttributes) {
         try {
             DeliveryResponse response = service.deliver(path, region, edgeId);
             redirectAttributes.addAttribute(
                     "message",
-                    response.cacheStatus() + " from " + response.edgeId() + " at v" + response.version()
-                            + " (" + response.estimatedLatencyMs() + "ms)");
+                    response.edgeId() + " served " + response.path() + " as " + response.cacheStatus()
+                            + " v" + response.version() + " in ~" + response.estimatedLatencyMs() + "ms."
+            );
         } catch (IllegalArgumentException ex) {
             redirectAttributes.addAttribute("message", ex.getMessage());
         }
@@ -70,14 +64,14 @@ public class CdnController {
     }
 
     @PostMapping("/invalidate")
-    public String invalidate(@RequestParam(value = "path", required = false) String path,
-                             @RequestParam(value = "prefix", required = false) String prefix,
-                             RedirectAttributes redirectAttributes) {
+    public String invalidate(String path, String prefix, RedirectAttributes redirectAttributes) {
         try {
             InvalidationResult result = service.invalidate(path, prefix);
             redirectAttributes.addAttribute(
                     "message",
-                    "Invalidated " + result.invalidatedEntries() + " cache entries across " + result.invalidatedEdges() + " edge(s).");
+                    "Invalidated " + result.invalidatedEntries() + " cache entries across "
+                            + result.invalidatedEdges() + " edges using " + result.mode() + "."
+            );
         } catch (IllegalArgumentException ex) {
             redirectAttributes.addAttribute("message", ex.getMessage());
         }
@@ -88,7 +82,9 @@ public class CdnController {
     @ResponseBody
     public ResponseEntity<OriginAsset> apiPublishAsset(@Valid @RequestBody PublishAssetRequest request) {
         try {
-            return ResponseEntity.status(201).body(service.publishAsset(request.path(), request.content(), request.cacheTtlSeconds()));
+            return ResponseEntity.status(201).body(
+                    service.publishAsset(request.path(), request.content(), request.cacheTtlSeconds())
+            );
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.badRequest().build();
         }
@@ -96,7 +92,7 @@ public class CdnController {
 
     @GetMapping("/api/origin/assets")
     @ResponseBody
-    public List<OriginAsset> apiAssets() {
+    public java.util.List<OriginAsset> apiAssets() {
         return service.listOriginAssets();
     }
 
@@ -122,13 +118,13 @@ public class CdnController {
 
     @GetMapping("/api/edges")
     @ResponseBody
-    public List<EdgeSummary> apiEdges() {
+    public java.util.List<EdgeSummary> apiEdges() {
         return service.listEdges();
     }
 
     @GetMapping("/api/cache")
     @ResponseBody
-    public List<CachedAssetView> apiCache() {
+    public java.util.List<CachedAssetView> apiCache() {
         return service.listCachedAssets();
     }
 }

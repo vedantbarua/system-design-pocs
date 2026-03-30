@@ -8,5 +8,6 @@ public record EdgeSummary(
         long hits,
         long misses,
         long originFetches,
-        long evictions) {
+        long evictions
+) {
 }
