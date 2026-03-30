@@ -8,5 +8,6 @@ public record DeliveryResponse(
         int version,
         long ttlRemainingSeconds,
         int estimatedLatencyMs,
-        String content) {
+        String content
+) {
 }

@@ -4,5 +4,6 @@ public record InvalidationResult(
         String mode,
         String matcher,
         int invalidatedEdges,
-        int invalidatedEntries) {
+        int invalidatedEntries
+) {
 }

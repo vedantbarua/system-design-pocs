@@ -8,5 +8,6 @@ public record OriginAsset(
         String content,
         int cacheTtlSeconds,
         int version,
-        Instant updatedAt) {
+        Instant updatedAt
+) {
 }
