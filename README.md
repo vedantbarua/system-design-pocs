@@ -2,7 +2,7 @@
 
 A curated repository of system design proof-of-concepts spanning distributed systems primitives, infrastructure building blocks, and product-style applications.
 
-This repo currently contains `57` POCs. The right next step is not adding many more folders. It is presenting the strongest work clearly and bringing the rest up to a consistent quality bar.
+This repo currently contains `58` POCs. The right next step is not adding many more folders. It is presenting the strongest work clearly and bringing the rest up to a consistent quality bar.
 
 ## Featured Portfolio
 
@@ -19,6 +19,7 @@ If someone only looks at 12 to 15 projects, start here.
 | [search-engine-poc](search-engine-poc/README.md) | Good indexing and fanout example beyond simple CRUD apps. |
 | [distributed-lock-manager-poc](distributed-lock-manager-poc/README.md) | Shows practical coordination using leases, Lua-safe release, and fencing tokens. |
 | [fault-tolerant-leader-election-poc](fault-tolerant-leader-election-poc/README.md) | Covers leader failover and cluster coordination basics. |
+| [database-replication-quorum-poc](database-replication-quorum-poc/README.md) | Good consistency tradeoff demo with quorum reads and writes, stale replicas, and repair mechanics. |
 | [distributed-job-scheduler-poc](distributed-job-scheduler-poc/README.md) | Strong control-plane example with timing wheel scheduling and sharded execution. |
 | [feature-flag-config-poc](feature-flag-config-poc/README.md) | Real production concern: config propagation, targeting, and rollout control. |
 | [distributed-tracing-observability-poc](distributed-tracing-observability-poc/README.md) | Important operational visibility story across services. |
@@ -37,20 +38,20 @@ This order moves from fundamentals to higher-level systems.
 5. [distributed-cache-poc](distributed-cache-poc/README.md)
 6. [distributed-lock-manager-poc](distributed-lock-manager-poc/README.md)
 7. [fault-tolerant-leader-election-poc](fault-tolerant-leader-election-poc/README.md)
-8. [message-queue-poc](message-queue-poc/README.md)
-9. [distributed-stream-processing-poc](distributed-stream-processing-poc/README.md)
-10. [event-sourcing-cqrs-poc](event-sourcing-cqrs-poc/README.md)
-11. [saga-pattern-orchestrator-poc](saga-pattern-orchestrator-poc/README.md)
-12. [object-storage-poc](object-storage-poc/README.md)
-13. [cdn-poc](cdn-poc/README.md)
-14. [search-engine-poc](search-engine-poc/README.md)
-15. [stock-exchange-poc](stock-exchange-poc/README.md)
+8. [database-replication-quorum-poc](database-replication-quorum-poc/README.md)
+9. [message-queue-poc](message-queue-poc/README.md)
+10. [distributed-stream-processing-poc](distributed-stream-processing-poc/README.md)
+11. [event-sourcing-cqrs-poc](event-sourcing-cqrs-poc/README.md)
+12. [saga-pattern-orchestrator-poc](saga-pattern-orchestrator-poc/README.md)
+13. [object-storage-poc](object-storage-poc/README.md)
+14. [cdn-poc](cdn-poc/README.md)
+15. [search-engine-poc](search-engine-poc/README.md)
+16. [stock-exchange-poc](stock-exchange-poc/README.md)
 
 ## Repository Gaps Worth Filling
 
 Do not add more adjacent product clones until these are covered.
 
-- Database replication and quorum semantics
 - Service discovery plus load balancing
 - Authentication, authorization, sessions, and token lifecycle
 
@@ -60,6 +61,7 @@ Do not add more adjacent product clones until these are covered.
 
 - [consistent-hashing-poc](consistent-hashing-poc/README.md)
 - [distributed-cache-poc](distributed-cache-poc/README.md)
+- [database-replication-quorum-poc](database-replication-quorum-poc/README.md)
 - [distributed-lock-manager-poc](distributed-lock-manager-poc/README.md)
 - [event-sourcing-cqrs-poc](event-sourcing-cqrs-poc/README.md)
 - [fault-tolerant-leader-election-poc](fault-tolerant-leader-election-poc/README.md)
@@ -135,8 +137,8 @@ Do not add more adjacent product clones until these are covered.
 
 The repo is in decent shape, but not fully standardized yet.
 
-- `57/57` POCs have a `README.md`
-- `47/57` POCs have a `TECHNICAL_README.md`
-- `36/57` POCs have an `IMPROVEMENTS.md`
+- `58/58` POCs have a `README.md`
+- `48/58` POCs have a `TECHNICAL_README.md`
+- `37/58` POCs have an `IMPROVEMENTS.md`
 
 Use [POC_STANDARDS.md](POC_STANDARDS.md) as the target format for future cleanup.
