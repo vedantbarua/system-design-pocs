@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Replication + Quorum POC</title>
+    <style>
+        :root {
+            --bg: #efe5d2;
+            --panel: rgba(255, 250, 242, 0.95);
+            --ink: #1f1911;
+            --muted: #655746;
+            --line: #d8c7ae;
+            --accent: #9c3d1b;
+            --accent-2: #1f6a78;
+            --ok: #2c6a4b;
+            --warn: #9f6c16;
+            --danger: #8f2d24;
+            --shadow: 0 16px 36px rgba(56, 35, 16, 0.14);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            color: var(--ink);
+            font-family: Georgia, "Times New Roman", serif;
+            background:
+                    radial-gradient(circle at top left, rgba(159, 108, 22, 0.18), transparent 26%),
+                    radial-gradient(circle at bottom right, rgba(31, 106, 120, 0.18), transparent 22%),
+                    linear-gradient(180deg, #f7f0e4 0%, var(--bg) 100%);
+        }
+
+        .page {
+            width: min(1380px, calc(100% - 28px));
+            margin: 0 auto;
+            padding: 28px 0 44px;
+        }
+
+        .hero, .panel {
+            background: var(--panel);
+            border: 1px solid rgba(101, 87, 70, 0.14);
+            border-radius: 22px;
+            box-shadow: var(--shadow);
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: 1.25fr 1fr;
+            gap: 18px;
+            padding: 28px;
+            margin-bottom: 22px;
+        }
+
+        h1, h2, h3, p { margin: 0; }
+
+        .eyebrow {
+            margin-bottom: 10px;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-size: 0.8rem;
+        }
+
+        h1 {
+            font-size: clamp(2rem, 3vw, 3.4rem);
+            line-height: 1;
+            font-weight: 600;
+        }
+
+        .subhead {
+            margin-top: 14px;
+            max-width: 60ch;
+            color: var(--muted);
+            line-height: 1.55;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .stat {
+            padding: 16px;
+            border-radius: 18px;
+            background: rgba(255,255,255,0.58);
+            border: 1px solid rgba(101, 87, 70, 0.12);
+        }
+
+        .stat strong {
+            display: block;
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .stat span {
+            color: var(--muted);
+            font-size: 0.92rem;
+        }
+
+        .message {
+            margin-bottom: 16px;
+            padding: 14px 16px;
+            border-radius: 14px;
+            background: rgba(31, 106, 120, 0.1);
+            border: 1px solid rgba(31, 106, 120, 0.16);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(12, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .panel {
+            padding: 20px;
+        }
+
+        .span-4 { grid-column: span 4; }
+        .span-5 { grid-column: span 5; }
+        .span-6 { grid-column: span 6; }
+        .span-7 { grid-column: span 7; }
+        .span-8 { grid-column: span 8; }
+        .span-12 { grid-column: span 12; }
+
+        form {
+            display: grid;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .row-2, .row-3 {
+            display: grid;
+            gap: 10px;
+        }
+
+        .row-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .row-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+        label {
+            display: grid;
+            gap: 6px;
+            color: var(--muted);
+            font-size: 0.94rem;
+        }
+
+        input, select, button {
+            font: inherit;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 13px;
+            border-radius: 12px;
+            border: 1px solid var(--line);
+            background: #fffdfa;
+            color: var(--ink);
+        }
+
+        button {
+            padding: 12px 16px;
+            border: 0;
+            border-radius: 999px;
+            background: var(--ink);
+            color: #fbf6ef;
+            cursor: pointer;
+        }
+
+        button.alt {
+            background: var(--accent-2);
+        }
+
+        button.warn {
+            background: var(--accent);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 14px;
+            font-size: 0.94rem;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 10px 8px;
+            border-bottom: 1px solid rgba(101, 87, 70, 0.12);
+            vertical-align: top;
+        }
+
+        th {
+            color: var(--muted);
+            font-weight: 600;
+        }
+
+        .pill {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 0.82rem;
+            background: rgba(31, 106, 120, 0.11);
+            color: var(--accent-2);
+        }
+
+        .pill.ok {
+            background: rgba(44, 106, 75, 0.12);
+            color: var(--ok);
+        }
+
+        .pill.warn {
+            background: rgba(159, 108, 22, 0.12);
+            color: var(--warn);
+        }
+
+        .pill.danger {
+            background: rgba(143, 45, 36, 0.12);
+            color: var(--danger);
+        }
+
+        .mono {
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+            font-size: 0.9rem;
+        }
+
+        .stack {
+            display: grid;
+            gap: 14px;
+        }
+
+        .card {
+            border: 1px solid rgba(101, 87, 70, 0.12);
+            border-radius: 16px;
+            padding: 14px;
+            background: rgba(255,255,255,0.58);
+        }
+
+        .card p {
+            margin-top: 8px;
+            color: var(--muted);
+            line-height: 1.45;
+        }
+
+        .mini-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .mini-actions form {
+            margin-top: 0;
+        }
+
+        .event-list {
+            display: grid;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .muted {
+            color: var(--muted);
+        }
+
+        @media (max-width: 1080px) {
+            .hero, .stats, .row-2, .row-3 {
+                grid-template-columns: 1fr;
+            }
+
+            .span-4, .span-5, .span-6, .span-7, .span-8, .span-12 {
+                grid-column: span 12;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+    <section class="hero">
+        <div>
+            <div class="eyebrow">Distributed Storage Behavior</div>
+            <h1>Database Replication + Quorum</h1>
+            <p class="subhead">
+                In-memory replicated key-value store that makes quorum decisions visible:
+                healthy replicas apply immediately, lagging replicas accumulate pending replication,
+                down replicas rely on hinted handoff, and reads can surface stale data or repair it.
+            </p>
+        </div>
+        <div class="stats">
+            <div class="stat">
+                <strong th:text="${snapshot.metrics.healthyReplicas}">3</strong>
+                <span>Healthy replicas</span>
+            </div>
+            <div class="stat">
+                <strong th:text="${snapshot.metrics.pendingReplications}">0</strong>
+                <span>Pending replications</span>
+            </div>
+            <div class="stat">
+                <strong th:text="${snapshot.metrics.latestCommittedVersion}">0</strong>
+                <span>Latest logical version</span>
+            </div>
+            <div class="stat">
+                <strong th:text="${snapshot.metrics.keysWithVisibleData}">0</strong>
+                <span>Keys with visible data</span>
+            </div>
+            <div class="stat">
+                <strong th:text="${snapshot.metrics.laggingReplicas}">0</strong>
+                <span>Lagging replicas</span>
+            </div>
+            <div class="stat">
+                <strong th:text="${snapshot.metrics.downReplicas}">0</strong>
+                <span>Down replicas</span>
+            </div>
+        </div>
+    </section>
+
+    <div class="message" th:if="${message}" th:text="${message}"></div>
+
+    <div class="grid">
+        <section class="panel span-4">
+            <h2>Write</h2>
+            <p class="muted">Commit a new version and require an immediate `W` acknowledgement threshold.</p>
+            <form method="post" action="/writes">
+                <label>Key
+                    <input name="key" value="cart-42" />
+                </label>
+                <label>Value
+                    <input name="value" value="paid" />
+                </label>
+                <label>Write quorum
+                    <select name="writeQuorum">
+                        <option value="1">1</option>
+                        <option value="2" selected>2</option>
+                        <option value="3">3</option>
+                    </select>
+                </label>
+                <button type="submit">Commit write</button>
+            </form>
+        </section>
+
+        <section class="panel span-4">
+            <h2>Read</h2>
+            <p class="muted">Query `R` reachable replicas, return the highest visible version, and optionally repair stale responders.</p>
+            <form method="post" action="/reads">
+                <label>Key
+                    <input name="key" value="cart-42" />
+                </label>
+                <label>Read quorum
+                    <select name="readQuorum">
+                        <option value="1">1</option>
+                        <option value="2" selected>2</option>
+                        <option value="3">3</option>
+                    </select>
+                </label>
+                <label>Repair on read
+                    <select name="repairOnRead">
+                        <option value="false" selected>Off</option>
+                        <option value="true">On</option>
+                    </select>
+                </label>
+                <button type="submit" class="alt">Execute read</button>
+            </form>
+        </section>
+
+        <section class="panel span-4">
+            <h2>Repair</h2>
+            <p class="muted">Use manual reconciliation to sync a single key or sweep all visible keys.</p>
+            <form method="post" action="/repairs/key">
+                <label>Key
+                    <input name="key" value="cart-42" />
+                </label>
+                <button type="submit" class="warn">Repair key</button>
+            </form>
+            <form method="post" action="/repairs/all">
+                <button type="submit">Repair all reachable keys</button>
+            </form>
+        </section>
+
+        <section class="panel span-7">
+            <h2>Replica Topology</h2>
+            <p class="muted">Change replica state to force partial writes, stale reads, and recovery workflows.</p>
+            <div class="stack" style="margin-top: 14px;">
+                <article class="card" th:each="replica : ${snapshot.replicas}">
+                    <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;">
+                        <div>
+                            <h3 th:text="${replica.replicaId}">replica-a</h3>
+                            <p>
+                                <span class="pill ok" th:if="${replica.mode == 'HEALTHY'}" th:text="${replica.mode}">HEALTHY</span>
+                                <span class="pill warn" th:if="${replica.mode == 'LAGGING'}" th:text="${replica.mode}">LAGGING</span>
+                                <span class="pill danger" th:if="${replica.mode == 'DOWN'}" th:text="${replica.mode}">DOWN</span>
+                            </p>
+                            <p class="muted">
+                                Stored keys: <strong th:text="${replica.storedKeys}">0</strong>,
+                                pending: <strong th:text="${replica.pendingReplications}">0</strong>,
+                                highest version: <strong th:text="${replica.highestVersion}">0</strong>
+                            </p>
+                        </div>
+                        <div class="mini-actions">
+                            <form method="post" action="/replicas/mode">
+                                <input type="hidden" name="replicaId" th:value="${replica.replicaId}" />
+                                <input type="hidden" name="mode" value="HEALTHY" />
+                                <button type="submit">Healthy</button>
+                            </form>
+                            <form method="post" action="/replicas/mode">
+                                <input type="hidden" name="replicaId" th:value="${replica.replicaId}" />
+                                <input type="hidden" name="mode" value="LAGGING" />
+                                <button type="submit" class="warn">Lagging</button>
+                            </form>
+                            <form method="post" action="/replicas/mode">
+                                <input type="hidden" name="replicaId" th:value="${replica.replicaId}" />
+                                <input type="hidden" name="mode" value="DOWN" />
+                                <button type="submit" class="alt">Down</button>
+                            </form>
+                            <form method="post" action="/replicas/drain">
+                                <input type="hidden" name="replicaId" th:value="${replica.replicaId}" />
+                                <button type="submit">Drain pending</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Key</th>
+                            <th>Value</th>
+                            <th>Version</th>
+                            <th>Coordinator</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="value : ${replica.values}">
+                            <td class="mono" th:text="${value.key}">cart-42</td>
+                            <td th:text="${value.value}">paid</td>
+                            <td th:text="${value.version}">2</td>
+                            <td class="mono" th:text="${value.coordinatorReplica}">replica-a</td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(replica.values)}">
+                            <td colspan="4" class="muted">No visible values on this replica.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Pending key</th>
+                            <th>Value</th>
+                            <th>Version</th>
+                            <th>Reason</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="pending : ${replica.pending}">
+                            <td class="mono" th:text="${pending.key}">cart-42</td>
+                            <td th:text="${pending.value}">paid</td>
+                            <td th:text="${pending.version}">2</td>
+                            <td th:text="${pending.reason}">replication-lag</td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(replica.pending)}">
+                            <td colspan="4" class="muted">No queued replication for this replica.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </article>
+            </div>
+        </section>
+
+        <section class="panel span-5">
+            <h2>Recent Operations</h2>
+            <p class="muted">Audit trail for quorum outcomes, topology changes, drains, and repairs.</p>
+            <div class="event-list">
+                <article class="card" th:each="event : ${snapshot.recentEvents}">
+                    <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+                        <strong th:text="${event.type}">WRITE</strong>
+                        <span class="pill" th:text="${event.status}">QUORUM_OK</span>
+                    </div>
+                    <p th:text="${event.detail}">Committed version 1...</p>
+                    <p class="mono muted" th:text="${event.key == null ? event.happenedAt : event.key + ' @ ' + event.happenedAt}">cart-42 @ 2026-04-02T00:00:00Z</p>
+                </article>
+                <article class="card" th:if="${#lists.isEmpty(snapshot.recentEvents)}">
+                    <p>No operations yet. Start with a write, then flip a replica to `LAGGING` or `DOWN`.</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="panel span-12">
+            <h2>Key Consistency View</h2>
+            <p class="muted">Compare the latest visible version for each key against every replica.</p>
+            <table>
+                <thead>
+                <tr>
+                    <th>Key</th>
+                    <th>Latest value</th>
+                    <th>Latest version</th>
+                    <th>Replica state</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="key : ${snapshot.keys}">
+                    <td class="mono" th:text="${key.key}">cart-42</td>
+                    <td th:text="${key.latestValue}">paid</td>
+                    <td th:text="${key.latestVersion}">2</td>
+                    <td>
+                        <div class="stack">
+                            <div th:each="replica : ${key.replicas}">
+                                <span class="mono" th:text="${replica.replicaId}">replica-a</span>
+                                <span>:</span>
+                                <span th:text="${replica.value == null ? 'missing' : replica.value}">paid</span>
+                                <span class="mono" th:text="${replica.version == null ? 'none' : 'v' + replica.version}">v2</span>
+                                <span class="pill ok" th:if="${replica.latest}">latest</span>
+                                <span class="pill warn" th:if="${!replica.latest and replica.version != null}">stale</span>
+                                <span class="pill danger" th:if="${replica.version == null}">missing</span>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(snapshot.keys)}">
+                    <td colspan="4" class="muted">No keys yet. Commit a write to seed the cluster.</td>
+                </tr>
+                </tbody>
+            </table>
+        </section>
+    </div>
+</div>
+</body>
+</html>
