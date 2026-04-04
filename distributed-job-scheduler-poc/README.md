@@ -1,35 +1,48 @@
-# Distributed Job Scheduler (Cron-as-a-Service) POC
-Node + Express backend with a React control plane modeling a distributed scheduler using a timing wheel, leader election, and sharded job store.
+# Distributed Job Scheduler POC
 
-## What this POC shows
-- Hierarchical timing wheel (simplified single wheel) for delayed scheduling
-- Leader election via leasing heartbeats
-- Sharded job routing by tenant
-- At-least-once delivery with worker leases and retries
-- Thundering herd smoothing using slot batching + dispatch caps
+Node and React proof-of-concept for a Cron-as-a-Service control plane with timing-wheel scheduling, lease-based leader election, shard-aware job placement, and at-least-once execution semantics.
 
-## How to Run
-1. Backend
+## Goal
 
-```bash
-cd system-design-pocs/distributed-job-scheduler-poc/backend
-npm install
-npm run dev
-```
+Demonstrate how a scheduler can smooth bursty workloads, coordinate a single active dispatcher, and recover work after lease expiry without introducing a real distributed datastore or message broker.
 
-Backend runs on `http://localhost:8130`.
+## What It Covers
 
-2. Frontend
+- Timing-wheel based delayed scheduling
+- Lease-based leader election through periodic node heartbeats
+- Tenant-to-shard routing for scalable job placement
+- At-least-once execution with worker lease expiry and retry
+- Dispatch caps that smooth thundering-herd releases
+- Operational dashboard for nodes, queues, jobs, executions, shards, and recent events
 
-```bash
-cd system-design-pocs/distributed-job-scheduler-poc/frontend
-npm install
-npm run dev
-```
+## Quick Start
 
-Frontend runs on `http://localhost:5179` and proxies `/api` to the backend.
+1. Start the backend:
+   ```bash
+   cd distributed-job-scheduler-poc/backend
+   npm install
+   npm run dev
+   ```
+2. Start the frontend:
+   ```bash
+   cd distributed-job-scheduler-poc/frontend
+   npm install
+   npm run dev
+   ```
+3. Open `http://localhost:5179`.
 
-## API
+The backend listens on `http://localhost:8130`, and the frontend proxies `/api` to it.
+
+## UI Flows
+
+- Watch node heartbeats elect a leader
+- Schedule one job with a future `runAt` timestamp
+- Seed a thundering-herd workload and inspect wheel depth plus dispatch smoothing
+- Pause and resume scheduling to see queued jobs accumulate and drain
+- Observe retries after lease expiry or random execution failure
+
+## JSON Endpoints
+
 - `GET /api/health`
 - `POST /api/nodes/heartbeat`
 - `GET /api/nodes`
@@ -43,6 +56,38 @@ Frontend runs on `http://localhost:5179` and proxies `/api` to the backend.
 - `POST /api/controls/resume`
 - `POST /api/seed`
 
-## Notes
-- State is in-memory; restarting the backend clears everything.
-- Lease expiry triggers re-schedule to guarantee at-least-once execution.
+Example job request:
+
+```json
+{
+  "tenantId": "tenant-1",
+  "name": "daily-summary",
+  "runAt": 1760000000000,
+  "payload": {
+    "type": "digest",
+    "region": "us-east"
+  },
+  "maxAttempts": 3
+}
+```
+
+## Configuration
+
+- `PORT` controls the backend port and defaults to `8130`
+- the scheduler tick interval is fixed in code at `200ms`
+- the timing wheel uses `60` slots with `1s` slot size
+- leader and worker leases use a `3500ms` timeout
+
+## Notes and Limitations
+
+- All scheduler state is in memory and resets on restart.
+- Leader election is process-local and based on a shared in-memory node map, not a real distributed lease store.
+- Execution failure rate is randomized to make retries visible in the demo.
+- There is no durable job log, exactly-once guarantee, or multi-process backend cluster.
+
+## Technologies Used
+
+- Node.js
+- Express
+- React
+- Vite
