@@ -53,8 +53,22 @@ Example simulation request:
 }
 ```
 
-## Notes
+## Configuration
+
+- `server.port` defaults to `8135`
+- seeded traces are loaded at startup and on reset
+- service metrics are computed from the in-memory trace set
+- propagation breakpoints are limited to `inventory-service`, `payment-service`, and `notification-service`
+
+## Notes and Limitations
 
 - Storage is fully in memory and resets on restart.
 - Detached traces intentionally represent missing trace-header propagation between services.
 - The latency values are simulated to highlight topology and failure modes, not benchmark real service performance.
+
+## Technologies Used
+
+- Spring Boot 3.2
+- Thymeleaf
+- Java 17
+- In-memory trace and span store

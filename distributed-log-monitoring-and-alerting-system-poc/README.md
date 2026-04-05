@@ -1,31 +1,52 @@
 # Distributed Log Monitoring and Alerting System POC
 
-This POC simulates a trading match engine log flow from client to server. Logs are collected, transformed through a pipeline, filtered via strategies, and finally dispatched to observers when alert thresholds are met.
+Spring Boot and React proof-of-concept for a centralized log-ingestion pipeline that normalizes events, scrubs PII, applies rule-based alerting, and exposes recent logs plus triggered alerts through a small control plane.
 
-## Architecture
-- LogCollector (Singleton/Factory)
-- Transformation Pipeline (Chain of Responsibility)
-- Filter Engine (Strategy Pattern)
-- Alerting Service (Observer Pattern)
+## Goal
 
-## Run
+Demonstrate how an operations system can ingest application logs, transform them through a processing pipeline, and trigger alerts based on reusable filtering rules rather than hard-coded endpoint logic.
 
-### Server
-```bash
-cd /Users/vedantbarua/Desktop/Projects/system-design-pocs/distributed-log-monitoring-and-alerting-system-poc/server
-mvn spring-boot:run
-```
+## What It Covers
 
-### Client
-```bash
-cd /Users/vedantbarua/Desktop/Projects/system-design-pocs/distributed-log-monitoring-and-alerting-system-poc/client
-npm install
-npm run dev
-```
+- Centralized log ingestion through a Spring Boot API
+- Chain-of-responsibility transformation pipeline
+- PII scrubbing for sensitive message content
+- Timestamp normalization and metadata enrichment
+- Strategy-based alert filters with threshold counters
+- Observer-style alert sinks for console output and in-memory dashboard state
+- React UI for sending logs, viewing recent events, and clearing alerts
 
-Open `http://localhost:5173`.
+## Quick Start
 
-## Sample Log Payload
+1. Start the server:
+   ```bash
+   cd distributed-log-monitoring-and-alerting-system-poc/server
+   mvn spring-boot:run
+   ```
+2. Start the client:
+   ```bash
+   cd distributed-log-monitoring-and-alerting-system-poc/client
+   npm install
+   npm run dev
+   ```
+3. Open `http://localhost:5173`.
+
+## UI Flows
+
+- Send a single log entry and inspect the normalized stored result
+- Send a sample burst to trip threshold-based alert rules
+- Submit messages with email or card-like text and observe PII scrubbing
+- Clear active alerts while keeping the recent log history visible
+
+## JSON Endpoints
+
+- `POST /api/logs`
+- `GET /api/logs`
+- `GET /api/alerts`
+- `DELETE /api/alerts`
+
+Example log request:
+
 ```json
 {
   "source": "trading-gateway",
@@ -40,7 +61,24 @@ Open `http://localhost:5173`.
 }
 ```
 
-## Alert Rules (Server)
-- `errors_over_threshold`: triggers on 3+ ERROR logs
-- `trade_rejected`: triggers on 2 occurrences of "trade rejected"
-- `fatal_matching_engine`: triggers on any FATAL log containing "matching"
+## Configuration
+
+- the Spring server runs on its configured application port
+- the Vite client runs on `5173`
+- the in-memory log store retains the most recent `200` entries
+- alert rules are registered in code during application startup
+
+## Notes and Limitations
+
+- Storage is fully in memory and resets on restart.
+- Alert thresholds are global counters and are not partitioned by tenant, service, or time window.
+- The pipeline models synchronous ingestion rather than a queue-backed or stream-based log path.
+- There is no persistent retention tier, indexing layer, or search API.
+
+## Technologies Used
+
+- Spring Boot
+- Java 17
+- React
+- Vite
+- In-memory processing pipeline and alert store
