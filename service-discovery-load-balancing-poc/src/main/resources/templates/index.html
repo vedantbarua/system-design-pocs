@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Discovery + Load Balancing POC</title>
+    <style>
+        :root {
+            --bg: #eef4f1;
+            --panel: rgba(252, 255, 253, 0.94);
+            --ink: #13211d;
+            --muted: #5b6d66;
+            --line: #cad9d3;
+            --accent: #0f766e;
+            --accent-2: #1d4ed8;
+            --warn: #b45309;
+            --danger: #b42318;
+            --shadow: 0 18px 42px rgba(19, 33, 29, 0.12);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: "Iowan Old Style", "Palatino Linotype", serif;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at 0% 0%, rgba(29, 78, 216, 0.12), transparent 30%),
+                radial-gradient(circle at 100% 10%, rgba(15, 118, 110, 0.14), transparent 35%),
+                linear-gradient(180deg, #f9fcfb 0%, var(--bg) 100%);
+        }
+
+        .page {
+            width: min(1440px, calc(100% - 28px));
+            margin: 0 auto;
+            padding: 28px 0 46px;
+        }
+
+        .hero, .panel {
+            background: var(--panel);
+            border: 1px solid rgba(19, 33, 29, 0.1);
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+        }
+
+        .hero {
+            padding: 28px;
+            display: grid;
+            grid-template-columns: 1.3fr 1fr;
+            gap: 18px;
+            margin-bottom: 20px;
+        }
+
+        .eyebrow {
+            margin: 0 0 10px;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-size: 0.8rem;
+        }
+
+        h1, h2, h3 {
+            margin: 0;
+            line-height: 1.05;
+        }
+
+        h1 {
+            font-size: clamp(2.4rem, 3.6vw, 4rem);
+        }
+
+        .subhead {
+            max-width: 64ch;
+            margin: 14px 0 0;
+            color: var(--muted);
+            line-height: 1.58;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .stat, .panel {
+            padding: 20px;
+        }
+
+        .stat strong {
+            display: block;
+            font-size: 2rem;
+            margin-bottom: 4px;
+        }
+
+        .muted, .stat span, label {
+            color: var(--muted);
+        }
+
+        .message {
+            margin-bottom: 18px;
+            padding: 14px 16px;
+            border-radius: 14px;
+            border: 1px solid rgba(15, 118, 110, 0.18);
+            background: rgba(15, 118, 110, 0.09);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(12, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .span-4 { grid-column: span 4; }
+        .span-5 { grid-column: span 5; }
+        .span-6 { grid-column: span 6; }
+        .span-7 { grid-column: span 7; }
+        .span-8 { grid-column: span 8; }
+        .span-12 { grid-column: span 12; }
+
+        form {
+            display: grid;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .row-2 {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        input, select, button {
+            width: 100%;
+            font: inherit;
+            padding: 12px 13px;
+            border-radius: 13px;
+        }
+
+        input, select {
+            border: 1px solid var(--line);
+            background: #fff;
+            color: var(--ink);
+        }
+
+        button {
+            border: 0;
+            cursor: pointer;
+            background: var(--ink);
+            color: #f4faf7;
+        }
+
+        button.alt {
+            background: var(--accent-2);
+        }
+
+        button.warn {
+            background: var(--warn);
+        }
+
+        button.danger {
+            background: var(--danger);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 14px;
+            font-size: 0.94rem;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 10px 8px;
+            vertical-align: top;
+            border-bottom: 1px solid rgba(19, 33, 29, 0.08);
+        }
+
+        th {
+            color: var(--muted);
+            font-weight: 600;
+        }
+
+        .pill {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            background: rgba(15, 118, 110, 0.1);
+            color: var(--accent);
+        }
+
+        .pill.canary {
+            background: rgba(29, 78, 216, 0.12);
+            color: var(--accent-2);
+        }
+
+        .pill.warn {
+            background: rgba(180, 83, 9, 0.14);
+            color: var(--warn);
+        }
+
+        .pill.danger {
+            background: rgba(180, 35, 24, 0.12);
+            color: var(--danger);
+        }
+
+        .service-card {
+            border: 1px solid rgba(19, 33, 29, 0.08);
+            border-radius: 18px;
+            padding: 16px;
+            margin-top: 14px;
+            background: rgba(255, 255, 255, 0.68);
+        }
+
+        .service-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 14px;
+            align-items: baseline;
+            flex-wrap: wrap;
+        }
+
+        .mini-actions {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .mini-actions form {
+            margin: 0;
+        }
+
+        code {
+            font-family: "SFMono-Regular", Consolas, monospace;
+            font-size: 0.92em;
+        }
+
+        @media (max-width: 1040px) {
+            .hero, .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .span-4, .span-5, .span-6, .span-7, .span-8, .span-12 {
+                grid-column: auto;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .row-2, .stats, .mini-actions {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+    <section class="hero">
+        <div>
+            <p class="eyebrow">Traffic Control Plane</p>
+            <h1>Service Discovery, Leases, and Smart Routing.</h1>
+            <p class="subhead">
+                Register service instances, renew their leases, flip them into draining mode, inject failures,
+                and watch the router prefer local healthy capacity while preserving sticky session choices via
+                weighted rendezvous hashing.
+            </p>
+        </div>
+        <div class="stats">
+            <div class="panel stat">
+                <strong th:text="${snapshot.serviceCount}">0</strong>
+                <span>services</span>
+            </div>
+            <div class="panel stat">
+                <strong th:text="${snapshot.instanceCount}">0</strong>
+                <span>instances</span>
+            </div>
+            <div class="panel stat">
+                <strong th:text="${snapshot.routableCount}">0</strong>
+                <span>healthy + routable</span>
+            </div>
+            <div class="panel stat">
+                <strong th:text="${snapshot.canaryCount}">0</strong>
+                <span>canary instances</span>
+            </div>
+        </div>
+    </section>
+
+    <div th:if="${message}" class="message" th:text="${message}"></div>
+
+    <section class="grid">
+        <article class="panel span-5">
+            <p class="eyebrow">Registry</p>
+            <h2>Register Instance</h2>
+            <p class="muted">Metadata format: <code>rack=r1,owner=edge</code></p>
+            <form method="post" action="/instances/register">
+                <div class="row-2">
+                    <label>Service
+                        <input name="serviceName" value="checkout" required>
+                    </label>
+                    <label>Instance ID
+                        <input name="instanceId" value="checkout-us-east-1a-v2">
+                    </label>
+                </div>
+                <div class="row-2">
+                    <label>Zone
+                        <input name="zone" value="us-east-1a" required>
+                    </label>
+                    <label>Version
+                        <input name="version" value="v2" required>
+                    </label>
+                </div>
+                <div class="row-2">
+                    <label>Weight
+                        <input type="number" name="weight" min="1" max="1000" value="100" required>
+                    </label>
+                    <label>Canary
+                        <select name="canary">
+                            <option value="false">false</option>
+                            <option value="true">true</option>
+                        </select>
+                    </label>
+                </div>
+                <label>Metadata
+                    <input name="metadata" value="rack=r1,owner=edge">
+                </label>
+                <button type="submit">Register</button>
+            </form>
+        </article>
+
+        <article class="panel span-7">
+            <p class="eyebrow">Router</p>
+            <h2>Simulate Request Routing</h2>
+            <p class="muted">
+                With a <code>sessionKey</code>, routing is sticky and deterministic. Without one, the service uses weighted round robin.
+            </p>
+            <form method="post" action="/route">
+                <div class="row-2">
+                    <label>Service
+                        <input name="serviceName" value="checkout" required>
+                    </label>
+                    <label>Client Zone
+                        <input name="clientZone" value="us-east-1a">
+                    </label>
+                </div>
+                <div class="row-2">
+                    <label>Session Key
+                        <input name="sessionKey" value="cart-42">
+                    </label>
+                    <label>Allow Canary
+                        <select name="allowCanary">
+                            <option value="true">true</option>
+                            <option value="false">false</option>
+                        </select>
+                    </label>
+                </div>
+                <button class="alt" type="submit">Route Request</button>
+            </form>
+
+            <table>
+                <thead>
+                <tr>
+                    <th>Recent routes</th>
+                    <th>Strategy</th>
+                    <th>Zone choice</th>
+                    <th>Note</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(snapshot.recentRoutes)}">
+                    <td colspan="4" class="muted">No routing decisions yet.</td>
+                </tr>
+                <tr th:each="route : ${snapshot.recentRoutes}">
+                    <td>
+                        <strong th:text="${route.instance.instanceId}">instance</strong><br>
+                        <span class="muted" th:text="${route.service + ' @ ' + #temporals.format(route.routedAt, 'HH:mm:ss')}">meta</span>
+                    </td>
+                    <td th:text="${route.strategy}">strategy</td>
+                    <td th:text="${route.requestedZone == null ? route.matchedZone : route.requestedZone + ' -> ' + route.matchedZone}">zone</td>
+                    <td th:text="${route.note}">note</td>
+                </tr>
+                </tbody>
+            </table>
+        </article>
+
+        <article class="panel span-12">
+            <p class="eyebrow">Cluster State</p>
+            <h2>Registered Services</h2>
+            <p class="muted">
+                Lease window: <span th:text="${snapshot.leaseDurationMillis}">15000</span> ms.
+                Temporary ejection: <span th:text="${snapshot.ejectionDurationMillis}">10000</span> ms.
+            </p>
+
+            <div th:if="${#lists.isEmpty(snapshot.services)}" class="service-card">
+                <p class="muted">No services registered yet.</p>
+            </div>
+
+            <div th:each="serviceView : ${snapshot.services}" class="service-card">
+                <div class="service-head">
+                    <div>
+                        <h3 th:text="${serviceView.service}">service</h3>
+                        <p class="muted" th:text="${serviceView.routableInstances + ' of ' + serviceView.totalInstances + ' routable, ' + serviceView.canaryInstances + ' canary'}">counts</p>
+                    </div>
+                    <div>
+                        <span class="pill" th:text="${serviceView.routableInstances + ' healthy'}">healthy</span>
+                        <span class="pill canary" th:text="${serviceView.canaryInstances + ' canary'}">canary</span>
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Instance</th>
+                        <th>Version</th>
+                        <th>State</th>
+                        <th>Lease</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="instance : ${serviceView.instances}">
+                        <td>
+                            <strong th:text="${instance.instanceId}">id</strong><br>
+                            <span class="muted" th:text="${instance.zone + ' • weight ' + instance.weight}">zone</span><br>
+                            <span th:if="${instance.canary}" class="pill canary">canary</span>
+                        </td>
+                        <td th:text="${instance.version}">v1</td>
+                        <td>
+                            <span class="pill"
+                                  th:classappend="${instance.effectiveState == 'ROUTABLE'} ? '' :
+                                  (${instance.effectiveState == 'DRAINING' || instance.effectiveState == 'EXPIRED'} ? ' warn' : ' danger')"
+                                  th:text="${instance.effectiveState}">state</span><br>
+                            <span class="muted" th:text="${'lifecycle=' + instance.lifecycle + ', failures=' + instance.consecutiveFailures}">meta</span>
+                        </td>
+                        <td>
+                            <span th:text="${#temporals.format(instance.lastHeartbeatAt, 'HH:mm:ss')}">beat</span><br>
+                            <span class="muted" th:text="${'expires @ ' + #temporals.format(T(java.time.Instant).ofEpochMilli(instance.leaseExpiresAtMillis), 'HH:mm:ss')}">expires</span><br>
+                            <span class="muted" th:if="${instance.ejectedUntil != null}" th:text="${'ejected until ' + #temporals.format(instance.ejectedUntil, 'HH:mm:ss')}">ejected</span>
+                        </td>
+                        <td>
+                            <div class="mini-actions">
+                                <form th:action="@{'/instances/' + ${instance.instanceId} + '/heartbeat'}" method="post">
+                                    <button type="submit">Heartbeat</button>
+                                </form>
+                                <form th:action="@{'/instances/' + ${instance.instanceId} + '/status'}" method="post">
+                                    <input type="hidden" name="lifecycle" value="DRAINING">
+                                    <button class="warn" type="submit">Drain</button>
+                                </form>
+                                <form th:action="@{'/instances/' + ${instance.instanceId} + '/status'}" method="post">
+                                    <input type="hidden" name="lifecycle" value="UP">
+                                    <button class="alt" type="submit">Recover</button>
+                                </form>
+                                <form th:action="@{'/instances/' + ${instance.instanceId} + '/result'}" method="post">
+                                    <input type="hidden" name="success" value="false">
+                                    <button class="danger" type="submit">Fail</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </article>
+
+        <article class="panel span-12">
+            <p class="eyebrow">Audit Trail</p>
+            <h2>Recent Registry Events</h2>
+            <table>
+                <thead>
+                <tr>
+                    <th>Time</th>
+                    <th>Type</th>
+                    <th>Service</th>
+                    <th>Instance</th>
+                    <th>Summary</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(snapshot.recentEvents)}">
+                    <td colspan="5" class="muted">No events yet.</td>
+                </tr>
+                <tr th:each="event : ${snapshot.recentEvents}">
+                    <td th:text="${#temporals.format(event.happenedAt, 'HH:mm:ss')}">12:00:00</td>
+                    <td th:text="${event.type}">REGISTER</td>
+                    <td th:text="${event.service}">checkout</td>
+                    <td th:text="${event.instanceId}">instance</td>
+                    <td th:text="${event.summary}">summary</td>
+                </tr>
+                </tbody>
+            </table>
+        </article>
+    </section>
+</div>
+</body>
+</html>
