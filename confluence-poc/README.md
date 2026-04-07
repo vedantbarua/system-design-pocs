@@ -1,45 +1,77 @@
 # Confluence POC
 
-A Confluence-style knowledge hub with:
-- In-memory Spring Boot API for spaces, pages, comments, search, and recent activity
-- React UI for browsing spaces, editing pages, and adding comments
-- Seed data for quick exploration on first run
+Confluence-style knowledge hub with an in-memory Spring Boot backend for spaces, pages, comments, search, and recent activity, plus a React UI for browsing and editing team knowledge.
 
-## Structure
-- `backend`: Spring Boot REST API
-- `frontend`: React (Vite)
+## Goal
 
-## Prerequisites
-- Java 17+
-- Maven
-- Node 18+
+Demonstrate the core data and workflow model of an internal knowledge system: spaces that group pages, versioned page editing, comments for collaboration, search across content and labels, and recent activity for discovery.
 
-## Run backend
-```bash
-cd /Users/vedantbarua/Desktop/Projects/system-design-pocs/confluence-poc/backend
-mvn spring-boot:run
-```
+## What It Covers
 
-## Run frontend
-```bash
-cd /Users/vedantbarua/Desktop/Projects/system-design-pocs/confluence-poc/frontend
-npm install
-npm run dev
-```
+- Space creation and listing
+- Page creation, editing, labels, and status changes
+- Incrementing page versions on save
+- Comment threads per page
+- Search across title, body, and labels
+- Recent-page feed and seeded starter content
 
-## API (core)
+## Quick Start
+
+1. Start the backend:
+   ```bash
+   cd confluence-poc/backend
+   mvn spring-boot:run
+   ```
+2. Start the frontend:
+   ```bash
+   cd confluence-poc/frontend
+   npm install
+   npm run dev
+   ```
+3. Open the frontend at the Vite dev-server URL.
+
+## UI Flows
+
+- Browse seeded spaces and pages on first load
+- Create a new space and add pages to it
+- Edit a page body, labels, and status, then save a new version
+- Add comments to an existing page
+- Search for pages by keyword or label and inspect recent activity
+
+## JSON Endpoints
+
 - `GET /api/spaces`
-- `POST /api/spaces` `{ key, name, owner }`
+- `POST /api/spaces`
 - `GET /api/spaces/{spaceId}/pages`
-- `POST /api/spaces/{spaceId}/pages` `{ title, body, labels, author }`
+- `POST /api/spaces/{spaceId}/pages`
 - `GET /api/pages/{pageId}`
-- `PUT /api/pages/{pageId}` `{ title, body, labels, status, editor }`
+- `PUT /api/pages/{pageId}`
 - `GET /api/pages/{pageId}/comments`
-- `POST /api/pages/{pageId}/comments` `{ author, text }`
+- `POST /api/pages/{pageId}/comments`
 - `GET /api/pages/search?q=...`
 - `GET /api/pages/recent?limit=8`
 - `GET /api/users`
 
+## Configuration
+
+- backend settings live in `backend/src/main/resources/application.yml`
+- frontend development settings live in `frontend/vite.config.js`
+- all application data is seeded in memory when the backend starts
+
+## Notes and Limitations
+
+- All spaces, pages, comments, and users are in memory and reset on restart.
+- Search is simple substring matching and does not include ranking, stemming, or permissions.
+- The POC models content editing, not collaborative real-time editing or access control.
+
+## Technologies Used
+
+- Spring Boot
+- Java
+- React
+- Vite
+
 ## Swagger / OpenAPI
+
 - Swagger UI: `/swagger-ui`
 - OpenAPI JSON: `/api-docs`
