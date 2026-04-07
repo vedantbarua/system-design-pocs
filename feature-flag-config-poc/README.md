@@ -86,8 +86,21 @@ Example client sync request:
 }
 ```
 
-## Notes
+## Configuration
+
+- `server.port` defaults to `8134`
+- `spring.thymeleaf.cache=false` keeps the dashboard editable during development
+- change-history retention is bounded in memory for the UI snapshot view
+
+## Notes and Limitations
 
 - Storage is fully in memory and resets on restart.
 - Rule matching is exact-key equality only in this POC.
 - Client sync models polling-based propagation rather than push or streaming.
+
+## Technologies Used
+
+- Spring Boot 3.2
+- Thymeleaf
+- Java 17
+- In-memory versioned definition store
