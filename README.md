@@ -1,36 +1,43 @@
 # System Design POCs
 
-A curated repository of system design proof-of-concepts spanning distributed systems primitives, infrastructure building blocks, and product-style applications.
+Proof-of-concepts for distributed systems, infrastructure patterns, and product-style architectures. This repository is meant to read like a working systems portfolio, not just a list of folders.
 
-This repo currently contains `59` POCs. The right next step is not adding many more folders. It is presenting the strongest work clearly and bringing the rest up to a consistent quality bar.
+There are currently `59` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
 
-## Featured Portfolio
+## What Makes This Repo Useful
 
-If someone only looks at 12 to 15 projects, start here.
+- Runnable demos instead of design-only notes
+- Strong coverage of distributed systems building blocks
+- A mix of APIs, dashboards, and realtime flows
+- Technical follow-up docs in many folders for deeper review
 
-| POC | Why it matters |
+## Start Here
+
+If a reviewer only opens a dozen projects, these are the best entry points.
+
+| POC | Why it stands out |
 | --- | --- |
-| [distributed-cache-poc](distributed-cache-poc/README.md) | Covers sharding, replication, failover, TTL, and eviction in one place. |
-| [message-queue-poc](message-queue-poc/README.md) | Strong event backbone demo with partitions, consumer groups, retries, replay, and DLQ. |
-| [distributed-stream-processing-poc](distributed-stream-processing-poc/README.md) | Good follow-on to the queue with windows, checkpoints, and replay. |
-| [event-sourcing-cqrs-poc](event-sourcing-cqrs-poc/README.md) | Demonstrates write/read model separation, snapshots, and rebuild mechanics. |
-| [object-storage-poc](object-storage-poc/README.md) | Useful storage-system coverage: buckets, multipart upload, versioning, presigned access. |
-| [cdn-poc](cdn-poc/README.md) | Complements object storage with cache locality, invalidation, and edge delivery. |
-| [search-engine-poc](search-engine-poc/README.md) | Good indexing and fanout example beyond simple CRUD apps. |
-| [distributed-lock-manager-poc](distributed-lock-manager-poc/README.md) | Shows practical coordination using leases, Lua-safe release, and fencing tokens. |
-| [fault-tolerant-leader-election-poc](fault-tolerant-leader-election-poc/README.md) | Covers leader failover and cluster coordination basics. |
-| [database-replication-quorum-poc](database-replication-quorum-poc/README.md) | Good consistency tradeoff demo with quorum reads and writes, stale replicas, and repair mechanics. |
-| [distributed-job-scheduler-poc](distributed-job-scheduler-poc/README.md) | Strong control-plane example with timing wheel scheduling and sharded execution. |
-| [feature-flag-config-poc](feature-flag-config-poc/README.md) | Real production concern: config propagation, targeting, and rollout control. |
-| [service-discovery-load-balancing-poc](service-discovery-load-balancing-poc/README.md) | Covers leases, zone-aware routing, sticky sessions, draining, and temporary ejection. |
+| [distributed-cache-poc](distributed-cache-poc/README.md) | Sharding, replication, failover, TTLs, and eviction in one concrete demo. |
+| [message-queue-poc](message-queue-poc/README.md) | Good event backbone example with partitions, consumer groups, retry, replay, and DLQ behavior. |
+| [distributed-stream-processing-poc](distributed-stream-processing-poc/README.md) | Useful continuation of queueing concepts with windows, checkpoints, and replay. |
+| [event-sourcing-cqrs-poc](event-sourcing-cqrs-poc/README.md) | Clear write/read separation, snapshotting, and rebuild mechanics. |
+| [object-storage-poc](object-storage-poc/README.md) | Strong storage-system coverage: buckets, multipart uploads, versioning, and presigned access. |
+| [cdn-poc](cdn-poc/README.md) | Good edge caching story with invalidation, TTLs, and regional cache behavior. |
+| [search-engine-poc](search-engine-poc/README.md) | Indexing, retrieval, and fanout beyond simple CRUD apps. |
+| [distributed-lock-manager-poc](distributed-lock-manager-poc/README.md) | Practical coordination demo using leases, safe release, and fencing tokens. |
+| [fault-tolerant-leader-election-poc](fault-tolerant-leader-election-poc/README.md) | Good cluster coordination and failover fundamentals. |
+| [database-replication-quorum-poc](database-replication-quorum-poc/README.md) | Strong consistency tradeoff demo with quorum reads and writes, stale replicas, and repair paths. |
+| [distributed-job-scheduler-poc](distributed-job-scheduler-poc/README.md) | Useful control-plane example with timing, sharding, and worker assignment. |
+| [feature-flag-config-poc](feature-flag-config-poc/README.md) | Good production-focused system for rollout control and config propagation. |
+| [service-discovery-load-balancing-poc](service-discovery-load-balancing-poc/README.md) | Lease-based discovery, routing, sticky sessions, draining, and temporary ejection. |
 | [distributed-tracing-observability-poc](distributed-tracing-observability-poc/README.md) | Important operational visibility story across services. |
-| [stock-exchange-poc](stock-exchange-poc/README.md) | Nice low-latency deterministic processing example. |
-| [saga-pattern-orchestrator-poc](saga-pattern-orchestrator-poc/README.md) | Demonstrates distributed workflow coordination and compensation. |
-| [notification-system-poc](notification-system-poc/README.md) | Good example of queueing, rate limits, provider routing, and delivery semantics. |
+| [stock-exchange-poc](stock-exchange-poc/README.md) | Strong deterministic processing example with ordered ingress and live market updates. |
+| [saga-pattern-orchestrator-poc](saga-pattern-orchestrator-poc/README.md) | Distributed workflow coordination with compensation logic. |
+| [notification-system-poc](notification-system-poc/README.md) | Real messaging-system concerns: queueing, provider routing, delivery semantics, and rate limits. |
 
-## Suggested Review Order
+## Suggested Review Path
 
-This order moves from fundamentals to higher-level systems.
+This path moves from core primitives to more layered systems.
 
 1. [key-value-store-poc](key-value-store-poc/README.md)
 2. [rate-limiter-poc](rate-limiter-poc/README.md)
@@ -50,13 +57,7 @@ This order moves from fundamentals to higher-level systems.
 16. [search-engine-poc](search-engine-poc/README.md)
 17. [stock-exchange-poc](stock-exchange-poc/README.md)
 
-## Repository Gaps Worth Filling
-
-Do not add more adjacent product clones until these are covered.
-
-- Authentication, authorization, sessions, and token lifecycle
-
-## Full Catalog
+## Repo Layout
 
 ### Distributed Systems Primitives
 
@@ -135,12 +136,20 @@ Do not add more adjacent product clones until these are covered.
 - [workout-tracker-poc](workout-tracker-poc/README.md)
 - [youTube-top-K-poc](youTube-top-K-poc/README.md)
 
-## Quality Bar
+## How To Read A Project Folder
 
-The repo is in decent shape, but not fully standardized yet.
+For the strongest review signal, open files in this order:
+
+1. `README.md` for the fast explanation and demo flow
+2. `TECHNICAL_README.md` or `TECHNICAL_DOC.md` for architecture and tradeoffs
+3. `IMPROVEMENTS.md` for the path from POC to production
+
+## Current Standard
+
+The repository direction is to make every project easy to scan in under two minutes and deep enough to discuss in an interview or portfolio review.
 
 - `59/59` POCs have a `README.md`
-- `49/59` POCs have a `TECHNICAL_README.md`
-- `38/59` POCs have an `IMPROVEMENTS.md`
+- `56/59` POCs have a technical companion doc
+- `47/59` POCs have an `IMPROVEMENTS.md`
 
-Use [POC_STANDARDS.md](POC_STANDARDS.md) as the target format for future cleanup.
+Use [POC_STANDARDS.md](POC_STANDARDS.md) as the baseline for future additions and cleanup.
