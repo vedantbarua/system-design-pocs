@@ -1,65 +1,99 @@
-# API Gateway with Dynamic Routing POC
+# API Gateway With Dynamic Routing POC
 
-A small system design POC that builds an API gateway as the entry point for multiple microservices. It demonstrates dynamic routing, request aggregation, and a circuit breaker pattern while a React "Service Health" dashboard keeps everything observable.
+Node-based API gateway proof-of-concept that sits in front of multiple backend services, performs dynamic proxy routing, exposes an aggregation endpoint, and demonstrates a lightweight circuit breaker. A React dashboard makes the health and failure behavior easier to understand than raw logs alone.
 
-## What This POC Shows
-- Dynamic routing via `http-proxy-middleware` with a live route registry.
-- Request aggregation that merges User + Order service data into one response.
-- Circuit breaker pattern to stop repeated calls to failing services.
-- A dashboard that visualizes service health and lets you inject failures.
+## Why This POC Matters
 
-## Architecture
-- Gateway: `backend/server.js`
-- User Service: `backend/services/user-service.js`
-- Order Service: `backend/services/order-service.js`
-- Dashboard: `frontend/`
+Gateways are one of the first real platform layers teams build once services start multiplying. The valuable part is not just request forwarding. It is dynamic route ownership, combined responses, and preventing one unhealthy service from dragging down the rest of the system.
 
-Ports
+## What It Shows
+
+- Dynamic routing with a live route registry
+- Proxying requests to downstream services
+- Aggregating user and order responses into a single API
+- Circuit-breaker behavior for unhealthy dependencies
+- A frontend dashboard for health visibility and chaos toggles
+
+## Architecture At A Glance
+
+- `backend/server.js` runs the gateway
+- `backend/services/user-service.js` is a sample user service
+- `backend/services/order-service.js` is a sample order service
+- `frontend/` is a React + Vite dashboard
+
+## Ports
+
 - Gateway: `9100`
-- User Service: `9101`
-- Order Service: `9102`
-- Dashboard: `5179`
+- User service: `9101`
+- Order service: `9102`
+- Frontend dashboard: `5179`
 
-## Run It
-Backend (starts gateway + both services):
+## Run It Locally
+
+### Backend
+
 ```bash
 cd api-gateway-dynamic-routing-poc/backend
 npm install
 npm run start:all
 ```
 
-Frontend:
+### Frontend
+
 ```bash
 cd api-gateway-dynamic-routing-poc/frontend
 npm install
 npm run dev
 ```
 
-Open the dashboard at `http://localhost:5179`.
+Open `http://localhost:5179`.
 
-## Try It
+## Demo Flow
+
+1. Load the dashboard and confirm all services are healthy.
+2. Call the aggregate endpoint through the gateway.
+3. Query individual user and order routes through the same gateway host.
+4. Simulate a service outage and watch the breaker behavior change.
+5. Reset the circuit and confirm traffic recovers.
+
+## Example Requests
+
 Aggregate request:
+
 ```bash
 curl http://localhost:9100/api/aggregate/u-1001
 ```
 
-Proxy routing (through the gateway):
+Proxy routing:
+
 ```bash
 curl http://localhost:9100/api/users/u-1001
 curl http://localhost:9100/api/orders?userId=u-1001
 ```
 
-Trip a circuit breaker by forcing the User service down:
+Force the user service down:
+
 ```bash
 curl -X POST http://localhost:9100/api/users/admin/chaos \
   -H "Content-Type: application/json" \
   -d '{"down": true}'
 ```
 
-Reset breaker:
+Reset the breaker:
+
 ```bash
 curl -X POST http://localhost:9100/api/circuit/users/reset
 ```
 
-## Everyday Use
-Think of the gateway as a hub for hobby projects. It gives you one URL to route traffic, combine data across services, and avoid cascading failures when a single project is unhealthy.
+## Design Notes
+
+- The gateway acts as the single external entry point.
+- Aggregation is useful for client efficiency, but it also couples the gateway to downstream response shapes.
+- Circuit breakers help stop repeated calls to a dependency that is already failing.
+
+## Limitations
+
+- In-memory route and breaker state
+- No service discovery integration
+- No auth, rate limiting, or request tracing
+- Simplified downstream services for demonstration only
