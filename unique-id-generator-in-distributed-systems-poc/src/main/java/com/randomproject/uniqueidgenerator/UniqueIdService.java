@@ -1,6 +1,7 @@
 package com.randomproject.uniqueidgenerator;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -24,9 +25,11 @@ public class UniqueIdService {
     private final int nodeShift;
     private final int timestampShift;
     private final int timestampBits;
+    private final long maxTimestampPart;
     private final long maxBackwardDriftMillis;
     private final LongSupplier timeSource;
 
+    @Autowired
     public UniqueIdService(
             @Value("${id.epoch-millis:1704067200000}") long epochMillis,
             @Value("${id.node-bits:10}") int nodeBits,
@@ -61,6 +64,7 @@ public class UniqueIdService {
         this.nodeShift = sequenceBits;
         this.timestampShift = nodeBits + sequenceBits;
         this.timestampBits = 63 - nodeBits - sequenceBits;
+        this.maxTimestampPart = (1L << timestampBits) - 1;
         this.maxBackwardDriftMillis = maxBackwardDriftMillis;
         this.timeSource = timeSource;
         if (defaultNodeId < 0 || defaultNodeId > maxNodeId) {
@@ -203,6 +207,9 @@ public class UniqueIdService {
         state.lastTimestamp = current;
         state.generatedCount++;
         long timestampPart = current - epochMillis;
+        if (timestampPart > maxTimestampPart) {
+            throw new IllegalArgumentException("Timestamp is outside the " + timestampBits + "-bit range for the configured epoch.");
+        }
         return (timestampPart << timestampShift) | ((long) state.nodeId << nodeShift) | state.sequence;
     }
 
