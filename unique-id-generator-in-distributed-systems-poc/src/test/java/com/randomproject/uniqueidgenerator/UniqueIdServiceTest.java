@@ -14,6 +14,51 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class UniqueIdServiceTest {
 
     @Test
+    void shouldPackTimestampNodeAndSequenceIntoSnowflakeLayout() {
+        long epochMillis = 1_704_067_200_000L;
+        long relativeTimestamp = 123L;
+        int nodeId = 513;
+        UniqueIdService service = new UniqueIdService(
+                epochMillis,
+                10,
+                12,
+                20,
+                1,
+                5,
+                () -> epochMillis + relativeTimestamp);
+
+        List<IdGeneration> generated = service.generate(nodeId, 3);
+
+        assertEquals((relativeTimestamp << 22) | ((long) nodeId << 12), generated.get(0).id());
+        assertEquals((relativeTimestamp << 22) | ((long) nodeId << 12) | 1L, generated.get(1).id());
+        assertEquals((relativeTimestamp << 22) | ((long) nodeId << 12) | 2L, generated.get(2).id());
+        assertEquals(41, generated.get(0).bitLayout().timestampBits().length());
+        assertEquals(10, generated.get(0).bitLayout().nodeBits().length());
+        assertEquals(12, generated.get(0).bitLayout().sequenceBits().length());
+    }
+
+    @Test
+    void shouldDecodeSnowflakeFieldsFromGeneratedId() {
+        long epochMillis = 1_704_067_200_000L;
+        UniqueIdService service = new UniqueIdService(
+                epochMillis,
+                10,
+                12,
+                20,
+                1,
+                5,
+                () -> epochMillis + 42L);
+
+        long id = service.generate(1023, 2).get(1).id();
+        IdDecodeResult decoded = service.decode(id);
+
+        assertEquals(42L, decoded.relativeTimestamp());
+        assertEquals(1023, decoded.nodeId());
+        assertEquals(1, decoded.sequence());
+        assertEquals(epochMillis + 42L, decoded.timestamp());
+    }
+
+    @Test
     void shouldGenerateUniqueIdsAcrossMultipleNodes() {
         UniqueIdService service = new UniqueIdService(
                 1_704_067_200_000L,
@@ -81,6 +126,39 @@ class UniqueIdServiceTest {
 
         IllegalArgumentException error = assertThrows(IllegalArgumentException.class, () -> service.generate(1, 1));
         assertTrue(error.getMessage().contains("Clock moved backwards"));
+    }
+
+    @Test
+    void shouldRejectNodeIdsOutsideTenBitRange() {
+        UniqueIdService service = new UniqueIdService(
+                1_704_067_200_000L,
+                10,
+                12,
+                20,
+                1,
+                5,
+                incrementingTime(1_704_067_200_100L));
+
+        IllegalArgumentException error = assertThrows(IllegalArgumentException.class, () -> service.generate(1024, 1));
+
+        assertTrue(error.getMessage().contains("Node id must be between 0 and 1023"));
+    }
+
+    @Test
+    void shouldRejectTimestampsOutsideFortyOneBitRange() {
+        long epochMillis = 1_704_067_200_000L;
+        UniqueIdService service = new UniqueIdService(
+                epochMillis,
+                10,
+                12,
+                20,
+                1,
+                5,
+                () -> epochMillis + (1L << 41));
+
+        IllegalArgumentException error = assertThrows(IllegalArgumentException.class, () -> service.generate(1, 1));
+
+        assertTrue(error.getMessage().contains("41-bit range"));
     }
 
     private static LongSupplier incrementingTime(long start) {
