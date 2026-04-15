@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bar Menu POC</title>
+    <style>
+        :root {
+            --ink: #17211d;
+            --muted: #59665f;
+            --line: #d9e1dc;
+            --panel: #ffffff;
+            --wash: #f3f7f4;
+            --accent: #0f7a5f;
+            --accent-dark: #0a5f4a;
+            --warm: #b33b2e;
+            --gold: #d69b2d;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
+            color: var(--ink);
+            background: linear-gradient(180deg, #f7faf8 0%, #e8f0eb 100%);
+        }
+
+        .page {
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 28px 18px 44px;
+        }
+
+        .topline {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            align-items: flex-end;
+            margin-bottom: 18px;
+            border-bottom: 1px solid var(--line);
+            padding-bottom: 18px;
+        }
+
+        h1, h2, h3, p { margin-top: 0; }
+        h1 { margin-bottom: 8px; font-size: 34px; line-height: 1.1; }
+        h2 { font-size: 22px; margin-bottom: 14px; }
+        h3 { font-size: 17px; margin-bottom: 8px; }
+        p { color: var(--muted); line-height: 1.5; }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(120px, 1fr));
+            gap: 10px;
+            min-width: 260px;
+        }
+
+        .stat, .panel, .drink, .session, .event {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+        }
+
+        .stat { padding: 12px; }
+        .stat span { display: block; color: var(--muted); font-size: 13px; }
+        .stat strong { display: block; margin-top: 4px; font-size: 24px; }
+
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.25fr) minmax(340px, 0.75fr);
+            gap: 18px;
+            align-items: start;
+        }
+
+        .panel { padding: 18px; }
+        .message {
+            padding: 10px 12px;
+            border: 1px solid #edc86a;
+            border-radius: 8px;
+            background: #fff8df;
+            color: #69470a;
+            margin-bottom: 14px;
+        }
+
+        .menu {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(245px, 1fr));
+            gap: 12px;
+        }
+
+        .drink {
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            min-height: 312px;
+            overflow: hidden;
+        }
+
+        .drink img {
+            width: 100%;
+            height: 118px;
+            object-fit: cover;
+            display: block;
+            background: var(--wash);
+        }
+
+        .drink-body { padding: 14px; }
+        .drink-title {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .tag {
+            display: inline-block;
+            border-radius: 999px;
+            padding: 4px 8px;
+            font-size: 12px;
+            background: #e7f4ee;
+            color: #0b684f;
+            white-space: nowrap;
+        }
+
+        .tag.zero { background: #f4ead6; color: #7a4d07; }
+        .meta { color: var(--muted); font-size: 13px; margin-bottom: 8px; }
+        .ingredients { padding-left: 18px; margin: 8px 0 0; color: var(--muted); }
+        .ingredients li { margin-bottom: 3px; }
+
+        form { margin: 0; }
+
+        button, .link-button {
+            border: 0;
+            border-radius: 8px;
+            background: var(--accent);
+            color: #fff;
+            padding: 10px 13px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 40px;
+        }
+
+        button:hover, .link-button:hover { background: var(--accent-dark); }
+        button.secondary { background: #e6ece8; color: var(--ink); }
+        button.secondary:hover { background: #d7e0da; }
+        button.warn { background: var(--warm); }
+        button.warn:hover { background: #8f2c22; }
+        button:disabled { opacity: 0.48; cursor: not-allowed; }
+        .drink form { padding: 0 14px 14px; }
+        .drink button { width: 100%; }
+
+        .helper {
+            position: sticky;
+            top: 14px;
+            display: grid;
+            gap: 14px;
+        }
+
+        .progress-wrap {
+            height: 12px;
+            border-radius: 999px;
+            background: #e8eee9;
+            overflow: hidden;
+            margin: 12px 0;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, var(--accent), var(--gold));
+            transition: width 180ms ease;
+        }
+
+        .step-box {
+            border-left: 4px solid var(--accent);
+            padding: 12px 0 12px 14px;
+            min-height: 132px;
+        }
+
+        .step-box strong { display: block; margin-bottom: 8px; font-size: 18px; }
+        .timer { color: var(--warm); font-weight: 800; }
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .session-list, .event-list {
+            display: grid;
+            gap: 8px;
+        }
+
+        .session, .event { padding: 10px; }
+        .session {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .session a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .empty {
+            color: var(--muted);
+            padding: 14px;
+            border: 1px dashed var(--line);
+            border-radius: 8px;
+            background: #fbfdfc;
+        }
+
+        .event { color: var(--muted); font-size: 14px; }
+        .event strong { color: var(--ink); }
+
+        @media (max-width: 880px) {
+            .topline { display: block; }
+            .stats { margin-top: 12px; min-width: 0; }
+            .layout { grid-template-columns: 1fr; }
+            .helper { position: static; }
+        }
+
+        @media (max-width: 560px) {
+            .page { padding: 20px 12px 34px; }
+            h1 { font-size: 28px; }
+            .controls { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<main class="page">
+    <header class="topline">
+        <div>
+            <h1>Bar Menu</h1>
+            <p>Pick a drink, follow each prep step, and keep every active build visible.</p>
+        </div>
+        <div class="stats">
+            <div class="stat">
+                <span>Drinks</span>
+                <strong th:text="${drinks.size()}">4</strong>
+            </div>
+            <div class="stat">
+                <span>Active helpers</span>
+                <strong th:text="${sessions.size()}">0</strong>
+            </div>
+        </div>
+    </header>
+
+    <div th:if="${message}" class="message" th:text="${message}"></div>
+
+    <div class="layout">
+        <section class="panel">
+            <h2>Drink menu</h2>
+            <div class="menu">
+                <article class="drink" th:each="drink : ${drinks}">
+                    <img th:alt="${drink.name}" th:src="${'https://source.unsplash.com/640x360/?cocktail,bar,' + drink.id}">
+                    <div class="drink-body">
+                        <div class="drink-title">
+                            <h3 th:text="${drink.name}">Margarita</h3>
+                            <span th:class="${drink.alcoholic ? 'tag' : 'tag zero'}"
+                                  th:text="${drink.alcoholic ? drink.category : 'ZERO PROOF'}">CLASSIC</span>
+                        </div>
+                        <div class="meta">
+                            <span th:text="${drink.glass}">Glass</span>
+                            <span> | </span>
+                            <span th:text="${drink.totalSeconds()} + ' sec guide'">80 sec guide</span>
+                        </div>
+                        <p th:text="${drink.flavor}">Flavor profile</p>
+                        <ul class="ingredients">
+                            <li th:each="ingredient : ${drink.ingredients}">
+                                <span th:text="${ingredient.amount}">2 oz</span>
+                                <span th:text="${ingredient.name}">Ingredient</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <form th:action="@{/sessions}" method="post">
+                        <input type="hidden" name="drinkId" th:value="${drink.id}">
+                        <button type="submit">Start helper</button>
+                    </form>
+                </article>
+            </div>
+        </section>
+
+        <aside class="helper">
+            <section class="panel" th:if="${activeSession != null}">
+                <h2 th:text="${activeSession.drink.name}">Active drink</h2>
+                <p>
+                    <span id="statusText" th:text="${activeSession.status}">ACTIVE</span>
+                    <span> | Step </span>
+                    <span id="stepCounter" th:text="${activeView.currentStepNumber} + ' of ' + ${activeView.totalSteps}">1 of 4</span>
+                </p>
+                <div class="progress-wrap">
+                    <div id="progressBar" class="progress-bar" th:style="'width:' + ${activeView.progressPercent} + '%'"></div>
+                </div>
+                <div class="step-box">
+                    <strong id="stepTitle" th:text="${activeSession.currentStep.title}">Build</strong>
+                    <p id="stepInstruction" th:text="${activeSession.currentStep.instruction}">Instruction</p>
+                    <div class="timer">
+                        <span id="stepSeconds" th:text="${activeSession.currentStep.seconds}">20</span>
+                        <span> second focus</span>
+                    </div>
+                </div>
+                <div class="controls">
+                    <form th:action="@{'/sessions/' + ${activeSession.id} + '/back'}" method="post">
+                        <button class="secondary" type="submit" th:disabled="${!activeSession.canGoBack()}">Back</button>
+                    </form>
+                    <form th:action="@{'/sessions/' + ${activeSession.id} + '/advance'}" method="post">
+                        <button type="submit" th:disabled="${!activeSession.canAdvance()}">Next</button>
+                    </form>
+                    <form th:action="@{'/sessions/' + ${activeSession.id} + '/reset'}" method="post">
+                        <button class="warn" type="submit">Reset</button>
+                    </form>
+                </div>
+            </section>
+
+            <section class="panel" th:if="${activeSession == null}">
+                <h2>Live helper</h2>
+                <div class="empty">Start a drink to begin the guided prep flow.</div>
+            </section>
+
+            <section class="panel">
+                <h2>Prep sessions</h2>
+                <div th:if="${#lists.isEmpty(sessions)}" class="empty">No drink helpers have started.</div>
+                <div class="session-list" th:if="${!#lists.isEmpty(sessions)}">
+                    <div class="session" th:each="session : ${sessions}">
+                        <div>
+                            <a th:href="@{/(active=${session.id})}" th:text="${session.drink.name}">Drink</a>
+                            <div class="meta">
+                                <span th:text="${session.id}">session</span>
+                                <span> | </span>
+                                <span th:text="${session.status}">ACTIVE</span>
+                            </div>
+                        </div>
+                        <span class="tag" th:text="${session.progressPercent} + '%'">25%</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel">
+                <h2>Recent events</h2>
+                <div th:if="${#lists.isEmpty(events)}" class="empty">No workflow events yet.</div>
+                <div id="events" class="event-list" th:if="${!#lists.isEmpty(events)}">
+                    <div class="event" th:each="event : ${events}">
+                        <strong th:text="${event.sessionId}">session</strong>
+                        <span th:text="${event.message}">message</span>
+                    </div>
+                </div>
+            </section>
+        </aside>
+    </div>
+</main>
+
+<script th:if="${activeSession != null}" th:inline="javascript">
+    const sessionId = /*[[${activeSession.id}]]*/ "";
+
+    async function refreshHelper() {
+        const [sessionResponse, eventResponse] = await Promise.all([
+            fetch(`/api/sessions/${sessionId}`),
+            fetch("/api/events")
+        ]);
+        if (!sessionResponse.ok) return;
+
+        const session = await sessionResponse.json();
+        document.getElementById("statusText").textContent = session.status;
+        document.getElementById("stepCounter").textContent = `${session.currentStepNumber} of ${session.totalSteps}`;
+        document.getElementById("progressBar").style.width = `${session.progressPercent}%`;
+        document.getElementById("stepTitle").textContent = session.currentStep.title;
+        document.getElementById("stepInstruction").textContent = session.currentStep.instruction;
+        document.getElementById("stepSeconds").textContent = session.currentStep.seconds;
+
+        if (eventResponse.ok) {
+            const events = await eventResponse.json();
+            const eventList = document.getElementById("events");
+            if (eventList) {
+                eventList.innerHTML = events.slice(0, 8)
+                    .map(event => `<div class="event"><strong>${event.sessionId}</strong> ${event.message}</div>`)
+                    .join("");
+            }
+        }
+    }
+
+    window.setInterval(refreshHelper, 2500);
+</script>
+</body>
+</html>
