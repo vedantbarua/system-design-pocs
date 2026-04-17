@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dark Mode Plugin Demo Page</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <nav>
+        <strong>Acme Docs</strong>
+        <a href="#pricing">Pricing</a>
+        <a href="#docs">Docs</a>
+        <a href="#support">Support</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div>
+          <p class="eyebrow">Light page fixture</p>
+          <h1>Use this page to test the dark-mode content script.</h1>
+          <p>
+            The page intentionally uses bright cards, form controls, tables, and dynamically inserted content.
+          </p>
+          <button id="add-card">Add dynamic card</button>
+        </div>
+      </section>
+
+      <section class="grid" id="docs">
+        <article class="card">
+          <h2>Documentation</h2>
+          <p>Text-heavy content should remain readable without needing page-specific selectors.</p>
+          <a href="#">Read the guide</a>
+        </article>
+        <article class="card">
+          <h2>Controls</h2>
+          <label>
+            Search
+            <input type="search" placeholder="Try a form field">
+          </label>
+        </article>
+        <article class="card">
+          <h2>Data</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Page</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Marketing</td>
+                <td>Converted</td>
+              </tr>
+              <tr>
+                <td>Dashboard</td>
+                <td>Converted</td>
+              </tr>
+            </tbody>
+          </table>
+        </article>
+      </section>
+    </main>
+
+    <script>
+      document.getElementById("add-card").addEventListener("click", () => {
+        const card = document.createElement("article");
+        card.className = "card dynamic-card";
+        card.innerHTML = "<h2>Dynamic content</h2><p>This card was inserted after page load.</p>";
+        document.querySelector(".grid").appendChild(card);
+      });
+    </script>
+  </body>
+</html>

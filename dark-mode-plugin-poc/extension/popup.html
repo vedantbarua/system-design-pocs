@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Default Dark Mode POC</title>
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <main>
+      <h1>Dark mode</h1>
+      <p id="host">Current site</p>
+
+      <label class="toggle">
+        <span>Enable everywhere</span>
+        <input id="global-toggle" type="checkbox">
+      </label>
+
+      <label class="toggle">
+        <span>Enable on this site</span>
+        <input id="site-toggle" type="checkbox">
+      </label>
+
+      <p class="status" id="status">Loading settings</p>
+    </main>
+    <script src="popup.js"></script>
+  </body>
+</html>
