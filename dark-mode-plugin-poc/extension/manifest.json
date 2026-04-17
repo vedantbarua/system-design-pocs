@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "Default Dark Mode POC",
+  "description": "Converts pages to dark mode by default with per-site controls.",
+  "version": "0.1.0",
+  "permissions": ["activeTab", "storage"],
+  "host_permissions": ["<all_urls>"],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["dark-mode.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "action": {
+    "default_title": "Default Dark Mode POC",
+    "default_popup": "popup.html"
+  }
+}

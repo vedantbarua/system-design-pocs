@@ -2,7 +2,7 @@
 
 Proof-of-concepts for distributed systems, infrastructure patterns, and product-style architectures. This repository is meant to read like a working systems portfolio, not just a list of folders.
 
-There are currently `60` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
+There are currently `61` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
 
 ## What Makes This Repo Useful
 
@@ -90,6 +90,7 @@ This path moves from core primitives to more layered systems.
 
 - [ad-click-aggregator-poc](ad-click-aggregator-poc/README.md)
 - [api-gateway-dynamic-routing-poc](api-gateway-dynamic-routing-poc/README.md)
+- [dark-mode-plugin-poc](dark-mode-plugin-poc/README.md)
 - [distributed-job-scheduler-poc](distributed-job-scheduler-poc/README.md)
 - [distributed-log-monitoring-and-alerting-system-poc](distributed-log-monitoring-and-alerting-system-poc/README.md)
 - [distributed-tracing-observability-poc](distributed-tracing-observability-poc/README.md)
@@ -149,8 +150,8 @@ For the strongest review signal, open files in this order:
 
 The repository direction is to make every project easy to scan in under two minutes and deep enough to discuss in an interview or portfolio review.
 
-- `60/60` POCs have a `README.md`
-- `57/60` POCs have a technical companion doc
-- `48/60` POCs have an `IMPROVEMENTS.md`
+- `61/61` POCs have a `README.md`
+- `58/61` POCs have a technical companion doc
+- `49/61` POCs have an `IMPROVEMENTS.md`
 
 Use [POC_STANDARDS.md](POC_STANDARDS.md) as the baseline for future additions and cleanup.
