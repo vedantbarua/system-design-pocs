@@ -1,165 +1,182 @@
 # Context Collab POC
 
-Context Collab is a proof-of-concept for sharing, merging, and reusing AI coding context across developers working on the same repository or problem.
+Context Collab is a local-first proof-of-concept for sharing, merging, auditing, and reusing AI coding context across developers working on the same repository.
 
 ## Goal
 
-Developers often build useful AI context in isolation: prompts, session transcripts, file references, debugging notes, decisions, failed attempts, patches, and follow-up plans. That context usually stays trapped inside one chat session or one person's local notes.
-
-This POC turns AI working context into a shared collaboration artifact. A team can publish context from one session, pull context from another developer, merge competing context branches, and continue working individually or together with better continuity.
+Developers often build useful AI context in isolation: prompts, session transcripts, file references, debugging notes, decisions, failed attempts, patches, and follow-up plans. This POC turns that context into a structured collaboration artifact that can be committed, reviewed, merged, and exported into the next AI assistant session.
 
 ## What It Covers
 
-- Repository-scoped context workspaces
-- Portable AI session files as the core storage format
-- Context branches for individual investigation paths
-- Pull and merge workflows between users
-- Conflict detection for contradictory assumptions, stale file references, and overlapping plans
-- Provenance tracking for who added each context item and where it came from
-- Context bundles that can be exported into an AI assistant prompt or local agent session
-- Audit trail for context changes, merges, and accepted decisions
-
-## Core Concept
-
-The central object is a **context session file**. It is a structured file committed locally or synced through the app.
-
-Example:
-
-```json
-{
-  "workspaceId": "repo-api-gateway",
-  "repository": {
-    "name": "api-gateway",
-    "remote": "git@github.com:team/api-gateway.git",
-    "baseCommit": "8f2a91c"
-  },
-  "contextId": "ctx-auth-routing-investigation",
-  "owner": "maya",
-  "branch": "auth-routing",
-  "items": [
-    {
-      "id": "item-001",
-      "type": "finding",
-      "summary": "Route predicates are evaluated before auth policy lookup.",
-      "files": ["src/router/predicate-engine.ts"],
-      "confidence": "high",
-      "createdBy": "maya",
-      "createdAt": "2026-04-19T16:30:00Z"
-    }
-  ]
-}
-```
-
-The POC can store this as JSON for simplicity, then later move to JSONL for append-only event replay.
+- Repository-scoped context workspaces stored under `.context-collab`
+- Portable context branch files with findings, assumptions, decisions, TODOs, file notes, risks, and prompt snippets
+- CLI workflow for init, branch creation, context capture, session import, merge preview, accepted merge, and prompt export
+- Local HTTP API over the same JSON storage
+- Browser UI for timeline review, item entry, merge preview, conflict review, audit events, and bundle export
+- Deterministic merge checks for duplicate findings, contradictory assumptions, overlapping file ownership, missing files, missing symbols, and base commit drift
+- Provenance tracking for branch owner, item creator, source, confidence, affected files, and audit events
 
 ## Quick Start
 
-This repository currently contains the product and technical plan for the POC. A runnable implementation can be built in phases from [PLAN.md](PLAN.md).
-
-Suggested first implementation shape:
-
 ```bash
 cd context-collab-poc
+npm test
+npm run seed
+npm run dev
 ```
 
-Planned local commands:
+Open:
+
+```text
+http://localhost:4100
+```
+
+The server uses the current project directory as the demo repository by default. To point it at another repository:
 
 ```bash
-context-collab init /path/to/repo
-context-collab capture --from-session ~/.codex/sessions/latest.jsonl
-context-collab list
-context-collab pull maya/auth-routing
-context-collab merge maya/auth-routing jordan/rate-limit-fix
-context-collab export --bundle merged-auth-routing
+CONTEXT_COLLAB_REPO=/path/to/repo npm run dev
+```
+
+## CLI Flows
+
+Initialize a repository workspace:
+
+```bash
+node src/cli.js init /path/to/repo --name "API Gateway"
+```
+
+Create personal context branches:
+
+```bash
+node src/cli.js branch --owner maya --name auth-routing --repo /path/to/repo
+node src/cli.js branch --owner jordan --name rate-limit-fix --repo /path/to/repo
+```
+
+Add durable context items:
+
+```bash
+node src/cli.js add --repo /path/to/repo --branch maya-auth-routing --type finding --file src/router.ts "Route predicates are evaluated before auth policy lookup."
+node src/cli.js add --repo /path/to/repo --branch jordan-rate-limit-fix --type patch-summary --file src/middleware/rate-limit.ts "Update rate limiting before expensive route checks."
+```
+
+Preview a merge:
+
+```bash
+node src/cli.js merge --repo /path/to/repo maya-auth-routing jordan-rate-limit-fix
+```
+
+Accept a merge and export a prompt bundle:
+
+```bash
+node src/cli.js merge --repo /path/to/repo maya-auth-routing jordan-rate-limit-fix --accept
+node src/cli.js export --repo /path/to/repo --title "Merged auth routing context"
+```
+
+Import a generic session file:
+
+```bash
+node src/cli.js import-session ~/.codex/sessions/latest.jsonl --repo /path/to/repo --branch maya-auth-routing
 ```
 
 ## Demo Flows
 
 ### Flow 1: Share AI Context From One Developer
 
-1. A developer runs an AI coding session against a repository.
-2. Context Collab imports the session transcript or structured notes.
-3. The developer selects useful context items: findings, assumptions, decisions, files, TODOs, and patches.
-4. The selected items are saved into a repository-scoped context branch.
-5. Another developer pulls that branch into their workspace.
+1. Initialize a workspace for a repository.
+2. Create a branch such as `maya-auth-routing`.
+3. Add findings, assumptions, decisions, TODOs, and affected file references.
+4. Review the branch in the UI.
+5. Export the branch or merge it into a shared bundle.
 
 ### Flow 2: Merge Context From Two Investigation Paths
 
-1. Developer A investigates auth routing and records file-level findings.
-2. Developer B investigates rate limiting and records a different plan.
-3. The team merges both context branches.
-4. The merge engine highlights duplicate findings, contradictory assumptions, and overlapping file ownership.
-5. The accepted merge becomes a new context bundle.
+1. Run `npm run seed` or create two branches manually.
+2. Select both branches in the UI.
+3. Click `Preview Merge`.
+4. Review duplicate findings, contradictory assumptions, ownership collisions, and stale references.
+5. Accept the merge and create a bundle.
 
 ### Flow 3: Build Individually From Shared Context
 
-1. A developer exports the merged context bundle.
-2. The bundle becomes the starting prompt or local session seed for an AI assistant.
-3. The developer continues privately, then publishes only the useful new context back to the team.
+1. Create a bundle from the latest accepted merge.
+2. Use the generated prompt block as the seed context for an AI coding session.
+3. Continue privately.
+4. Publish only durable new context items back into a branch.
 
 ### Flow 4: Build Together On One Problem
 
-1. Multiple developers join the same repository workspace.
-2. Each user contributes findings and decisions in near real time.
-3. The shared context timeline shows what changed, who added it, and which files are affected.
-4. The team pins accepted decisions so future AI sessions inherit the agreed direction.
+1. Multiple contributors create separate branches in the same `.context-collab` workspace.
+2. Each branch keeps provenance for owner, source, confidence, file references, and timestamps.
+3. The audit trail records workspace, branch, item, merge, and bundle events.
+4. Accepted merge outputs become team-approved context bundles.
 
-## Planned API Surface
+## JSON And HTTP API
 
-### Context Workspaces
+### Local Files
 
-- `POST /api/workspaces` - create a repository workspace
-- `GET /api/workspaces` - list workspaces
-- `GET /api/workspaces/{workspaceId}` - fetch workspace metadata
+```text
+.context-collab/
+  workspace.json
+  audit.jsonl
+  branches/
+    maya-auth-routing.json
+    jordan-rate-limit-fix.json
+  merges/
+    merge-*.json
+  bundles/
+    bundle-*.json
+    bundle-*.prompt.md
+```
 
-### Context Branches
+### HTTP Endpoints
 
-- `POST /api/workspaces/{workspaceId}/branches` - create a context branch
-- `GET /api/workspaces/{workspaceId}/branches` - list branches
-- `GET /api/branches/{branchId}/items` - list context items
-- `POST /api/branches/{branchId}/items` - add a context item
+- `GET /api/health` - check server status and active repository root
+- `GET /api/state` - fetch workspace, branches, merges, bundles, and audit events
+- `POST /api/workspaces` - initialize a workspace
+- `POST /api/branches` - create a context branch
+- `POST /api/items` - add a context item to a branch
+- `POST /api/merges/preview` - preview duplicate, conflict, and stale-reference checks
+- `POST /api/merges` - accept a merge result and write merge audit data
+- `POST /api/bundles` - create assistant-ready prompt and JSON bundle exports
+- `POST /api/seed-demo` - create two demo branches, an accepted merge, and a bundle
 
-### Pull And Merge
+Example merge preview request:
 
-- `POST /api/branches/{branchId}/pull` - pull another user's branch into the local workspace
-- `POST /api/merges/preview` - preview a context merge and conflicts
-- `POST /api/merges` - accept a merge result
-- `GET /api/merges/{mergeId}` - inspect a completed merge
-
-### Exports
-
-- `POST /api/bundles` - create a curated context bundle
-- `GET /api/bundles/{bundleId}` - fetch a bundle
-- `GET /api/bundles/{bundleId}/prompt` - export assistant-ready prompt context
-- `GET /api/bundles/{bundleId}/session-file` - export portable context session file
+```json
+{
+  "sourceBranchIds": ["maya-auth-routing", "jordan-rate-limit-fix"]
+}
+```
 
 ## Configuration
 
-Planned configuration values:
-
 ```env
+PORT=4100
+CONTEXT_COLLAB_REPO=/path/to/repo
 CONTEXT_COLLAB_DATA_DIR=.context-collab
-CONTEXT_COLLAB_MAX_SESSION_BYTES=5000000
-CONTEXT_COLLAB_DEFAULT_RELEVANCE_DAYS=14
-CONTEXT_COLLAB_REQUIRE_BASE_COMMIT=true
-CONTEXT_COLLAB_ENABLE_REALTIME=true
 ```
+
+## Five Implementation Phases
+
+1. Local JSON storage and CLI workflow: workspace init, branch files, context items, session import, list, merge preview, and export.
+2. Local API and web UI: browser workflow over the same storage for context entry, timeline review, merge preview, and bundle export.
+3. Shared collaboration model: branch owner, source provenance, pull-like branch coexistence, accepted merge records, and append-only audit trail.
+4. Context quality checks: deterministic duplicate detection, contradiction checks, stale file and symbol checks, ownership collisions, and assistant-ready bundle rendering.
+5. Documentation and verification: seed data, Node test coverage, README, technical design notes, and prioritized improvement plan.
 
 ## Notes And Limitations
 
-- The first version should not try to store every token from every AI chat. It should capture durable context: findings, decisions, assumptions, plans, and file references.
-- Merge quality depends on structured context items. Raw transcripts can be attached, but they should not be the primary collaboration unit.
-- The POC can start with local file storage and in-memory APIs before adding a database.
-- Repository file references can become stale after code changes. The merge preview should detect base commit drift and missing files.
-- This is not a replacement for Git. It is a companion layer for the reasoning and working context around code changes.
+- The POC intentionally uses local JSON files instead of a database.
+- The merge engine is deterministic and conservative; it flags review risks instead of attempting semantic truth.
+- The session import adapter is generic and does not depend on one vendor's transcript format.
+- The UI polls only on user actions; production realtime collaboration would use WebSockets or server-sent events.
+- Context Collab is not a Git replacement. It is a companion layer for the reasoning and working context around code changes.
 
 ## Technologies Used
 
-Recommended first implementation:
-
-- Node.js or Spring Boot backend
-- React frontend for workspace, timeline, merge preview, and bundle export
-- Local JSON or SQLite storage
-- WebSocket updates for shared context timelines
-- Git metadata inspection for repository identity and base commit tracking
-
+- Node.js
+- Native `node:http` server
+- Native `node:test` test runner
+- Static HTML, CSS, and JavaScript
+- Local JSON and JSONL storage
+- Git metadata inspection through the local `git` CLI

@@ -1,0 +1,60 @@
+{
+  "branchId": "maya-auth-routing",
+  "workspaceId": "ws-context-collab-demo",
+  "name": "auth-routing",
+  "owner": "maya",
+  "baseCommit": "8bdc98e",
+  "parentBranchId": null,
+  "createdAt": "2026-04-20T23:23:42.212Z",
+  "updatedAt": "2026-04-20T23:23:42.242Z",
+  "items": [
+    {
+      "itemId": "item-07a412b97b",
+      "branchId": "maya-auth-routing",
+      "type": "finding",
+      "summary": "Route predicates are evaluated before auth policy lookup.",
+      "body": "The merge should preserve this ordering note for future assistant sessions.",
+      "files": [
+        "README.md"
+      ],
+      "symbols": [],
+      "confidence": "high",
+      "source": "manual",
+      "createdBy": "maya",
+      "createdAt": "2026-04-20T23:23:42.242Z",
+      "supersedes": null
+    },
+    {
+      "itemId": "item-9c1451cfd7",
+      "branchId": "maya-auth-routing",
+      "type": "assumption",
+      "summary": "Do not modify the rate limit middleware in the auth routing pass.",
+      "body": "",
+      "files": [
+        "src/middleware/rate-limit.ts"
+      ],
+      "symbols": [],
+      "confidence": "medium",
+      "source": "manual",
+      "createdBy": "maya",
+      "createdAt": "2026-04-20T23:23:42.242Z",
+      "supersedes": null
+    },
+    {
+      "itemId": "item-2e86ff2477",
+      "branchId": "maya-auth-routing",
+      "type": "todo",
+      "summary": "Update README.md with accepted auth routing context.",
+      "body": "",
+      "files": [
+        "README.md"
+      ],
+      "symbols": [],
+      "confidence": "high",
+      "source": "manual",
+      "createdBy": "maya",
+      "createdAt": "2026-04-20T23:23:42.242Z",
+      "supersedes": null
+    }
+  ]
+}

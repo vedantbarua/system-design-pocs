@@ -1,0 +1,11 @@
+{
+  "workspaceId": "ws-context-collab-demo",
+  "name": "Context Collab Demo",
+  "repositoryRemote": "git@github.com:vedantbarua/system-design-pocs.git",
+  "repositoryRoot": "/Users/vedantbarua/Desktop/Projects/system-design-pocs/context-collab-poc",
+  "defaultBranch": "context-transfer-phase-1",
+  "baseCommit": "8bdc98e",
+  "createdAt": "2026-04-20T23:23:42.183Z",
+  "updatedAt": "2026-04-20T23:23:42.183Z",
+  "currentHead": "8bdc98e"
+}

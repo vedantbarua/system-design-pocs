@@ -1,0 +1,96 @@
+{
+  "bundleId": "bundle-88e6639086",
+  "workspaceId": "ws-context-collab-demo",
+  "sourceMergeId": "merge-9aaa5863c5",
+  "title": "Merged auth routing context",
+  "summary": "Merged context from auth routing and rate limit investigations.",
+  "includedItems": [
+    {
+      "itemId": "item-07a412b97b",
+      "branchId": "maya-auth-routing",
+      "type": "finding",
+      "summary": "Route predicates are evaluated before auth policy lookup.",
+      "body": "The merge should preserve this ordering note for future assistant sessions.",
+      "files": [
+        "README.md"
+      ],
+      "symbols": [],
+      "confidence": "high",
+      "source": "manual",
+      "createdBy": "maya",
+      "createdAt": "2026-04-20T23:23:42.242Z",
+      "supersedes": null,
+      "fromBranchId": "maya-auth-routing"
+    },
+    {
+      "itemId": "item-9c1451cfd7",
+      "branchId": "maya-auth-routing",
+      "type": "assumption",
+      "summary": "Do not modify the rate limit middleware in the auth routing pass.",
+      "body": "",
+      "files": [
+        "src/middleware/rate-limit.ts"
+      ],
+      "symbols": [],
+      "confidence": "medium",
+      "source": "manual",
+      "createdBy": "maya",
+      "createdAt": "2026-04-20T23:23:42.242Z",
+      "supersedes": null,
+      "fromBranchId": "maya-auth-routing"
+    },
+    {
+      "itemId": "item-2e86ff2477",
+      "branchId": "maya-auth-routing",
+      "type": "todo",
+      "summary": "Update README.md with accepted auth routing context.",
+      "body": "",
+      "files": [
+        "README.md"
+      ],
+      "symbols": [],
+      "confidence": "high",
+      "source": "manual",
+      "createdBy": "maya",
+      "createdAt": "2026-04-20T23:23:42.242Z",
+      "supersedes": null,
+      "fromBranchId": "maya-auth-routing"
+    },
+    {
+      "itemId": "item-011d0e0ee6",
+      "branchId": "jordan-rate-limit-fix",
+      "type": "patch-summary",
+      "summary": "Update the rate limit middleware to run before expensive route checks.",
+      "body": "",
+      "files": [
+        "src/middleware/rate-limit.ts"
+      ],
+      "symbols": [],
+      "confidence": "medium",
+      "source": "manual",
+      "createdBy": "jordan",
+      "createdAt": "2026-04-20T23:23:42.242Z",
+      "supersedes": null,
+      "fromBranchId": "jordan-rate-limit-fix"
+    },
+    {
+      "itemId": "item-c40cd9e6a5",
+      "branchId": "jordan-rate-limit-fix",
+      "type": "todo",
+      "summary": "Update README.md with bundle export steps.",
+      "body": "",
+      "files": [
+        "README.md"
+      ],
+      "symbols": [],
+      "confidence": "medium",
+      "source": "manual",
+      "createdBy": "jordan",
+      "createdAt": "2026-04-20T23:23:42.243Z",
+      "supersedes": null,
+      "fromBranchId": "jordan-rate-limit-fix"
+    }
+  ],
+  "promptText": "# Merged auth routing context\n\nMerged context from auth routing and rate limit investigations.\n\n## Repository\n- Workspace: Context Collab Demo\n- Remote: git@github.com:vedantbarua/system-design-pocs.git\n- Base commit: 8bdc98e\n\n## Merge Context\n- Merge: merge-9aaa5863c5\n- Branches: maya-auth-routing, jordan-rate-limit-fix\n\n## Context Items\n- [finding] Route predicates are evaluated before auth policy lookup.\n  - Confidence: high\n  - Source: manual\n  - Provenance: maya via maya-auth-routing\n  - Files: README.md\n  - Detail: The merge should preserve this ordering note for future assistant sessions.\n- [assumption] Do not modify the rate limit middleware in the auth routing pass.\n  - Confidence: medium\n  - Source: manual\n  - Provenance: maya via maya-auth-routing\n  - Files: src/middleware/rate-limit.ts\n- [todo] Update README.md with accepted auth routing context.\n  - Confidence: high\n  - Source: manual\n  - Provenance: maya via maya-auth-routing\n  - Files: README.md\n- [patch-summary] Update the rate limit middleware to run before expensive route checks.\n  - Confidence: medium\n  - Source: manual\n  - Provenance: jordan via jordan-rate-limit-fix\n  - Files: src/middleware/rate-limit.ts\n- [todo] Update README.md with bundle export steps.\n  - Confidence: medium\n  - Source: manual\n  - Provenance: jordan via jordan-rate-limit-fix\n  - Files: README.md\n\n## Instructions\nUse this as durable working context. Treat conflicts and stale references as review targets before changing code.\n",
+  "createdAt": "2026-04-20T23:23:42.272Z"
+}

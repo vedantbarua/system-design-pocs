@@ -1,0 +1,60 @@
+{
+  "branchId": "jordan-rate-limit-fix",
+  "workspaceId": "ws-context-collab-demo",
+  "name": "rate-limit-fix",
+  "owner": "jordan",
+  "baseCommit": "8bdc98e",
+  "parentBranchId": null,
+  "createdAt": "2026-04-20T23:23:42.241Z",
+  "updatedAt": "2026-04-20T23:23:42.243Z",
+  "items": [
+    {
+      "itemId": "item-5883e288f4",
+      "branchId": "jordan-rate-limit-fix",
+      "type": "finding",
+      "summary": "Route predicates are evaluated before auth policy lookup.",
+      "body": "",
+      "files": [
+        "README.md"
+      ],
+      "symbols": [],
+      "confidence": "high",
+      "source": "manual",
+      "createdBy": "jordan",
+      "createdAt": "2026-04-20T23:23:42.242Z",
+      "supersedes": null
+    },
+    {
+      "itemId": "item-011d0e0ee6",
+      "branchId": "jordan-rate-limit-fix",
+      "type": "patch-summary",
+      "summary": "Update the rate limit middleware to run before expensive route checks.",
+      "body": "",
+      "files": [
+        "src/middleware/rate-limit.ts"
+      ],
+      "symbols": [],
+      "confidence": "medium",
+      "source": "manual",
+      "createdBy": "jordan",
+      "createdAt": "2026-04-20T23:23:42.242Z",
+      "supersedes": null
+    },
+    {
+      "itemId": "item-c40cd9e6a5",
+      "branchId": "jordan-rate-limit-fix",
+      "type": "todo",
+      "summary": "Update README.md with bundle export steps.",
+      "body": "",
+      "files": [
+        "README.md"
+      ],
+      "symbols": [],
+      "confidence": "medium",
+      "source": "manual",
+      "createdBy": "jordan",
+      "createdAt": "2026-04-20T23:23:42.243Z",
+      "supersedes": null
+    }
+  ]
+}
