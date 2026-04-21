@@ -1,0 +1,161 @@
+{
+  "mergeId": "merge-9aaa5863c5",
+  "sourceBranchIds": [
+    "maya-auth-routing",
+    "jordan-rate-limit-fix"
+  ],
+  "targetBranchId": null,
+  "acceptedItems": [
+    {
+      "itemId": "item-07a412b97b",
+      "branchId": "maya-auth-routing",
+      "type": "finding",
+      "summary": "Route predicates are evaluated before auth policy lookup.",
+      "body": "The merge should preserve this ordering note for future assistant sessions.",
+      "files": [
+        "README.md"
+      ],
+      "symbols": [],
+      "confidence": "high",
+      "source": "manual",
+      "createdBy": "maya",
+      "createdAt": "2026-04-20T23:23:42.242Z",
+      "supersedes": null,
+      "fromBranchId": "maya-auth-routing"
+    },
+    {
+      "itemId": "item-9c1451cfd7",
+      "branchId": "maya-auth-routing",
+      "type": "assumption",
+      "summary": "Do not modify the rate limit middleware in the auth routing pass.",
+      "body": "",
+      "files": [
+        "src/middleware/rate-limit.ts"
+      ],
+      "symbols": [],
+      "confidence": "medium",
+      "source": "manual",
+      "createdBy": "maya",
+      "createdAt": "2026-04-20T23:23:42.242Z",
+      "supersedes": null,
+      "fromBranchId": "maya-auth-routing"
+    },
+    {
+      "itemId": "item-2e86ff2477",
+      "branchId": "maya-auth-routing",
+      "type": "todo",
+      "summary": "Update README.md with accepted auth routing context.",
+      "body": "",
+      "files": [
+        "README.md"
+      ],
+      "symbols": [],
+      "confidence": "high",
+      "source": "manual",
+      "createdBy": "maya",
+      "createdAt": "2026-04-20T23:23:42.242Z",
+      "supersedes": null,
+      "fromBranchId": "maya-auth-routing"
+    },
+    {
+      "itemId": "item-011d0e0ee6",
+      "branchId": "jordan-rate-limit-fix",
+      "type": "patch-summary",
+      "summary": "Update the rate limit middleware to run before expensive route checks.",
+      "body": "",
+      "files": [
+        "src/middleware/rate-limit.ts"
+      ],
+      "symbols": [],
+      "confidence": "medium",
+      "source": "manual",
+      "createdBy": "jordan",
+      "createdAt": "2026-04-20T23:23:42.242Z",
+      "supersedes": null,
+      "fromBranchId": "jordan-rate-limit-fix"
+    },
+    {
+      "itemId": "item-c40cd9e6a5",
+      "branchId": "jordan-rate-limit-fix",
+      "type": "todo",
+      "summary": "Update README.md with bundle export steps.",
+      "body": "",
+      "files": [
+        "README.md"
+      ],
+      "symbols": [],
+      "confidence": "medium",
+      "source": "manual",
+      "createdBy": "jordan",
+      "createdAt": "2026-04-20T23:23:42.243Z",
+      "supersedes": null,
+      "fromBranchId": "jordan-rate-limit-fix"
+    }
+  ],
+  "duplicateItems": [
+    {
+      "type": "duplicate",
+      "itemIds": [
+        "item-07a412b97b",
+        "item-5883e288f4"
+      ],
+      "branchIds": [
+        "maya-auth-routing",
+        "jordan-rate-limit-fix"
+      ],
+      "reason": "same type with matching summary or high token overlap"
+    }
+  ],
+  "conflicts": [
+    {
+      "type": "contradiction",
+      "itemIds": [
+        "item-9c1451cfd7",
+        "item-011d0e0ee6"
+      ],
+      "branchIds": [
+        "maya-auth-routing",
+        "jordan-rate-limit-fix"
+      ],
+      "files": [
+        "src/middleware/rate-limit.ts"
+      ],
+      "reason": "same file reference with incompatible positive and negative intent"
+    },
+    {
+      "type": "ownership-collision",
+      "itemIds": [
+        "item-2e86ff2477",
+        "item-c40cd9e6a5"
+      ],
+      "branchIds": [
+        "maya-auth-routing",
+        "jordan-rate-limit-fix"
+      ],
+      "files": [
+        "README.md"
+      ],
+      "reason": "multiple owners are planning work on the same file"
+    }
+  ],
+  "staleReferences": [
+    {
+      "type": "missing-file",
+      "itemId": "item-9c1451cfd7",
+      "branchId": "maya-auth-routing",
+      "file": "src/middleware/rate-limit.ts",
+      "reason": "referenced file does not exist in the current repository"
+    },
+    {
+      "type": "missing-file",
+      "itemId": "item-011d0e0ee6",
+      "branchId": "jordan-rate-limit-fix",
+      "file": "src/middleware/rate-limit.ts",
+      "reason": "referenced file does not exist in the current repository"
+    }
+  ],
+  "generatedAt": "2026-04-20T23:23:42.272Z",
+  "status": "accepted",
+  "acceptedBy": "demo",
+  "acceptedAt": "2026-04-20T23:23:42.272Z"
+}

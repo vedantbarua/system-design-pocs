@@ -1,0 +1,16 @@
+{
+  "name": "context-collab-poc",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Local-first shared AI context collaboration POC",
+  "bin": {
+    "context-collab": "src/cli.js"
+  },
+  "scripts": {
+    "cli": "node src/cli.js",
+    "dev": "node src/server.js",
+    "seed": "node src/cli.js seed-demo",
+    "test": "node --test"
+  }
+}

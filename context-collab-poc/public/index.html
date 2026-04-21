@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Context Collab POC</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="page">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Context Collab</p>
+          <h1>Shared AI working context</h1>
+          <p class="lede">Publish findings, compare investigation branches, catch stale references, and export an assistant-ready bundle.</p>
+        </div>
+        <div class="actions">
+          <button id="initBtn">Initialize Workspace</button>
+          <button id="seedBtn" class="secondary">Seed Demo</button>
+        </div>
+      </header>
+
+      <section class="metrics" id="metrics"></section>
+
+      <section class="workspace-grid">
+        <article class="panel">
+          <div class="section-title">
+            <div>
+              <h2>Branches</h2>
+              <p>Personal context paths for the same repository.</p>
+            </div>
+          </div>
+          <div id="branches" class="branch-list"></div>
+        </article>
+
+        <article class="panel">
+          <div class="section-title">
+            <div>
+              <h2>Add Context</h2>
+              <p>Capture durable context, not raw chat noise.</p>
+            </div>
+          </div>
+          <form id="itemForm" class="form">
+            <label>
+              Branch
+              <select id="branchSelect" name="branchId"></select>
+            </label>
+            <label>
+              Type
+              <select name="type">
+                <option value="finding">finding</option>
+                <option value="assumption">assumption</option>
+                <option value="decision">decision</option>
+                <option value="todo">todo</option>
+                <option value="risk">risk</option>
+                <option value="question">question</option>
+                <option value="patch-summary">patch-summary</option>
+                <option value="file-note">file-note</option>
+                <option value="prompt-snippet">prompt-snippet</option>
+              </select>
+            </label>
+            <label class="wide">
+              Summary
+              <input name="summary" required placeholder="Route predicates are evaluated before auth policy lookup." />
+            </label>
+            <label class="wide">
+              Files
+              <input name="files" placeholder="src/router.ts, README.md" />
+            </label>
+            <label class="wide">
+              Detail
+              <textarea name="body" placeholder="Evidence, constraints, source notes, or next steps."></textarea>
+            </label>
+            <button type="submit">Add Item</button>
+          </form>
+        </article>
+      </section>
+
+      <section class="workspace-grid">
+        <article class="panel">
+          <div class="section-title">
+            <div>
+              <h2>Merge Preview</h2>
+              <p>Deterministic checks expose duplicates, contradictions, owner collisions, and stale references.</p>
+            </div>
+            <button id="previewBtn">Preview Merge</button>
+          </div>
+          <div id="mergePreview" class="merge-preview empty">Select at least two branches.</div>
+        </article>
+
+        <article class="panel">
+          <div class="section-title">
+            <div>
+              <h2>Bundle Export</h2>
+              <p>Accepted context becomes a prompt seed for the next AI session.</p>
+            </div>
+            <button id="bundleBtn">Create Bundle</button>
+          </div>
+          <pre id="bundleOutput" class="prompt-output">No bundle exported yet.</pre>
+        </article>
+      </section>
+
+      <section class="panel">
+        <div class="section-title">
+          <div>
+            <h2>Audit Trail</h2>
+            <p>Workspace, branch, item, merge, and bundle events.</p>
+          </div>
+        </div>
+        <div id="audit" class="audit-list"></div>
+      </section>
+    </main>
+
+    <script src="/app.js"></script>
+  </body>
+</html>
