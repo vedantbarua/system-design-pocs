@@ -257,7 +257,15 @@ export function listItems(repoRoot, branchId) {
 
 export function importSession(repoRoot, branchId, sessionPath) {
   const content = fs.readFileSync(sessionPath, "utf8");
+  return importSessionContent(repoRoot, branchId, content, {
+    source: `session:${path.basename(sessionPath)}`,
+    sessionPath
+  });
+}
+
+export function importSessionContent(repoRoot, branchId, content, options = {}) {
   const imported = [];
+  const source = options.source || "session:manual";
 
   function addImported(summary, body, type = "prompt-snippet") {
     imported.push(addItem(repoRoot, branchId, {
@@ -265,11 +273,11 @@ export function importSession(repoRoot, branchId, sessionPath) {
       summary,
       body,
       confidence: "medium",
-      source: `session:${path.basename(sessionPath)}`
+      source
     }));
   }
 
-  if (sessionPath.endsWith(".jsonl")) {
+  if (options.format === "jsonl" || source.endsWith(".jsonl")) {
     const lines = content.split(/\r?\n/).filter(Boolean);
     for (const line of lines) {
       try {
@@ -297,7 +305,13 @@ export function importSession(repoRoot, branchId, sessionPath) {
     }
   }
 
-  appendAudit(repoRoot, { event: "session.imported", branchId, sessionPath, itemCount: imported.length });
+  appendAudit(repoRoot, {
+    event: "session.imported",
+    branchId,
+    sessionPath: options.sessionPath || null,
+    source,
+    itemCount: imported.length
+  });
   return imported;
 }
 
@@ -450,6 +464,12 @@ export function listMerges(repoRoot) {
     .map((file) => readJson(path.join(allPaths.merges, file), null))
     .filter(Boolean)
     .sort((a, b) => String(b.acceptedAt || b.generatedAt).localeCompare(String(a.acceptedAt || a.generatedAt)));
+}
+
+export function loadMerge(repoRoot, mergeId) {
+  const merge = readJson(path.join(paths(repoRoot).merges, `${mergeId}.json`), null);
+  if (!merge) throw new Error(`Merge not found: ${mergeId}`);
+  return merge;
 }
 
 export function createBundle(repoRoot, input = {}) {
