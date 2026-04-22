@@ -12,7 +12,7 @@
         <div>
           <p class="eyebrow">Context Collab</p>
           <h1>Shared AI working context</h1>
-          <p class="lede">Publish findings, compare investigation branches, catch stale references, and export an assistant-ready bundle.</p>
+          <p class="lede">Create repository-scoped branches, import session context, compare investigation paths, preview merges, and export a reusable assistant bundle.</p>
         </div>
         <div class="actions">
           <button id="initBtn">Initialize Workspace</button>
@@ -20,14 +20,15 @@
         </div>
       </header>
 
+      <section id="notice"></section>
       <section class="metrics" id="metrics"></section>
 
-      <section class="workspace-grid">
+      <section class="workspace-grid top-grid">
         <article class="panel">
           <div class="section-title">
             <div>
-              <h2>Branches</h2>
-              <p>Personal context paths for the same repository.</p>
+              <h2>Context Branches</h2>
+              <p>Select branches for merge preview or focus one branch for detailed review.</p>
             </div>
           </div>
           <div id="branches" class="branch-list"></div>
@@ -36,14 +37,51 @@
         <article class="panel">
           <div class="section-title">
             <div>
+              <h2>Branch Timeline</h2>
+              <p>Full item history for the focused branch.</p>
+            </div>
+            <select id="branchSelect" aria-label="Focused branch"></select>
+          </div>
+          <div id="branchDetails"></div>
+        </article>
+      </section>
+
+      <section class="workspace-grid form-grid">
+        <article class="panel">
+          <div class="section-title">
+            <div>
+              <h2>Create Branch</h2>
+              <p>Start a personal or investigative context path.</p>
+            </div>
+          </div>
+          <form id="branchForm" class="form">
+            <label>
+              Owner
+              <input name="owner" required placeholder="maya" />
+            </label>
+            <label>
+              Branch Name
+              <input name="name" required placeholder="auth-routing" />
+            </label>
+            <label class="wide">
+              Parent Branch Id
+              <input name="parentBranchId" placeholder="optional parent branch id" />
+            </label>
+            <button type="submit">Create Branch</button>
+          </form>
+        </article>
+
+        <article class="panel">
+          <div class="section-title">
+            <div>
               <h2>Add Context</h2>
-              <p>Capture durable context, not raw chat noise.</p>
+              <p>Capture durable findings, decisions, risks, and next actions.</p>
             </div>
           </div>
           <form id="itemForm" class="form">
             <label>
               Branch
-              <select id="branchSelect" name="branchId"></select>
+              <select id="itemBranchSelect" name="branchId"></select>
             </label>
             <label>
               Type
@@ -69,10 +107,55 @@
             </label>
             <label class="wide">
               Detail
-              <textarea name="body" placeholder="Evidence, constraints, source notes, or next steps."></textarea>
+              <textarea name="body" placeholder="Evidence, constraints, or follow-up notes."></textarea>
             </label>
             <button type="submit">Add Item</button>
           </form>
+        </article>
+      </section>
+
+      <section class="workspace-grid form-grid">
+        <article class="panel">
+          <div class="section-title">
+            <div>
+              <h2>Import Session</h2>
+              <p>Paste JSON, JSONL, or plain text from an AI session and normalize it into context items.</p>
+            </div>
+          </div>
+          <form id="importForm" class="form">
+            <label>
+              Branch
+              <select id="importBranchSelect" name="branchId"></select>
+            </label>
+            <label>
+              Format
+              <select name="format">
+                <option value="jsonl">jsonl</option>
+                <option value="json">json</option>
+                <option value="text">text</option>
+              </select>
+            </label>
+            <label class="wide">
+              Source Label
+              <input name="source" placeholder="session:web-ui" />
+            </label>
+            <label class="wide">
+              Session Content
+              <textarea name="content" class="session-input" placeholder='{"message":"Auth runs after predicate parsing"}'></textarea>
+            </label>
+            <button type="submit">Import Session</button>
+          </form>
+        </article>
+
+        <article class="panel">
+          <div class="section-title">
+            <div>
+              <h2>Branch Compare</h2>
+              <p>Compare the focused branch against another branch before merging.</p>
+            </div>
+            <select id="branchCompareSelect" aria-label="Compare branch"></select>
+          </div>
+          <div id="branchCompare" class="compare-layout"></div>
         </article>
       </section>
 
@@ -81,7 +164,7 @@
           <div class="section-title">
             <div>
               <h2>Merge Preview</h2>
-              <p>Deterministic checks expose duplicates, contradictions, owner collisions, and stale references.</p>
+              <p>Run deterministic checks for duplicates, contradictions, ownership collisions, and stale references.</p>
             </div>
             <button id="previewBtn">Preview Merge</button>
           </div>
@@ -92,22 +175,23 @@
           <div class="section-title">
             <div>
               <h2>Bundle Export</h2>
-              <p>Accepted context becomes a prompt seed for the next AI session.</p>
+              <p>Create a prompt-ready bundle from the latest accepted merge.</p>
             </div>
             <button id="bundleBtn">Create Bundle</button>
           </div>
           <pre id="bundleOutput" class="prompt-output">No bundle exported yet.</pre>
+          <div id="bundleHistory" class="bundle-history"></div>
         </article>
       </section>
 
       <section class="panel">
         <div class="section-title">
           <div>
-            <h2>Audit Trail</h2>
-            <p>Workspace, branch, item, merge, and bundle events.</p>
+            <h2>Timeline</h2>
+            <p>Recent workspace, branch, import, merge, and bundle events.</p>
           </div>
         </div>
-        <div id="audit" class="audit-list"></div>
+        <div id="timeline" class="timeline"></div>
       </section>
     </main>
 

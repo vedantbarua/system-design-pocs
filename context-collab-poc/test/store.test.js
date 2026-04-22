@@ -8,6 +8,7 @@ import {
   addItem,
   createBranch,
   createBundle,
+  importSessionContent,
   initWorkspace,
   previewMerge
 } from "../src/lib/store.js";
@@ -83,4 +84,22 @@ test("accepted merge can be exported as assistant-ready prompt bundle", () => {
   assert.equal(bundle.sourceMergeId, merge.mergeId);
   assert.match(bundle.promptText, /Keep context bundles concise/);
   assert.match(bundle.promptText, /## Context Items/);
+});
+
+test("importSessionContent normalizes pasted jsonl and plain text into context items", () => {
+  const repo = tempRepo();
+  initWorkspace(repo, { name: "demo" });
+  const branch = createBranch(repo, { owner: "maya", name: "imports" });
+
+  const imported = importSessionContent(
+    repo,
+    branch.branchId,
+    '{"message":"Auth runs after predicate parsing"}\nplain text line from session\n',
+    { source: "session:web-ui", format: "jsonl" }
+  );
+
+  assert.equal(imported.length, 2);
+  assert.equal(imported[0].type, "prompt-snippet");
+  assert.match(imported[0].summary, /Auth runs after predicate parsing/);
+  assert.match(imported[1].summary, /plain text line/);
 });
