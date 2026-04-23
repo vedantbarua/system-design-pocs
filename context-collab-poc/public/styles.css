@@ -79,7 +79,6 @@ button.ghost,
   color: var(--green);
   font-size: 0.78rem;
   font-weight: 800;
-  letter-spacing: 0;
   text-transform: uppercase;
 }
 
@@ -119,6 +118,30 @@ h2 {
 #notice {
   min-height: 24px;
   margin-bottom: 12px;
+}
+
+.connection-pill {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.connection-pill.live {
+  background: var(--green-soft);
+  color: var(--green);
+}
+
+.connection-pill.connecting {
+  background: #fff6df;
+  color: #8b6500;
+}
+
+.connection-pill.offline {
+  background: #fff1f1;
+  color: var(--red);
 }
 
 .metrics {
@@ -161,10 +184,6 @@ h2 {
   margin-bottom: 16px;
 }
 
-.top-grid {
-  align-items: start;
-}
-
 .panel {
   padding: 18px;
 }
@@ -172,7 +191,8 @@ h2 {
 .branch-list,
 .items,
 .compare-layout,
-.bundle-history {
+.bundle-history,
+.presence-list {
   display: grid;
   gap: 10px;
 }
@@ -184,7 +204,8 @@ h2 {
 .notice,
 .timeline-event,
 .bundle-row,
-.compare-group {
+.compare-group,
+.presence-user {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--surface-alt);
@@ -216,15 +237,18 @@ h2 {
 .conflict small,
 .detail-head small,
 .timeline-event small,
-.bundle-row small {
+.bundle-row small,
+.presence-user small {
   display: block;
   color: var(--muted);
   font-size: 0.82rem;
   margin-top: 3px;
 }
 
-.compact-items {
-  max-height: 320px;
+.compact-items,
+.detail-items,
+.timeline {
+  max-height: 520px;
   overflow: auto;
 }
 
@@ -233,7 +257,8 @@ h2 {
 .empty,
 .notice,
 .timeline-event,
-.compare-group {
+.compare-group,
+.presence-user {
   padding: 10px;
 }
 
@@ -254,15 +279,24 @@ h2 {
   font-weight: 800;
 }
 
-.detail-items {
-  max-height: 560px;
-  overflow: auto;
-}
-
 .detail-text {
   margin: 6px 0;
   white-space: pre-wrap;
-  color: var(--ink);
+}
+
+.presence-user {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.presence-dot,
+.timeline-mark {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--blue);
+  flex: 0 0 auto;
 }
 
 .form {
@@ -364,10 +398,6 @@ textarea {
 }
 
 .timeline-mark {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--blue);
   margin-top: 6px;
 }
 

@@ -1,8 +1,25 @@
 const state = {
   data: null,
   selectedBranchId: null,
-  lastPreview: null
+  lastPreview: null,
+  currentUser: loadUser(),
+  events: null,
+  connectionStatus: "offline"
 };
+
+function loadUser() {
+  try {
+    const saved = JSON.parse(localStorage.getItem("context-collab-user") || "null");
+    if (saved?.userId && saved?.name) return saved;
+  } catch {
+    // Ignore malformed local storage values.
+  }
+  return { userId: "local-user", name: "Local User", color: "#177245" };
+}
+
+function saveUser() {
+  localStorage.setItem("context-collab-user", JSON.stringify(state.currentUser));
+}
 
 async function api(path, options = {}) {
   const response = await fetch(path, {
@@ -55,6 +72,30 @@ function summarizeTypes(items) {
     .join(" · ");
 }
 
+function notice(message, type = "success") {
+  $("#notice").innerHTML = `<div class="notice ${type === "error" ? "error" : ""}">${escapeHtml(message)}</div>`;
+}
+
+function renderIdentity() {
+  $("#userId").value = state.currentUser.userId;
+  $("#userName").value = state.currentUser.name;
+  $("#connectionState").textContent = state.connectionStatus;
+  $("#connectionState").className = `connection-pill ${state.connectionStatus}`;
+
+  const presence = state.data?.presence || [];
+  $("#presenceList").innerHTML = presence.length
+    ? presence.map((user) => `
+      <div class="presence-user">
+        <span class="presence-dot"></span>
+        <div>
+          <strong>${escapeHtml(user.name)}</strong>
+          <small>${escapeHtml(user.userId)}</small>
+        </div>
+      </div>
+    `).join("")
+    : `<div class="empty compact">No active collaborators.</div>`;
+}
+
 function renderMetrics() {
   const workspace = state.data?.workspace;
   const metrics = [
@@ -63,7 +104,7 @@ function renderMetrics() {
     ["items", itemCount()],
     ["merges", state.data?.merges.length || 0],
     ["bundles", state.data?.bundles.length || 0],
-    ["head", workspace?.currentHead || "no-git"]
+    ["active users", state.data?.presence?.length || 0]
   ];
 
   $("#metrics").innerHTML = metrics.map(([label, value]) => `
@@ -74,18 +115,24 @@ function renderMetrics() {
   `).join("");
 }
 
-function renderBranchOptions() {
+function branchOptions() {
   const branches = state.data?.branches || [];
-  const options = branches.map((branch) => `
+  return branches.map((branch) => `
     <option value="${branch.branchId}" ${branch.branchId === state.selectedBranchId ? "selected" : ""}>
       ${escapeHtml(branch.owner)}/${escapeHtml(branch.name)}
     </option>
   `).join("");
+}
+
+function renderBranchOptions() {
+  const options = branchOptions();
+  const branches = state.data?.branches || [];
 
   $("#itemBranchSelect").innerHTML = options;
   $("#importBranchSelect").innerHTML = options;
   $("#branchSelect").innerHTML = options;
   $("#branchCompareSelect").innerHTML = `<option value="">Select a branch</option>${options}`;
+  $("#pullSourceSelect").innerHTML = `<option value="">Select a branch</option>${options}`;
 
   if (!state.selectedBranchId && branches[0]) {
     state.selectedBranchId = branches[0].branchId;
@@ -95,7 +142,7 @@ function renderBranchOptions() {
 function renderBranches() {
   const branches = state.data?.branches || [];
   $("#branches").innerHTML = branches.length ? branches.map((branch) => `
-    <article class="branch ${branch.branchId === state.selectedBranchId ? "active" : ""}" data-branch-card="${branch.branchId}">
+    <article class="branch ${branch.branchId === state.selectedBranchId ? "active" : ""}">
       <label class="branch-head">
         <input type="checkbox" data-branch-check value="${branch.branchId}" />
         <span class="branch-meta">
@@ -112,7 +159,7 @@ function renderBranches() {
           <div class="item">
             <span class="badge">${escapeHtml(item.type)}</span>
             <p>${escapeHtml(item.summary)}</p>
-            <small>${escapeHtml((item.files || []).join(", ") || "no files")}</small>
+            <small>${escapeHtml(item.createdBy)} · ${escapeHtml((item.files || []).join(", ") || "no files")}</small>
           </div>
         `).join("") || `<div class="empty compact">No items yet.</div>`}
       </div>
@@ -124,6 +171,8 @@ function renderBranches() {
       state.selectedBranchId = button.dataset.focusBranch;
       renderBranchOptions();
       renderBranchDetails();
+      renderCompare();
+      renderBranches();
     });
   }
 }
@@ -141,7 +190,7 @@ function renderBranchDetails() {
         <h3>${escapeHtml(branch.owner)}/${escapeHtml(branch.name)}</h3>
         <p>${escapeHtml(branch.items.length)} items · parent ${escapeHtml(branch.parentBranchId || "none")}</p>
       </div>
-      <small>${escapeHtml(branch.updatedAt)}</small>
+      <button class="ghost" id="pullFocusedBranch">Pull Into My Branch</button>
     </div>
     <div class="items detail-items">
       ${branch.items.map((item) => `
@@ -154,6 +203,10 @@ function renderBranchDetails() {
       `).join("") || `<div class="empty">No items in this branch yet.</div>`}
     </div>
   `;
+
+  $("#pullFocusedBranch").addEventListener("click", async () => {
+    await pullBranch(branch.branchId);
+  });
 }
 
 function renderTimeline() {
@@ -166,9 +219,11 @@ function renderTimeline() {
         <p>${escapeHtml(
           [
             event.branchId,
+            event.sourceBranchId,
             event.mergeId,
             event.bundleId,
             event.workspaceId,
+            event.userId,
             event.owner,
             event.name
           ].filter(Boolean).join(" · ")
@@ -253,6 +308,7 @@ function renderBundles() {
 }
 
 function renderAll() {
+  renderIdentity();
   renderMetrics();
   renderBranchOptions();
   renderBranches();
@@ -270,8 +326,49 @@ async function loadState() {
   renderAll();
 }
 
-function notice(message, type = "success") {
-  $("#notice").innerHTML = `<div class="notice ${type === "error" ? "error" : ""}">${escapeHtml(message)}</div>`;
+async function registerUser() {
+  const user = await api("/api/users", {
+    method: "POST",
+    body: JSON.stringify(state.currentUser)
+  });
+  state.currentUser = {
+    userId: user.userId,
+    name: user.name,
+    color: user.color
+  };
+  saveUser();
+}
+
+function connectEvents() {
+  if (state.events) state.events.close();
+  state.connectionStatus = "connecting";
+  renderIdentity();
+
+  const params = new URLSearchParams({
+    userId: state.currentUser.userId,
+    name: state.currentUser.name
+  });
+  const events = new EventSource(`/api/events?${params.toString()}`);
+  state.events = events;
+
+  events.addEventListener("connected", (event) => {
+    const payload = JSON.parse(event.data);
+    state.connectionStatus = "live";
+    state.data = payload.state;
+    renderAll();
+  });
+
+  events.addEventListener("state.changed", (event) => {
+    const payload = JSON.parse(event.data);
+    state.connectionStatus = "live";
+    state.data = payload.state;
+    renderAll();
+  });
+
+  events.addEventListener("error", () => {
+    state.connectionStatus = "offline";
+    renderIdentity();
+  });
 }
 
 async function initializeWorkspace() {
@@ -281,16 +378,14 @@ async function initializeWorkspace() {
   });
   await api("/api/branches", {
     method: "POST",
-    body: JSON.stringify({ owner: "local", name: "main" })
+    body: JSON.stringify({ owner: state.currentUser.userId, name: "main" })
   });
   notice("Workspace initialized.");
-  await loadState();
 }
 
 async function seedDemoData() {
   await api("/api/seed-demo", { method: "POST", body: "{}" });
   notice("Demo workspace seeded.");
-  await loadState();
 }
 
 async function createBranch(event) {
@@ -299,7 +394,7 @@ async function createBranch(event) {
   const branch = await api("/api/branches", {
     method: "POST",
     body: JSON.stringify({
-      owner: form.get("owner"),
+      owner: form.get("owner") || state.currentUser.userId,
       name: form.get("name"),
       parentBranchId: form.get("parentBranchId") || null
     })
@@ -307,7 +402,6 @@ async function createBranch(event) {
   state.selectedBranchId = branch.branchId;
   event.currentTarget.reset();
   notice(`Branch created: ${branch.branchId}`);
-  await loadState();
 }
 
 async function addContextItem(event) {
@@ -320,6 +414,7 @@ async function addContextItem(event) {
       type: form.get("type"),
       summary: form.get("summary"),
       body: form.get("body"),
+      createdBy: state.currentUser.userId,
       files: String(form.get("files") || "")
         .split(",")
         .map((file) => file.trim())
@@ -328,7 +423,6 @@ async function addContextItem(event) {
   });
   event.currentTarget.reset();
   notice("Context item added.");
-  await loadState();
 }
 
 async function importSession(event) {
@@ -346,13 +440,12 @@ async function importSession(event) {
       branchId: form.get("branchId"),
       content,
       format: form.get("format"),
-      source: form.get("source") || "session:web-ui"
+      source: form.get("source") || `session:${state.currentUser.userId}:web-ui`
     })
   });
 
   event.currentTarget.reset();
   notice(`Imported ${result.imported} session items.`);
-  await loadState();
 }
 
 async function previewMerge() {
@@ -387,11 +480,10 @@ async function acceptMerge() {
     body: JSON.stringify({
       sourceBranchIds,
       preview: state.lastPreview,
-      acceptedBy: "web-ui"
+      acceptedBy: state.currentUser.userId
     })
   });
   notice(`Accepted merge ${merge.mergeId}.`);
-  await loadState();
 }
 
 async function createBundle() {
@@ -400,21 +492,59 @@ async function createBundle() {
     method: "POST",
     body: JSON.stringify({
       mergeId: latestMerge?.mergeId || null,
-      title: "Assistant-ready shared context",
+      title: `${state.currentUser.name}'s shared context bundle`,
       summary: "Curated context exported from Context Collab."
     })
   });
   $("#bundleOutput").textContent = bundle.promptText;
   notice(`Bundle created: ${bundle.bundleId}`);
-  await loadState();
+}
+
+async function pullBranch(sourceBranchId) {
+  const branch = await api(`/api/branches/${sourceBranchId}/pull`, {
+    method: "POST",
+    body: JSON.stringify({
+      owner: state.currentUser.userId,
+      name: `${sourceBranchId}-copy`
+    })
+  });
+  state.selectedBranchId = branch.branchId;
+  notice(`Pulled ${sourceBranchId} into ${branch.branchId}.`);
+}
+
+async function pullSelectedBranch(event) {
+  event.preventDefault();
+  const form = new FormData(event.currentTarget);
+  const sourceBranchId = form.get("sourceBranchId");
+  if (!sourceBranchId) {
+    notice("Select a source branch to pull.", "error");
+    return;
+  }
+  await pullBranch(sourceBranchId);
+  event.currentTarget.reset();
+}
+
+async function updateIdentity(event) {
+  event.preventDefault();
+  const form = new FormData(event.currentTarget);
+  state.currentUser = {
+    userId: String(form.get("userId") || "").trim() || "local-user",
+    name: String(form.get("name") || "").trim() || "Local User",
+    color: "#177245"
+  };
+  await registerUser();
+  connectEvents();
+  notice(`Connected as ${state.currentUser.name}.`);
 }
 
 function wireEvents() {
+  $("#identityForm").addEventListener("submit", updateIdentity);
   $("#initBtn").addEventListener("click", initializeWorkspace);
   $("#seedBtn").addEventListener("click", seedDemoData);
   $("#branchForm").addEventListener("submit", createBranch);
   $("#itemForm").addEventListener("submit", addContextItem);
   $("#importForm").addEventListener("submit", importSession);
+  $("#pullForm").addEventListener("submit", pullSelectedBranch);
   $("#previewBtn").addEventListener("click", previewMerge);
   $("#bundleBtn").addEventListener("click", createBundle);
   $("#branchCompareSelect").addEventListener("change", renderCompare);
@@ -426,7 +556,13 @@ function wireEvents() {
   });
 }
 
-wireEvents();
-loadState().catch((error) => {
+async function start() {
+  wireEvents();
+  await registerUser();
+  await loadState();
+  connectEvents();
+}
+
+start().catch((error) => {
   notice(error.message, "error");
 });

@@ -10,6 +10,7 @@ import {
   createBundle,
   importSessionContent,
   initWorkspace,
+  pullBranch,
   previewMerge
 } from "../src/lib/store.js";
 
@@ -102,4 +103,23 @@ test("importSessionContent normalizes pasted jsonl and plain text into context i
   assert.equal(imported[0].type, "prompt-snippet");
   assert.match(imported[0].summary, /Auth runs after predicate parsing/);
   assert.match(imported[1].summary, /plain text line/);
+});
+
+test("pullBranch clones another user's branch into a new owner branch", () => {
+  const repo = tempRepo();
+  initWorkspace(repo, { name: "demo" });
+  const source = createBranch(repo, { owner: "maya", name: "auth-routing" });
+  addItem(repo, source.branchId, {
+    type: "finding",
+    summary: "Routing context should be preserved for collaborators.",
+    files: ["README.md"]
+  });
+
+  const pulled = pullBranch(repo, source.branchId, { owner: "jordan", name: "auth-routing-copy" });
+
+  assert.equal(pulled.owner, "jordan");
+  assert.equal(pulled.parentBranchId, source.branchId);
+  assert.equal(pulled.items.length, 1);
+  assert.equal(pulled.items[0].source, `pull:${source.branchId}`);
+  assert.equal(pulled.items[0].createdBy, "jordan");
 });

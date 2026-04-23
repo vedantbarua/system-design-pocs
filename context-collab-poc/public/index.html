@@ -12,7 +12,7 @@
         <div>
           <p class="eyebrow">Context Collab</p>
           <h1>Shared AI working context</h1>
-          <p class="lede">Create repository-scoped branches, import session context, compare investigation paths, preview merges, and export a reusable assistant bundle.</p>
+          <p class="lede">Join a shared workspace, publish context branches, pull another developer's branch, and watch merges and bundles update live.</p>
         </div>
         <div class="actions">
           <button id="initBtn">Initialize Workspace</button>
@@ -21,6 +21,40 @@
       </header>
 
       <section id="notice"></section>
+
+      <section class="workspace-grid identity-grid">
+        <article class="panel">
+          <div class="section-title">
+            <div>
+              <h2>Identity</h2>
+              <p>Pick a shared name for branch ownership, item provenance, and merge acceptance.</p>
+            </div>
+            <span id="connectionState" class="connection-pill offline">offline</span>
+          </div>
+          <form id="identityForm" class="form">
+            <label>
+              User Id
+              <input id="userId" name="userId" required placeholder="maya" />
+            </label>
+            <label>
+              Display Name
+              <input id="userName" name="name" required placeholder="Maya" />
+            </label>
+            <button type="submit">Join Shared Workspace</button>
+          </form>
+        </article>
+
+        <article class="panel">
+          <div class="section-title">
+            <div>
+              <h2>Presence</h2>
+              <p>Active collaborators connected to this shared server.</p>
+            </div>
+          </div>
+          <div id="presenceList" class="presence-list"></div>
+        </article>
+      </section>
+
       <section class="metrics" id="metrics"></section>
 
       <section class="workspace-grid top-grid">
@@ -57,7 +91,7 @@
           <form id="branchForm" class="form">
             <label>
               Owner
-              <input name="owner" required placeholder="maya" />
+              <input name="owner" placeholder="Defaults to current user" />
             </label>
             <label>
               Branch Name
@@ -71,6 +105,24 @@
           </form>
         </article>
 
+        <article class="panel">
+          <div class="section-title">
+            <div>
+              <h2>Pull Branch</h2>
+              <p>Copy another user's branch into your own working context.</p>
+            </div>
+          </div>
+          <form id="pullForm" class="form">
+            <label class="wide">
+              Source Branch
+              <select id="pullSourceSelect" name="sourceBranchId"></select>
+            </label>
+            <button type="submit">Pull Into My Branch</button>
+          </form>
+        </article>
+      </section>
+
+      <section class="workspace-grid form-grid">
         <article class="panel">
           <div class="section-title">
             <div>
@@ -112,9 +164,7 @@
             <button type="submit">Add Item</button>
           </form>
         </article>
-      </section>
 
-      <section class="workspace-grid form-grid">
         <article class="panel">
           <div class="section-title">
             <div>
@@ -146,7 +196,9 @@
             <button type="submit">Import Session</button>
           </form>
         </article>
+      </section>
 
+      <section class="workspace-grid">
         <article class="panel">
           <div class="section-title">
             <div>
@@ -157,9 +209,7 @@
           </div>
           <div id="branchCompare" class="compare-layout"></div>
         </article>
-      </section>
 
-      <section class="workspace-grid">
         <article class="panel">
           <div class="section-title">
             <div>
@@ -170,7 +220,9 @@
           </div>
           <div id="mergePreview" class="merge-preview empty">Select at least two branches.</div>
         </article>
+      </section>
 
+      <section class="workspace-grid">
         <article class="panel">
           <div class="section-title">
             <div>
@@ -182,16 +234,16 @@
           <pre id="bundleOutput" class="prompt-output">No bundle exported yet.</pre>
           <div id="bundleHistory" class="bundle-history"></div>
         </article>
-      </section>
 
-      <section class="panel">
-        <div class="section-title">
-          <div>
-            <h2>Timeline</h2>
-            <p>Recent workspace, branch, import, merge, and bundle events.</p>
+        <article class="panel">
+          <div class="section-title">
+            <div>
+              <h2>Timeline</h2>
+              <p>Recent workspace, branch, import, merge, pull, and bundle events.</p>
+            </div>
           </div>
-        </div>
-        <div id="timeline" class="timeline"></div>
+          <div id="timeline" class="timeline"></div>
+        </article>
       </section>
     </main>
 

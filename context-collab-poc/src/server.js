@@ -1,6 +1,7 @@
 import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";
+import crypto from "node:crypto";
 import {
   acceptMerge,
   addItem,
@@ -13,18 +14,24 @@ import {
   listBundles,
   listItems,
   listMerges,
+  listUsers,
   loadBranch,
   loadBundle,
   loadMerge,
   loadWorkspace,
   previewMerge,
-  seedDemo
+  pullBranch,
+  seedDemo,
+  upsertUser
 } from "./lib/store.js";
 
 const PORT = Number(process.env.PORT || 4100);
 const HOST = process.env.HOST || "127.0.0.1";
 const REPO_ROOT = path.resolve(process.env.CONTEXT_COLLAB_REPO || process.cwd());
 const PUBLIC_DIR = path.resolve(new URL("../public", import.meta.url).pathname);
+
+const clients = new Map();
+const presence = new Map();
 
 function sendJson(res, status, body) {
   res.writeHead(status, { "content-type": "application/json" });
@@ -60,6 +67,71 @@ function serveStatic(req, res) {
   sendText(res, 200, fs.readFileSync(absolute, "utf8"), contentType);
 }
 
+function currentState() {
+  const state = getState(REPO_ROOT);
+  return {
+    ...state,
+    users: listUsers(REPO_ROOT),
+    presence: [...presence.values()].sort((a, b) => a.name.localeCompare(b.name))
+  };
+}
+
+function broadcast(event, payload) {
+  const chunk = `event: ${event}\ndata: ${JSON.stringify(payload)}\n\n`;
+  for (const client of clients.values()) {
+    client.res.write(chunk);
+  }
+}
+
+function broadcastState(reason, detail = {}) {
+  broadcast("state.changed", {
+    reason,
+    detail,
+    state: currentState()
+  });
+}
+
+function registerPresence(query) {
+  const userId = String(query.get("userId") || "guest").trim() || "guest";
+  const name = String(query.get("name") || userId).trim() || userId;
+  const clientId = crypto.randomBytes(8).toString("hex");
+  const record = {
+    clientId,
+    userId,
+    name,
+    connectedAt: new Date().toISOString()
+  };
+  presence.set(clientId, record);
+  broadcastState("presence.joined", { userId, name });
+  return record;
+}
+
+function handleEvents(req, res) {
+  const url = new URL(req.url, `http://${req.headers.host}`);
+  const record = registerPresence(url.searchParams);
+
+  res.writeHead(200, {
+    "content-type": "text/event-stream",
+    "cache-control": "no-cache",
+    connection: "keep-alive"
+  });
+
+  res.write(`event: connected\ndata: ${JSON.stringify({ clientId: record.clientId, state: currentState() })}\n\n`);
+
+  const heartbeat = setInterval(() => {
+    res.write(`event: heartbeat\ndata: ${JSON.stringify({ at: new Date().toISOString() })}\n\n`);
+  }, 15000);
+
+  clients.set(record.clientId, { res, heartbeat, userId: record.userId, name: record.name });
+
+  req.on("close", () => {
+    clearInterval(heartbeat);
+    clients.delete(record.clientId);
+    presence.delete(record.clientId);
+    broadcastState("presence.left", { userId: record.userId, name: record.name });
+  });
+}
+
 async function handleApi(req, res) {
   const url = new URL(req.url, `http://${req.headers.host}`);
   const segments = url.pathname.split("/").filter(Boolean);
@@ -71,12 +143,30 @@ async function handleApi(req, res) {
     }
 
     if (req.method === "GET" && url.pathname === "/api/state") {
-      sendJson(res, 200, getState(REPO_ROOT));
+      sendJson(res, 200, currentState());
+      return;
+    }
+
+    if (req.method === "GET" && url.pathname === "/api/presence") {
+      sendJson(res, 200, [...presence.values()]);
+      return;
+    }
+
+    if (req.method === "GET" && url.pathname === "/api/users") {
+      sendJson(res, 200, listUsers(REPO_ROOT));
+      return;
+    }
+
+    if (req.method === "POST" && url.pathname === "/api/users") {
+      const body = await readBody(req);
+      const user = upsertUser(REPO_ROOT, body);
+      sendJson(res, 201, user);
+      broadcastState("user.updated", { userId: user.userId });
       return;
     }
 
     if (req.method === "GET" && url.pathname === "/api/workspaces") {
-      const state = getState(REPO_ROOT);
+      const state = currentState();
       sendJson(res, 200, state.workspace ? [state.workspace] : []);
       return;
     }
@@ -95,6 +185,7 @@ async function handleApi(req, res) {
       const body = await readBody(req);
       const workspace = initWorkspace(body.repositoryRoot || REPO_ROOT, body);
       sendJson(res, 201, workspace);
+      broadcastState("workspace.updated", { workspaceId: workspace.workspaceId });
       return;
     }
 
@@ -115,13 +206,25 @@ async function handleApi(req, res) {
 
     if (req.method === "POST" && url.pathname === "/api/branches") {
       const body = await readBody(req);
-      sendJson(res, 201, createBranch(REPO_ROOT, body));
+      const branch = createBranch(REPO_ROOT, body);
+      sendJson(res, 201, branch);
+      broadcastState("branch.created", { branchId: branch.branchId });
+      return;
+    }
+
+    if (req.method === "POST" && segments[0] === "api" && segments[1] === "branches" && segments[2] && segments[3] === "pull") {
+      const body = await readBody(req);
+      const branch = pullBranch(REPO_ROOT, segments[2], body);
+      sendJson(res, 201, branch);
+      broadcastState("branch.pulled", { branchId: branch.branchId, sourceBranchId: segments[2] });
       return;
     }
 
     if (req.method === "POST" && url.pathname === "/api/items") {
       const body = await readBody(req);
-      sendJson(res, 201, addItem(REPO_ROOT, body.branchId, body));
+      const item = addItem(REPO_ROOT, body.branchId, body);
+      sendJson(res, 201, item);
+      broadcastState("item.added", { branchId: body.branchId, itemId: item.itemId });
       return;
     }
 
@@ -133,6 +236,7 @@ async function handleApi(req, res) {
         sessionPath: body.sessionPath
       });
       sendJson(res, 201, { imported: imported.length, items: imported });
+      broadcastState("session.imported", { branchId: body.branchId, imported: imported.length });
       return;
     }
 
@@ -154,13 +258,17 @@ async function handleApi(req, res) {
 
     if (req.method === "POST" && url.pathname === "/api/merges") {
       const body = await readBody(req);
-      sendJson(res, 201, acceptMerge(REPO_ROOT, body.sourceBranchIds || [], body));
+      const merge = acceptMerge(REPO_ROOT, body.sourceBranchIds || [], body);
+      sendJson(res, 201, merge);
+      broadcastState("merge.accepted", { mergeId: merge.mergeId });
       return;
     }
 
     if (req.method === "POST" && url.pathname === "/api/bundles") {
       const body = await readBody(req);
-      sendJson(res, 201, createBundle(REPO_ROOT, body));
+      const bundle = createBundle(REPO_ROOT, body);
+      sendJson(res, 201, bundle);
+      broadcastState("bundle.created", { bundleId: bundle.bundleId });
       return;
     }
 
@@ -181,7 +289,9 @@ async function handleApi(req, res) {
     }
 
     if (req.method === "POST" && url.pathname === "/api/seed-demo") {
-      sendJson(res, 201, seedDemo(REPO_ROOT));
+      const seeded = seedDemo(REPO_ROOT);
+      sendJson(res, 201, seeded);
+      broadcastState("demo.seeded", {});
       return;
     }
 
@@ -192,7 +302,9 @@ async function handleApi(req, res) {
 }
 
 const server = http.createServer((req, res) => {
-  if (req.url.startsWith("/api/")) {
+  if (req.url.startsWith("/api/events")) {
+    handleEvents(req, res);
+  } else if (req.url.startsWith("/api/")) {
     handleApi(req, res);
   } else {
     serveStatic(req, res);

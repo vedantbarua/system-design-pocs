@@ -80,6 +80,7 @@ export function paths(repoRoot) {
   return {
     base,
     workspace: path.join(base, "workspace.json"),
+    users: path.join(base, "users.json"),
     branches: path.join(base, "branches"),
     merges: path.join(base, "merges"),
     bundles: path.join(base, "bundles"),
@@ -170,6 +171,35 @@ export function loadWorkspace(repoRoot) {
   return workspace;
 }
 
+export function listUsers(repoRoot) {
+  return readJson(paths(repoRoot).users, []);
+}
+
+export function upsertUser(repoRoot, input = {}) {
+  const userId = slug(input.userId || input.name || input.handle || "local");
+  const users = listUsers(repoRoot);
+  const nowAt = now();
+  const existing = users.find((user) => user.userId === userId);
+
+  if (existing) {
+    existing.name = input.name || existing.name;
+    existing.color = input.color || existing.color;
+    existing.updatedAt = nowAt;
+  } else {
+    users.push({
+      userId,
+      name: input.name || userId,
+      color: input.color || "#177245",
+      createdAt: nowAt,
+      updatedAt: nowAt
+    });
+  }
+
+  writeJson(paths(repoRoot).users, users);
+  appendAudit(repoRoot, { event: "user.upserted", userId, name: input.name || userId });
+  return users.find((user) => user.userId === userId);
+}
+
 export function branchFile(repoRoot, branchId) {
   return path.join(paths(repoRoot).branches, `${branchId}.json`);
 }
@@ -195,6 +225,39 @@ export function createBranch(repoRoot, options = {}) {
   };
   writeJson(branchFile(repoRoot, branchId), branch);
   appendAudit(repoRoot, { event: "branch.created", branchId, owner, name });
+  return branch;
+}
+
+export function pullBranch(repoRoot, sourceBranchId, options = {}) {
+  const source = loadBranch(repoRoot, sourceBranchId);
+  const owner = options.owner || process.env.USER || "local";
+  const targetName = options.name || `${source.name}-pull`;
+  const branch = createBranch(repoRoot, {
+    owner,
+    name: targetName,
+    parentBranchId: source.branchId,
+    baseCommit: options.baseCommit || source.baseCommit
+  });
+
+  if (branch.items.length === 0) {
+    branch.items = source.items.map((item) => ({
+      ...item,
+      itemId: id("item", `${sourceBranchId}:${item.summary}`),
+      branchId: branch.branchId,
+      source: `pull:${sourceBranchId}`,
+      createdBy: owner,
+      createdAt: now()
+    }));
+    saveBranch(repoRoot, branch);
+    appendAudit(repoRoot, {
+      event: "branch.pulled",
+      sourceBranchId,
+      branchId: branch.branchId,
+      owner,
+      itemCount: branch.items.length
+    });
+  }
+
   return branch;
 }
 
