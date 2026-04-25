@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LedgerFlow Bookkeeping POC</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Main navigation">
+        <div class="brand">
+          <div class="brand-mark">LF</div>
+          <div>
+            <strong>LedgerFlow</strong>
+            <span>Bookkeeping POC</span>
+          </div>
+        </div>
+
+        <nav class="nav-list">
+          <button class="nav-item active" data-view="dashboard" type="button">
+            <span class="nav-icon">D</span>
+            Dashboard
+          </button>
+          <button class="nav-item" data-view="invoices" type="button">
+            <span class="nav-icon">I</span>
+            Invoices
+          </button>
+          <button class="nav-item" data-view="transactions" type="button">
+            <span class="nav-icon">T</span>
+            Transactions
+          </button>
+          <button class="nav-item" data-view="bills" type="button">
+            <span class="nav-icon">B</span>
+            Bills
+          </button>
+          <button class="nav-item" data-view="reconcile" type="button">
+            <span class="nav-icon">R</span>
+            Reconcile
+          </button>
+          <button class="nav-item" data-view="reports" type="button">
+            <span class="nav-icon">P</span>
+            Reports
+          </button>
+        </nav>
+
+        <div class="sidebar-panel">
+          <span>Connected account</span>
+          <strong>Chase Business Checking</strong>
+          <small id="bankBalance"></small>
+        </div>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Northstar Studio LLC</p>
+            <h1 id="pageTitle">Dashboard</h1>
+          </div>
+          <div class="topbar-actions">
+            <button class="ghost-button" id="seedButton" type="button">Reset demo data</button>
+            <button class="primary-button" id="quickActionButton" type="button">New invoice</button>
+          </div>
+        </header>
+
+        <section class="view active" id="dashboardView">
+          <div class="metric-grid" id="metricGrid"></div>
+
+          <div class="dashboard-grid">
+            <section class="panel cash-panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Cash flow</p>
+                  <h2>Money in and out</h2>
+                </div>
+                <select id="cashRange" aria-label="Cash flow range">
+                  <option value="6">Last 6 months</option>
+                  <option value="3">Last 3 months</option>
+                </select>
+              </div>
+              <canvas id="cashChart" width="760" height="320" aria-label="Cash flow chart"></canvas>
+            </section>
+
+            <section class="panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Today</p>
+                  <h2>Bookkeeping queue</h2>
+                </div>
+              </div>
+              <div class="queue-list" id="queueList"></div>
+            </section>
+          </div>
+
+          <section class="panel">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">Recent activity</p>
+                <h2>Audit timeline</h2>
+              </div>
+            </div>
+            <div class="timeline" id="auditTimeline"></div>
+          </section>
+        </section>
+
+        <section class="view" id="invoicesView">
+          <div class="content-grid">
+            <form class="panel form-panel" id="invoiceForm">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Accounts receivable</p>
+                  <h2>Create invoice</h2>
+                </div>
+              </div>
+              <label>
+                Customer
+                <input name="customer" required value="Orchid Cafe" />
+              </label>
+              <label>
+                Service
+                <input name="service" required value="Brand refresh sprint" />
+              </label>
+              <div class="form-row">
+                <label>
+                  Amount
+                  <input name="amount" type="number" min="1" step="1" required value="4200" />
+                </label>
+                <label>
+                  Due date
+                  <input name="dueDate" type="date" required />
+                </label>
+              </div>
+              <button class="primary-button wide" type="submit">Send invoice</button>
+            </form>
+
+            <section class="panel table-panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Open invoices</p>
+                  <h2>Customer balances</h2>
+                </div>
+                <div class="segmented" role="group" aria-label="Invoice filter">
+                  <button class="segment active" data-invoice-filter="all" type="button">All</button>
+                  <button class="segment" data-invoice-filter="open" type="button">Open</button>
+                  <button class="segment" data-invoice-filter="overdue" type="button">Overdue</button>
+                </div>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Customer</th>
+                      <th>Service</th>
+                      <th>Due</th>
+                      <th>Status</th>
+                      <th class="num">Amount</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody id="invoiceTable"></tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="transactionsView">
+          <div class="content-grid">
+            <form class="panel form-panel" id="transactionForm">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Bank feed</p>
+                  <h2>Add transaction</h2>
+                </div>
+              </div>
+              <label>
+                Merchant or memo
+                <input name="merchant" required value="Figma" />
+              </label>
+              <div class="form-row">
+                <label>
+                  Type
+                  <select name="type">
+                    <option value="expense">Expense</option>
+                    <option value="income">Income</option>
+                  </select>
+                </label>
+                <label>
+                  Amount
+                  <input name="amount" type="number" min="1" step="1" required value="89" />
+                </label>
+              </div>
+              <label>
+                Category
+                <select name="category" id="categorySelect"></select>
+              </label>
+              <button class="primary-button wide" type="submit">Post transaction</button>
+            </form>
+
+            <section class="panel table-panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Categorization</p>
+                  <h2>Transaction register</h2>
+                </div>
+                <input class="search" id="transactionSearch" placeholder="Search transactions" />
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Merchant</th>
+                      <th>Category</th>
+                      <th>Status</th>
+                      <th class="num">Amount</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody id="transactionTable"></tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="billsView">
+          <div class="content-grid">
+            <form class="panel form-panel" id="billForm">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Accounts payable</p>
+                  <h2>Schedule bill</h2>
+                </div>
+              </div>
+              <label>
+                Vendor
+                <input name="vendor" required value="Nimbus Cloud" />
+              </label>
+              <div class="form-row">
+                <label>
+                  Amount
+                  <input name="amount" type="number" min="1" step="1" required value="760" />
+                </label>
+                <label>
+                  Due date
+                  <input name="dueDate" type="date" required />
+                </label>
+              </div>
+              <label>
+                Category
+                <select name="category">
+                  <option>Software</option>
+                  <option>Rent</option>
+                  <option>Payroll</option>
+                  <option>Marketing</option>
+                  <option>Contractors</option>
+                </select>
+              </label>
+              <button class="primary-button wide" type="submit">Add bill</button>
+            </form>
+
+            <section class="panel table-panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Upcoming payments</p>
+                  <h2>Vendor bills</h2>
+                </div>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Vendor</th>
+                      <th>Category</th>
+                      <th>Due</th>
+                      <th>Status</th>
+                      <th class="num">Amount</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody id="billTable"></tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="reconcileView">
+          <div class="reconcile-layout">
+            <section class="panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Month close</p>
+                  <h2>Bank reconciliation</h2>
+                </div>
+                <button class="primary-button" id="reconcileButton" type="button">Mark selected matched</button>
+              </div>
+              <div class="reconcile-summary" id="reconcileSummary"></div>
+              <div class="match-list" id="matchList"></div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Assistant</p>
+                  <h2>Suggested matches</h2>
+                </div>
+              </div>
+              <div class="insight-list" id="insightList"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="reportsView">
+          <div class="report-grid">
+            <section class="panel report-card">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Profit and loss</p>
+                  <h2>This month</h2>
+                </div>
+              </div>
+              <div id="profitReport"></div>
+            </section>
+            <section class="panel report-card">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Expense mix</p>
+                  <h2>By category</h2>
+                </div>
+              </div>
+              <div id="categoryReport"></div>
+            </section>
+            <section class="panel report-card wide-card">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Aging</p>
+                  <h2>Receivables and payables</h2>
+                </div>
+              </div>
+              <div id="agingReport"></div>
+            </section>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
