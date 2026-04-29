@@ -1,10 +1,20 @@
 # Ad Click Aggregator POC
 
-A minimal ad-click aggregation service with a React UI. The backend ingests click events and returns summary + time-series rollups by campaign, ad, or publisher.
+A minimal ad-click aggregation service with a React UI. The backend ingests click events and returns overview, summary, and time-series rollups by campaign, ad, or publisher.
 
-## What’s inside
-- Spring Boot API with in-memory event store and aggregation endpoints
-- React + Vite dashboard for ingesting clicks and exploring rollups
+## Goal
+
+Show the core shape of an analytics ingestion and aggregation system: accept timestamped click events, retain them in an append-only in-memory store, and answer filtered aggregate queries across multiple dimensions.
+
+## What It Covers
+
+- Click ingestion with validation and server-side event IDs
+- Time-window filtering with ISO-8601 timestamps
+- Grouped rollups by campaign, ad, or publisher
+- Minute, hour, and day buckets for time-series views
+- Spend aggregation using integer cents
+- Seed data generation for demoing dashboard behavior quickly
+- React + Vite dashboard for ingesting clicks and exploring metrics
 
 ## How to Run
 
@@ -24,6 +34,15 @@ A minimal ad-click aggregation service with a React UI. The backend ingests clic
    npm run dev
    ```
 2. Open `http://localhost:5173`.
+
+## Demo Flow
+
+1. Start the backend and frontend.
+2. Click **Seed 120 clicks** to create a synthetic 24-hour event set.
+3. Switch the **Group by** selector between campaign, ad, and publisher.
+4. Switch the interval between minute, hour, and day to see bucket granularity change.
+5. Use the time filters to narrow the aggregation window.
+6. Submit a custom click and refresh the rollups.
 
 ## API Endpoints
 
@@ -60,6 +79,29 @@ curl "http://localhost:8110/api/summary?groupBy=campaign"
 curl "http://localhost:8110/api/timeseries?groupBy=publisher&interval=hour"
 ```
 
-## Notes
+## Configuration
+
+- Backend port: `server.port=8110`
+- Frontend dev server: `http://localhost:5173`
+- CORS allows `GET` and `POST` requests from the Vite dev origin.
+- Jackson writes Java time values as ISO strings instead of numeric timestamps.
+
+## Notes and Limitations
+
 - Timestamps use ISO-8601 (UTC), e.g. `2026-02-01T15:30:00Z`.
 - Data is in-memory and resets when the backend restarts.
+- Aggregates are recalculated from the full filtered event list on each request.
+- There is no authentication, tenant isolation, deduplication, or durable ingestion queue.
+
+## Technologies Used
+
+- Java 17
+- Spring Boot 3.2
+- Spring Web and Bean Validation
+- React 18
+- Vite 5
+
+## More Detail
+
+- [Technical README](TECHNICAL_README.md)
+- [Improvements](IMPROVEMENTS.md)

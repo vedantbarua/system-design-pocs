@@ -114,7 +114,6 @@ When deciding whether a POC belongs in the featured set:
 
 The fastest repo-wide improvement is to bring these lagging projects up to the standard because they are already strong topics:
 
-- `ad-click-aggregator-poc`
 - `api-gateway-dynamic-routing-poc`
 - `distributed-job-scheduler-poc`
 - `distributed-lock-manager-poc`
