@@ -1,0 +1,23 @@
+{
+  "name": "restaurant-booking-system-backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Restaurant booking system backend POC with holds, reservations, waitlist, and event visibility.",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "start": "tsx src/server.ts",
+    "build": "tsc --noEmit"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.5.5",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.2"
+  }
+}
