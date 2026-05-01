@@ -1,6 +1,10 @@
 # Compiled class file
 *.class
 
+# Python artifacts
+__pycache__/
+*.py[cod]
+
 # Log file
 *.log
 

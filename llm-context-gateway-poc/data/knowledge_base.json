@@ -1,0 +1,46 @@
+{
+  "documents": [
+    {
+      "doc_id": "gateway-architecture",
+      "title": "LLM Gateway Architecture",
+      "source": "architecture-notes.md",
+      "tags": ["gateway", "routing", "system design"],
+      "body": "The LLM gateway sits between product clients and model providers. It owns request validation, retrieval, prompt assembly, provider routing, caching, response shaping, and audit logging. Keeping these responsibilities in one boundary prevents every client from duplicating model-specific behavior. The gateway should expose stable product APIs while hiding provider changes behind adapters."
+    },
+    {
+      "doc_id": "grounding-citations",
+      "title": "Grounding and Citations",
+      "source": "rag-playbook.md",
+      "tags": ["rag", "retrieval", "citations"],
+      "body": "A grounded answer should be generated from retrieved context and should carry citations back to the source chunks. Retrieval quality matters more than prompt wording when the system must answer private or domain-specific questions. The gateway should return the selected document ids, titles, scores, and snippets so reviewers can inspect why a response was produced."
+    },
+    {
+      "doc_id": "provider-failover",
+      "title": "Provider Failover",
+      "source": "resilience-plan.md",
+      "tags": ["fallback", "provider", "reliability"],
+      "body": "Provider calls can fail because of timeouts, rate limits, auth errors, or model outages. The gateway should apply a short timeout, record the failure, and fall back to a deterministic local response when the product flow can tolerate degraded quality. For critical paths, the gateway can route to a secondary provider or return a typed unavailable response."
+    },
+    {
+      "doc_id": "prompt-safety",
+      "title": "Prompt Safety Boundary",
+      "source": "safety-notes.md",
+      "tags": ["guardrail", "prompt injection", "security"],
+      "body": "Prompt-injection attempts often ask the assistant to ignore previous instructions, reveal system prompts, or follow hidden directions from retrieved content. The gateway should check user input and retrieved text before model execution. Blocks should be explicit, logged, and measurable so the team can tune safety rules without hiding failures."
+    },
+    {
+      "doc_id": "answer-evaluation",
+      "title": "Answer Evaluation",
+      "source": "eval-plan.md",
+      "tags": ["evaluation", "quality", "testing"],
+      "body": "LLM features need regression checks because small prompt or model changes can alter output. A lightweight evaluation set should cover expected facts, refusal behavior, citation presence, latency budget, and provider fallback. Production systems should store prompt version, model version, retrieved documents, and final answer for offline review."
+    },
+    {
+      "doc_id": "cost-latency-budget",
+      "title": "Cost and Latency Budget",
+      "source": "operations.md",
+      "tags": ["latency", "cost", "budget"],
+      "body": "The gateway should enforce context limits, top-k retrieval limits, timeout budgets, and cache policy. These controls keep token spend predictable and prevent one request from consuming too much latency. Cache keys should include normalized user intent, route, prompt version, and retrieval parameters to avoid returning stale or mismatched answers."
+    }
+  ]
+}
