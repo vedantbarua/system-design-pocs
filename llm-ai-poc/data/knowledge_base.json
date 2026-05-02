@@ -1,0 +1,34 @@
+{
+  "documents": [
+    {
+      "doc_id": "rag-grounding",
+      "title": "Retrieval Grounding",
+      "tags": ["rag", "retrieval", "citations", "hallucination"],
+      "body": "Use retrieval when the answer depends on private, changing, or policy-controlled knowledge. A useful RAG flow stores source ids with snippets, limits context by budget, and returns citations with the final answer so reviewers can inspect the source of truth."
+    },
+    {
+      "doc_id": "tool-calling",
+      "title": "Tool Calling",
+      "tags": ["agents", "tools", "workflow", "determinism"],
+      "body": "Use tool calling when the model needs fresh data, deterministic computation, or side effects. The agent should create typed tool calls, validate arguments, enforce a tool budget, and log every call with latency and success status."
+    },
+    {
+      "doc_id": "guardrails",
+      "title": "Guardrails And Safety",
+      "tags": ["safety", "prompt-injection", "policy", "validation"],
+      "body": "Guardrails run before and after model execution. Input checks block prompt injection and oversized requests. Output checks should verify citations, prevent unsafe actions, and route uncertain answers to human review."
+    },
+    {
+      "doc_id": "evaluation",
+      "title": "Offline Evaluation",
+      "tags": ["evals", "quality", "regression", "testing"],
+      "body": "Treat prompts and tools like production code. Keep a versioned evaluation set with expected facts, blocked prompts, tool-call assertions, and latency budgets. Run it before changing prompts, retrieval settings, or models."
+    },
+    {
+      "doc_id": "cost-latency",
+      "title": "Cost And Latency Controls",
+      "tags": ["cost", "latency", "budget", "caching"],
+      "body": "LLM systems need explicit budgets. Common controls include max tool steps, context limits, request timeouts, caching for repeat questions, smaller models for routing, and escalation only when quality or risk requires it."
+    }
+  ]
+}
