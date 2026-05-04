@@ -1,0 +1,30 @@
+[
+  {
+    "doc_id": "local-model-gateway",
+    "title": "Local Model Gateway",
+    "source": "architecture-note",
+    "tags": ["ollama", "gateway", "local inference"],
+    "body": "A Python service should call Ollama through a small gateway boundary instead of scattering direct HTTP calls across application code. The boundary owns model selection, request timeouts, fallback behavior, prompt assembly, and operational logging."
+  },
+  {
+    "doc_id": "rag-grounding",
+    "title": "RAG Grounding",
+    "source": "design-review",
+    "tags": ["rag", "citations", "retrieval"],
+    "body": "Grounded answers should include the documents used to assemble the prompt. Retrieval can start with lexical scoring for a dependency-free proof of concept, then move to Ollama embeddings with a vector index when semantic recall becomes important."
+  },
+  {
+    "doc_id": "model-lifecycle",
+    "title": "Model Lifecycle",
+    "source": "ops-runbook",
+    "tags": ["models", "lifecycle", "timeouts"],
+    "body": "Local model operations need explicit health checks, model discovery, request timeouts, and keep-alive controls. A production service should report whether Ollama is reachable and whether the requested chat and embedding models are installed."
+  },
+  {
+    "doc_id": "privacy-boundary",
+    "title": "Privacy Boundary",
+    "source": "security-note",
+    "tags": ["privacy", "security", "offline"],
+    "body": "Running inference locally can reduce exposure to third-party model providers, but the application still needs prompt-injection checks, source authorization, audit logs, and redaction for sensitive fields before text is written to logs."
+  }
+]
