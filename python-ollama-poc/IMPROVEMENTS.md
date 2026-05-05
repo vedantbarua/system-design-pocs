@@ -3,7 +3,7 @@
 ## Production Gaps
 
 - Replace the demo HTTP server with FastAPI, Starlette, or another production server.
-- Add durable storage for traces, metrics, prompts, citations, and evaluation results.
+- Move JSONL traces into durable queryable storage for prompts, citations, and evaluation results.
 - Add a prompt registry with versions, owners, and rollback controls.
 - Add model readiness checks that verify configured chat and embedding models are installed.
 - Add structured response schemas for supported answer types.
@@ -18,11 +18,11 @@
 
 ## Scaling Improvements
 
-- Move retrieval data into a vector index backed by Ollama embeddings.
+- Move retrieval data from the JSON vector index into a dedicated vector database.
 - Add chunk ingestion and incremental re-indexing.
 - Cache prompts and responses in Redis or SQLite with prompt/model version keys.
 - Support multiple Ollama hosts and route by model availability.
-- Stream responses to clients instead of waiting for full completion.
+- Add browser-native server-sent events or WebSockets on top of the NDJSON streaming endpoint.
 
 ## Security Improvements
 
@@ -34,8 +34,8 @@
 
 ## Testing Improvements
 
-- Add HTTP endpoint tests with mocked Ollama responses.
+- Add more HTTP endpoint tests with mocked Ollama responses.
 - Add golden-answer fixtures with expected citations.
-- Add provider-contract tests for `/api/chat`, `/api/embed`, `/api/tags`, and `/api/version`.
+- Add live provider-contract tests for `/api/chat`, `/api/embed`, `/api/tags`, and `/api/version`.
 - Add latency and timeout tests around fallback behavior.
 - Add fuzz tests for malformed JSON, injection phrases, and oversized prompts.
