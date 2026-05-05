@@ -11,11 +11,11 @@ Show how a Python service can wrap local Ollama inference with the control-plane
 - Python standard-library client for Ollama `POST /api/chat`
 - Ollama health check through `/api/version`
 - Local model discovery through `/api/tags`
-- Embedding hook through `POST /api/embed`
-- RAG-style retrieval over a small local knowledge base
+- Persisted embedding index built through `POST /api/embed` or deterministic local embeddings
+- Lexical, vector, and hybrid RAG-style retrieval over a small local knowledge base
 - Prompt-injection guardrail before model execution
-- In-memory response cache, recent events, and request metrics
-- CLI, HTTP API, deterministic fallback, and smoke evaluation
+- In-memory response cache, persisted JSONL traces, recent events, and request metrics
+- CLI, HTTP API, NDJSON streaming, deterministic fallback, and smoke evaluation
 
 ## Quick Start
 
@@ -33,20 +33,31 @@ python3 -m unittest discover -s tests
 python3 app.py eval
 ```
 
+Build the local vector index without requiring Ollama:
+
+```bash
+python3 app.py index --local
+python3 app.py ask "How should grounded answers cite local context?" --retrieval-mode hybrid
+```
+
 Use local Ollama:
 
 ```bash
 ollama pull llama3.2
+ollama pull embeddinggemma
+python3 app.py index
 python3 app.py ask "How should a Python service call Ollama safely?"
 ```
 
 ## Demo Flows
 
 1. Ask how the Python service should call Ollama and inspect citations.
-2. Stop Ollama or point `OLLAMA_BASE_URL` to a bad port and observe mock fallback.
-3. Ask the same prompt twice and observe a cache hit.
-4. Submit a prompt-injection style request and observe a typed guardrail block.
-5. Run `models` or `health` to inspect local Ollama reachability.
+2. Build a local vector index and compare `lexical`, `vector`, and `hybrid` retrieval modes.
+3. Stream a response through `stream` or `POST /ask-stream`.
+4. Stop Ollama or point `OLLAMA_BASE_URL` to a bad port and observe mock fallback.
+5. Ask the same prompt twice and observe a cache hit.
+6. Submit a prompt-injection style request and observe a typed guardrail block.
+7. Run `models`, `health`, or `traces` to inspect local operations.
 
 ## JSON Endpoints
 
@@ -71,6 +82,17 @@ Other endpoints:
 - `GET /documents`
 - `GET /metrics`
 - `GET /events`
+- `GET /traces`
+- `POST /ask-stream`
+- `POST /index`
+
+Streaming response:
+
+```bash
+curl -s http://127.0.0.1:8110/ask-stream \
+  -H "Content-Type: application/json" \
+  -d '{"prompt":"How should a Python service call Ollama safely?","retrieval_mode":"hybrid"}'
+```
 
 ## Configuration
 
@@ -84,19 +106,22 @@ Useful environment variables:
 - `OLLAMA_TIMEOUT_SECONDS`: HTTP timeout, defaults to `20`
 - `OLLAMA_KEEP_ALIVE`: model keep-alive duration, defaults to `5m`
 - `OLLAMA_ALLOW_MOCK_FALLBACK`: set to `false` to fail closed when Ollama is unavailable
+- `OLLAMA_RETRIEVAL_MODE`: `lexical`, `vector`, or `hybrid`, defaults to `hybrid`
+- `OLLAMA_VECTOR_INDEX_PATH`: vector index path, defaults to `runtime/vector_index.json`
+- `OLLAMA_TRACE_PATH`: JSONL trace path, defaults to `runtime/traces.jsonl`
 
-## Implementation Plan
+## Implementation Notes
 
-1. Keep the first version dependency-free so the control-plane behavior is easy to review and test.
-2. Use direct Ollama HTTP calls for chat, health, model listing, and embedding experiments.
-3. Keep retrieval lexical in the first pass, then replace it with Ollama embeddings plus a vector index.
-4. Make fallback explicit in metrics so local demo availability does not hide provider failures.
-5. Add streaming and persisted traces after the synchronous JSON path is stable.
+1. The POC stays dependency-free so the control-plane behavior is easy to review and test.
+2. Direct Ollama HTTP calls cover chat, streaming, health, model listing, and embeddings.
+3. Retrieval can run as lexical, vector, or hybrid. The vector index can be built with Ollama embeddings or deterministic local hashes.
+4. Fallback is explicit in metrics and traces so local demo availability does not hide provider failures.
+5. Runtime artifacts are written under `runtime/`, which is intentionally ignored by git.
 
 ## Notes And Limitations
 
 - The fallback response is deterministic and does not represent real model quality.
-- Retrieval is lexical scoring, not semantic vector search.
+- Deterministic local embeddings are only a testable fallback, not a semantic replacement for model embeddings.
 - Cache, events, and metrics are process-local.
 - The HTTP server is for demonstration, not production traffic.
 - There is no authentication, tenant isolation, or source-level authorization.
