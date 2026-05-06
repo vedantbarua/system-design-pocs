@@ -1,0 +1,54 @@
+{
+  "routes": [
+    {
+      "name": "summarize",
+      "description": "Condense long text into a concise summary with the main points preserved.",
+      "keywords": ["summarize", "summary", "brief", "tl;dr", "recap", "condense"],
+      "model_profile": "fast",
+      "max_prompt_chars": 2200,
+      "max_output_tokens": 180,
+      "temperature": 0.1,
+      "system_prompt": "Summarize the user content clearly and avoid adding facts that were not provided."
+    },
+    {
+      "name": "classify",
+      "description": "Assign a simple label, priority, and confidence to short user text.",
+      "keywords": ["classify", "label", "category", "sentiment", "priority", "triage"],
+      "model_profile": "fast",
+      "max_prompt_chars": 1600,
+      "max_output_tokens": 120,
+      "temperature": 0.0,
+      "system_prompt": "Classify the user content using only observable signals from the prompt."
+    },
+    {
+      "name": "extract",
+      "description": "Extract action items, owners, dates, risks, and decisions from text.",
+      "keywords": ["extract", "actions", "action items", "owners", "risks", "decisions", "dates"],
+      "model_profile": "balanced",
+      "max_prompt_chars": 2600,
+      "max_output_tokens": 220,
+      "temperature": 0.1,
+      "system_prompt": "Extract structured facts from the user content without inventing missing fields."
+    },
+    {
+      "name": "rewrite",
+      "description": "Rewrite text for clarity, tone, or brevity while preserving the meaning.",
+      "keywords": ["rewrite", "improve", "polish", "tone", "shorten", "clarify"],
+      "model_profile": "balanced",
+      "max_prompt_chars": 2200,
+      "max_output_tokens": 220,
+      "temperature": 0.3,
+      "system_prompt": "Rewrite the user content while preserving the original intent and constraints."
+    },
+    {
+      "name": "answer",
+      "description": "Answer a general question when no specialized task is a better fit.",
+      "keywords": ["answer", "explain", "what", "why", "how", "compare", "recommend"],
+      "model_profile": "reasoning",
+      "max_prompt_chars": 3200,
+      "max_output_tokens": 260,
+      "temperature": 0.2,
+      "system_prompt": "Answer the user question directly. Call out assumptions and uncertainty."
+    }
+  ]
+}
