@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Spring AI POC</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<main class="shell">
+    <section class="workspace">
+        <div class="panel input-panel">
+            <div>
+                <p class="eyebrow">Spring AI POC</p>
+                <h1>AI assistant boundary</h1>
+            </div>
+
+            <form id="ask-form">
+                <label for="prompt">Prompt</label>
+                <textarea id="prompt" name="prompt" rows="5" maxlength="2000" required>Design a tiny rate limiter POC and call out the main tradeoffs.</textarea>
+
+                <label for="context">Context</label>
+                <textarea id="context" name="context" rows="4" maxlength="2000">Use Java 17, Spring Boot, and an in-memory implementation suitable for a local demo.</textarea>
+
+                <button type="submit" id="submit-button">Ask assistant</button>
+            </form>
+        </div>
+
+        <div class="panel output-panel">
+            <div class="result-header">
+                <div>
+                    <p class="eyebrow">Response</p>
+                    <h2 id="mode">Waiting</h2>
+                </div>
+                <span id="timestamp">--</span>
+            </div>
+            <pre id="answer">Submit a prompt to call the Spring controller. Without an API key, the app returns a deterministic demo response.</pre>
+            <div>
+                <h3>Next Actions</h3>
+                <ul id="next-actions">
+                    <li>Run locally and submit the sample prompt.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+</main>
+
+<script>
+    const form = document.querySelector("#ask-form");
+    const button = document.querySelector("#submit-button");
+    const answer = document.querySelector("#answer");
+    const mode = document.querySelector("#mode");
+    const timestamp = document.querySelector("#timestamp");
+    const nextActions = document.querySelector("#next-actions");
+
+    form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        button.disabled = true;
+        button.textContent = "Thinking";
+        answer.textContent = "Calling /api/ai/ask...";
+        nextActions.innerHTML = "";
+
+        try {
+            const response = await fetch("/api/ai/ask", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({
+                    prompt: form.prompt.value,
+                    context: form.context.value
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`Request failed with HTTP ${response.status}`);
+            }
+
+            const payload = await response.json();
+            mode.textContent = payload.mode;
+            timestamp.textContent = new Date(payload.generatedAt).toLocaleTimeString();
+            answer.textContent = payload.answer;
+            payload.nextActions.forEach((item) => {
+                const li = document.createElement("li");
+                li.textContent = item;
+                nextActions.appendChild(li);
+            });
+        } catch (error) {
+            mode.textContent = "Error";
+            timestamp.textContent = "--";
+            answer.textContent = error.message;
+        } finally {
+            button.disabled = false;
+            button.textContent = "Ask assistant";
+        }
+    });
+</script>
+</body>
+</html>
