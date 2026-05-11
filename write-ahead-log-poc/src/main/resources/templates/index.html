@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Write-Ahead Log POC</title>
+    <style>
+        :root {
+            color-scheme: light;
+            --bg: #f6f7f9;
+            --panel: #ffffff;
+            --ink: #18202a;
+            --muted: #657184;
+            --line: #d9dee7;
+            --accent: #1f7a5c;
+            --accent-dark: #155b45;
+            --warn: #9a5a00;
+            --delete: #a93f35;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--ink);
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+        header {
+            background: #17212b;
+            color: #f8fafc;
+            padding: 28px 32px;
+            border-bottom: 5px solid var(--accent);
+        }
+        header h1 {
+            margin: 0 0 8px;
+            font-size: clamp(28px, 4vw, 44px);
+            letter-spacing: 0;
+        }
+        header p {
+            margin: 0;
+            max-width: 860px;
+            color: #d4dbe4;
+            line-height: 1.55;
+        }
+        main {
+            width: min(1180px, calc(100% - 32px));
+            margin: 24px auto 48px;
+            display: grid;
+            gap: 20px;
+        }
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 14px;
+        }
+        .metric, section {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+        }
+        .metric {
+            padding: 16px;
+        }
+        .metric span {
+            display: block;
+            color: var(--muted);
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+        .metric strong {
+            font-size: 28px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+        section {
+            overflow: hidden;
+        }
+        section h2 {
+            margin: 0;
+            padding: 16px 18px;
+            font-size: 18px;
+            border-bottom: 1px solid var(--line);
+            background: #fbfcfe;
+        }
+        .content {
+            padding: 18px;
+        }
+        form {
+            display: grid;
+            gap: 12px;
+        }
+        label {
+            display: grid;
+            gap: 6px;
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 700;
+        }
+        input {
+            width: 100%;
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            padding: 10px 12px;
+            font: inherit;
+            color: var(--ink);
+            background: #fff;
+        }
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        button {
+            border: 0;
+            border-radius: 6px;
+            padding: 10px 14px;
+            font-weight: 800;
+            cursor: pointer;
+            background: var(--accent);
+            color: #fff;
+            min-height: 40px;
+        }
+        button:hover { background: var(--accent-dark); }
+        .secondary button { background: #314154; }
+        .secondary button:hover { background: #263443; }
+        .danger button { background: var(--delete); }
+        .danger button:hover { background: #853029; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        th, td {
+            text-align: left;
+            padding: 11px 12px;
+            border-bottom: 1px solid var(--line);
+            vertical-align: top;
+        }
+        th {
+            color: var(--muted);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            background: #fbfcfe;
+        }
+        code {
+            font-family: "SFMono-Regular", Consolas, monospace;
+            font-size: 13px;
+        }
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            min-height: 24px;
+            padding: 3px 8px;
+            border-radius: 999px;
+            background: #e6f3ee;
+            color: var(--accent-dark);
+            font-weight: 800;
+            font-size: 12px;
+        }
+        .tag.delete {
+            background: #f7e7e4;
+            color: var(--delete);
+        }
+        .event {
+            display: grid;
+            gap: 4px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--line);
+        }
+        .event:last-child {
+            border-bottom: 0;
+        }
+        .event strong {
+            font-size: 13px;
+            color: #273346;
+        }
+        .event span {
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.45;
+        }
+        .empty {
+            color: var(--muted);
+            padding: 18px;
+        }
+        @media (max-width: 880px) {
+            header { padding: 24px 18px; }
+            .metrics, .grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Write-Ahead Log POC</h1>
+    <p>Append commands before applying state, checkpoint the durable image, simulate crash recovery by replaying entries after the checkpoint, and compact old log records.</p>
+</header>
+
+<main>
+    <div class="metrics">
+        <div class="metric">
+            <span>State Keys</span>
+            <strong th:text="${snapshot.state().size()}">0</strong>
+        </div>
+        <div class="metric">
+            <span>Retained WAL Entries</span>
+            <strong th:text="${snapshot.log().size()}">0</strong>
+        </div>
+        <div class="metric">
+            <span>Checkpoint LSN</span>
+            <strong th:text="${snapshot.checkpoint().lsn()}">0</strong>
+        </div>
+        <div class="metric">
+            <span>Next LSN</span>
+            <strong th:text="${snapshot.nextLsn()}">1</strong>
+        </div>
+    </div>
+
+    <div class="grid">
+        <section>
+            <h2>Append Command</h2>
+            <div class="content">
+                <form method="post" action="/put" th:object="${putRequest}">
+                    <label>
+                        Command ID
+                        <input name="commandId" th:value="*{commandId}" required maxlength="80">
+                    </label>
+                    <label>
+                        Key
+                        <input name="key" th:value="*{key}" required maxlength="80">
+                    </label>
+                    <label>
+                        Value
+                        <input name="value" th:value="*{value}" required maxlength="240">
+                    </label>
+                    <button type="submit">Append PUT</button>
+                </form>
+            </div>
+        </section>
+
+        <section>
+            <h2>Delete And Recovery Controls</h2>
+            <div class="content">
+                <form method="post" action="/delete" th:object="${deleteRequest}">
+                    <label>
+                        Command ID
+                        <input name="commandId" th:value="*{commandId}" required maxlength="80">
+                    </label>
+                    <label>
+                        Key
+                        <input name="key" th:value="*{key}" required maxlength="80">
+                    </label>
+                    <div class="danger">
+                        <button type="submit">Append DELETE</button>
+                    </div>
+                </form>
+                <div class="actions" style="margin-top: 14px;">
+                    <form method="post" action="/checkpoint" class="secondary"><button type="submit">Checkpoint</button></form>
+                    <form method="post" action="/recover" class="secondary"><button type="submit">Crash + Recover</button></form>
+                    <form method="post" action="/compact" class="secondary"><button type="submit">Compact</button></form>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="grid">
+        <section>
+            <h2>Materialized State</h2>
+            <table th:if="${!snapshot.state().isEmpty()}">
+                <thead>
+                <tr><th>Key</th><th>Value</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="item : ${snapshot.state()}">
+                    <td><code th:text="${item.key}">key</code></td>
+                    <td th:text="${item.value}">value</td>
+                </tr>
+                </tbody>
+            </table>
+            <div class="empty" th:if="${snapshot.state().isEmpty()}">No keys are currently materialized.</div>
+        </section>
+
+        <section>
+            <h2>Checkpoint Image</h2>
+            <div class="content">
+                <p><strong>LSN:</strong> <span th:text="${snapshot.checkpoint().lsn()}">0</span></p>
+                <p><strong>Created:</strong> <span th:text="${snapshot.checkpoint().createdAt()}">time</span></p>
+                <table th:if="${!snapshot.checkpoint().state().isEmpty()}">
+                    <thead>
+                    <tr><th>Key</th><th>Value</th></tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="item : ${snapshot.checkpoint().state()}">
+                        <td><code th:text="${item.key}">key</code></td>
+                        <td th:text="${item.value}">value</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <section>
+        <h2>Retained WAL</h2>
+        <table th:if="${!snapshot.log().isEmpty()}">
+            <thead>
+            <tr>
+                <th>LSN</th>
+                <th>Command</th>
+                <th>Operation</th>
+                <th>Key</th>
+                <th>Value</th>
+                <th>Appended</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="entry : ${snapshot.log()}">
+                <td th:text="${entry.lsn()}">1</td>
+                <td><code th:text="${entry.commandId()}">cmd</code></td>
+                <td>
+                    <span class="tag" th:classappend="${entry.operation().name() == 'DELETE'} ? ' delete' : ''" th:text="${entry.operation()}">PUT</span>
+                </td>
+                <td><code th:text="${entry.key()}">key</code></td>
+                <td th:text="${entry.value() ?: '-'}">value</td>
+                <td th:text="${entry.appendedAt()}">time</td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="empty" th:if="${snapshot.log().isEmpty()}">The retained log is empty after compaction.</div>
+    </section>
+
+    <section>
+        <h2>Recent Events</h2>
+        <div class="content">
+            <div class="event" th:each="event : ${snapshot.events()}">
+                <strong><span th:text="${event.type()}">type</span> · <span th:text="${event.occurredAt()}">time</span></strong>
+                <span th:text="${event.message()}">message</span>
+            </div>
+        </div>
+    </section>
+</main>
+</body>
+</html>
