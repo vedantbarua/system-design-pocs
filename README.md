@@ -2,7 +2,7 @@
 
 Proof-of-concepts for distributed systems, infrastructure patterns, and product-style architectures. This repository is meant to read like a working systems portfolio, not just a list of folders.
 
-There are currently `71` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
+There are currently `72` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
 
 ## What Makes This Repo Useful
 
@@ -34,6 +34,7 @@ If a reviewer only opens a dozen projects, these are the best entry points.
 | [distributed-tracing-observability-poc](distributed-tracing-observability-poc/README.md) | Important operational visibility story across services. |
 | [stock-exchange-poc](stock-exchange-poc/README.md) | Strong deterministic processing example with ordered ingress and live market updates. |
 | [saga-pattern-orchestrator-poc](saga-pattern-orchestrator-poc/README.md) | Distributed workflow coordination with compensation logic. |
+| [transactional-outbox-poc](transactional-outbox-poc/README.md) | Practical reliability pattern for atomic state writes, async publishing, idempotent consumers, duplicate delivery, and DLQ handling. |
 | [notification-system-poc](notification-system-poc/README.md) | Real messaging-system concerns: queueing, provider routing, delivery semantics, and rate limits. |
 
 ## Suggested Review Path
@@ -54,10 +55,11 @@ This path moves from core primitives to more layered systems.
 12. [event-sourcing-cqrs-poc](event-sourcing-cqrs-poc/README.md)
 13. [write-ahead-log-poc](write-ahead-log-poc/README.md)
 14. [saga-pattern-orchestrator-poc](saga-pattern-orchestrator-poc/README.md)
-15. [object-storage-poc](object-storage-poc/README.md)
-16. [cdn-poc](cdn-poc/README.md)
-17. [search-engine-poc](search-engine-poc/README.md)
-18. [stock-exchange-poc](stock-exchange-poc/README.md)
+15. [transactional-outbox-poc](transactional-outbox-poc/README.md)
+16. [object-storage-poc](object-storage-poc/README.md)
+17. [cdn-poc](cdn-poc/README.md)
+18. [search-engine-poc](search-engine-poc/README.md)
+19. [stock-exchange-poc](stock-exchange-poc/README.md)
 
 ## Repo Layout
 
@@ -75,6 +77,7 @@ This path moves from core primitives to more layered systems.
 - [rate-limiter-poc](rate-limiter-poc/README.md)
 - [resilient-flow-poc](resilient-flow-poc/README.md)
 - [saga-pattern-orchestrator-poc](saga-pattern-orchestrator-poc/README.md)
+- [transactional-outbox-poc](transactional-outbox-poc/README.md)
 - [unique-id-generator-in-distributed-systems-poc](unique-id-generator-in-distributed-systems-poc/README.md)
 - [write-ahead-log-poc](write-ahead-log-poc/README.md)
 
@@ -158,8 +161,8 @@ For the strongest review signal, open files in this order:
 
 The repository direction is to make every project easy to scan in under two minutes and deep enough to discuss in an interview or portfolio review.
 
-- `71/71` POCs have a `README.md`
-- `69/71` POCs have a technical companion doc
-- `61/71` POCs have an `IMPROVEMENTS.md`
+- `72/72` POCs have a `README.md`
+- `70/72` POCs have a technical companion doc
+- `62/72` POCs have an `IMPROVEMENTS.md`
 
 Use [POC_STANDARDS.md](POC_STANDARDS.md) as the baseline for future additions and cleanup.
