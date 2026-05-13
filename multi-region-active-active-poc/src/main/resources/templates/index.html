@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Multi-Region Active-Active POC</title>
+    <style>
+        :root {
+            --ink: #172033;
+            --muted: #5a6475;
+            --line: #d9dee8;
+            --surface: #ffffff;
+            --band: #f5f7fb;
+            --accent: #0f766e;
+            --accent-soft: #ccfbf1;
+            --blue: #2563eb;
+            --blue-soft: #dbeafe;
+            --warn: #b45309;
+            --warn-soft: #ffedd5;
+            --danger: #b91c1c;
+            --danger-soft: #fee2e2;
+            --ok: #047857;
+            --ok-soft: #d1fae5;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            color: var(--ink);
+            background: #eef2f7;
+            font-family: "Inter", "Segoe UI", sans-serif;
+        }
+        .page {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 28px 20px 56px;
+        }
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            gap: 18px;
+            align-items: flex-start;
+            margin-bottom: 18px;
+        }
+        h1, h2, h3 { margin: 0; letter-spacing: 0; }
+        h1 { font-size: 30px; }
+        h2 { font-size: 18px; }
+        h3 { font-size: 15px; }
+        p {
+            margin: 8px 0 0;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 7px 10px;
+            border-radius: 999px;
+            background: var(--accent-soft);
+            color: #115e59;
+            font-size: 12px;
+            font-weight: 800;
+        }
+        .message {
+            margin-bottom: 18px;
+            padding: 12px 14px;
+            background: var(--blue-soft);
+            color: #1e3a8a;
+            border: 1px solid #93c5fd;
+            border-radius: 8px;
+            font-weight: 700;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+        .stat, .panel, .region {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            box-shadow: 0 16px 42px rgba(23, 32, 51, 0.07);
+        }
+        .stat {
+            padding: 14px;
+        }
+        .stat span {
+            display: block;
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        .stat strong {
+            display: block;
+            margin-top: 6px;
+            font-size: 26px;
+        }
+        .layout {
+            display: grid;
+            gap: 18px;
+        }
+        @media (min-width: 1120px) {
+            .layout-main { grid-template-columns: 380px minmax(0, 1fr); }
+            .regions { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+            .ops { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+        .panel {
+            padding: 18px;
+        }
+        form {
+            display: grid;
+            gap: 12px;
+            margin-top: 14px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #2b3548;
+            font-size: 13px;
+            font-weight: 800;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px 11px;
+            border: 1px solid #c8d0dd;
+            border-radius: 6px;
+            background: #fff;
+            color: var(--ink);
+            font: inherit;
+        }
+        button {
+            border: 0;
+            border-radius: 6px;
+            background: var(--accent);
+            color: #fff;
+            padding: 10px 12px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+        button.secondary { background: var(--blue); }
+        button.warn { background: var(--warn); }
+        button.danger { background: var(--danger); }
+        .button-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .regions {
+            display: grid;
+            gap: 14px;
+        }
+        .region {
+            padding: 16px;
+            min-width: 0;
+        }
+        .region-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .status {
+            display: inline-flex;
+            border-radius: 999px;
+            padding: 5px 9px;
+            font-size: 12px;
+            font-weight: 800;
+        }
+        .status.ok { background: var(--ok-soft); color: var(--ok); }
+        .status.down { background: var(--danger-soft); color: var(--danger); }
+        .status.warn { background: var(--warn-soft); color: var(--warn); }
+        .cart {
+            padding: 12px;
+            background: var(--band);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+        .cart-top {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            align-items: center;
+        }
+        .meta {
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.5;
+            overflow-wrap: anywhere;
+        }
+        .items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+            margin-top: 8px;
+        }
+        .item {
+            border-radius: 999px;
+            background: #e0f2fe;
+            color: #075985;
+            padding: 5px 8px;
+            font-size: 12px;
+            font-weight: 800;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+        }
+        th, td {
+            border-bottom: 1px solid var(--line);
+            padding: 9px 7px;
+            text-align: left;
+            vertical-align: top;
+        }
+        th {
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        .mono {
+            font-family: "SFMono-Regular", Consolas, monospace;
+            font-size: 12px;
+            overflow-wrap: anywhere;
+        }
+        .empty {
+            padding: 12px;
+            margin-top: 10px;
+            background: var(--band);
+            border: 1px dashed #c8d0dd;
+            border-radius: 8px;
+            color: var(--muted);
+        }
+        .events {
+            margin: 0;
+            padding-left: 18px;
+            color: var(--muted);
+            line-height: 1.55;
+        }
+    </style>
+</head>
+<body>
+<main class="page">
+    <section class="topbar">
+        <div>
+            <h1>Multi-Region Active-Active POC</h1>
+            <p>Shopping cart writes, async cross-region replication, outage recovery, and conflict handling.</p>
+        </div>
+        <span class="badge" th:text="${snapshot.defaultStrategy()}">VECTOR_CLOCK</span>
+    </section>
+
+    <div class="message" th:if="${message}" th:text="${message}"></div>
+
+    <section class="stats">
+        <div class="stat">
+            <span>Regions</span>
+            <strong th:text="${snapshot.activeRegions()} + '/' + ${snapshot.regionCount()}">3/3</strong>
+        </div>
+        <div class="stat">
+            <span>Pending Replication</span>
+            <strong th:text="${snapshot.pendingReplication()}">0</strong>
+        </div>
+        <div class="stat">
+            <span>Unresolved Conflicts</span>
+            <strong th:text="${snapshot.unresolvedConflicts()}">0</strong>
+        </div>
+    </section>
+
+    <section class="layout layout-main">
+        <aside class="layout">
+            <div class="panel">
+                <h2>Local Cart Write</h2>
+                <form method="post" action="/ui/carts/items">
+                    <div>
+                        <label for="regionId">Write Region</label>
+                        <select id="regionId" name="regionId">
+                            <option th:each="region : ${snapshot.regions()}" th:value="${region.regionId()}" th:text="${region.regionId()}"></option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="cartId">Cart</label>
+                        <input id="cartId" name="cartId" value="cart-42">
+                    </div>
+                    <div>
+                        <label for="sku">SKU</label>
+                        <input id="sku" name="sku" value="sku-keyboard">
+                    </div>
+                    <div>
+                        <label for="quantityDelta">Quantity Delta</label>
+                        <input id="quantityDelta" name="quantityDelta" type="number" min="-50" max="50" value="1">
+                    </div>
+                    <div>
+                        <label for="strategy">Conflict Strategy</label>
+                        <select id="strategy" name="strategy">
+                            <option th:each="strategy : ${strategies}" th:value="${strategy}" th:text="${strategy}"></option>
+                        </select>
+                    </div>
+                    <button type="submit">Write Cart</button>
+                </form>
+            </div>
+
+            <div class="panel">
+                <h2>Replication Controls</h2>
+                <form method="post" action="/ui/replication/drain">
+                    <div>
+                        <label for="targetRegionId">Target Region</label>
+                        <select id="targetRegionId" name="targetRegionId">
+                            <option value="">all reachable regions</option>
+                            <option th:each="region : ${snapshot.regions()}" th:value="${region.regionId()}" th:text="${region.regionId()}"></option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="maxEvents">Max Events</label>
+                        <input id="maxEvents" name="maxEvents" type="number" min="1" max="100" value="20">
+                    </div>
+                    <div>
+                        <label for="drainStrategy">Strategy</label>
+                        <select id="drainStrategy" name="strategy">
+                            <option th:each="strategy : ${strategies}" th:value="${strategy}" th:text="${strategy}"></option>
+                        </select>
+                    </div>
+                    <button class="secondary" type="submit">Drain Replication</button>
+                </form>
+
+                <form method="post" action="/ui/replication/drop">
+                    <div>
+                        <label for="dropCartId">Drop Events For Cart</label>
+                        <input id="dropCartId" name="cartId" placeholder="optional cart id">
+                    </div>
+                    <button class="danger" type="submit">Drop Matching Events</button>
+                </form>
+            </div>
+        </aside>
+
+        <section class="layout">
+            <div class="regions">
+                <article class="region" th:each="region : ${snapshot.regions()}">
+                    <div class="region-head">
+                        <div>
+                            <h2 th:text="${region.regionId()}">us-east</h2>
+                            <div class="meta" th:text="'clock=' + ${region.localClock()} + ' carts=' + ${region.cartCount()}">clock=0 carts=0</div>
+                        </div>
+                        <span th:class="${region.active() ? 'status ok' : 'status down'}"
+                              th:text="${region.active() ? 'active' : 'down'}">active</span>
+                    </div>
+
+                    <form method="post" action="/ui/regions/mode">
+                        <input type="hidden" name="regionId" th:value="${region.regionId()}">
+                        <input type="hidden" name="active" th:value="${!region.active()}">
+                        <button th:class="${region.active() ? 'warn' : 'secondary'}"
+                                th:text="${region.active() ? 'Take Region Down' : 'Restore Region'}">Toggle</button>
+                    </form>
+
+                    <div class="empty" th:if="${#lists.isEmpty(region.carts())}">No local carts.</div>
+                    <div class="cart" th:each="cart : ${region.carts()}">
+                        <div class="cart-top">
+                            <h3 th:text="${cart.cartId()}">cart-42</h3>
+                            <span th:if="${cart.hasConflict()}" class="status warn">conflict</span>
+                        </div>
+                        <div class="items">
+                            <span class="item" th:each="item : ${cart.items()}"
+                                  th:text="${item.sku()} + ' x' + ${item.quantity()}">sku x1</span>
+                            <span class="meta" th:if="${#lists.isEmpty(cart.items())}">empty cart</span>
+                        </div>
+                        <div class="meta mono" th:text="'vc=' + ${cart.vectorClock()}">vc={}</div>
+                        <div class="meta" th:text="'version=' + ${cart.version()} + ' writer=' + ${cart.lastWriterRegion()}">version=1 writer=us-east</div>
+                    </div>
+                </article>
+            </div>
+
+            <section class="layout ops">
+                <div class="panel">
+                    <h2>Pending Replication</h2>
+                    <div class="empty" th:if="${#lists.isEmpty(snapshot.pendingEvents())}">No queued events.</div>
+                    <table th:unless="${#lists.isEmpty(snapshot.pendingEvents())}">
+                        <thead>
+                        <tr>
+                            <th>Event</th>
+                            <th>Route</th>
+                            <th>Cart</th>
+                            <th>Vector</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="event : ${snapshot.pendingEvents()}">
+                            <td class="mono" th:text="${event.eventId()}">1</td>
+                            <td th:text="${event.sourceRegionId()} + ' -> ' + ${event.targetRegionId()}">a -> b</td>
+                            <td th:text="${event.cartId()}">cart</td>
+                            <td class="mono" th:text="${event.vectorClock()}">vc</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="panel">
+                    <h2>Conflicts</h2>
+                    <div class="empty" th:if="${#lists.isEmpty(snapshot.conflicts())}">No unresolved conflicts.</div>
+                    <div class="cart" th:each="conflict : ${snapshot.conflicts()}">
+                        <h3 th:text="${conflict.regionId()} + ' / ' + ${conflict.cartId()}">region/cart</h3>
+                        <div class="meta mono" th:text="'local=' + ${conflict.localVectorClock()}">local</div>
+                        <div class="meta mono" th:text="'incoming=' + ${conflict.incomingVectorClock()}">incoming</div>
+                        <form method="post" action="/ui/conflicts/reconcile">
+                            <input type="hidden" name="regionId" th:value="${conflict.regionId()}">
+                            <input type="hidden" name="cartId" th:value="${conflict.cartId()}">
+                            <select name="strategy">
+                                <option value="CART_MERGE">CART_MERGE</option>
+                                <option value="LAST_WRITE_WINS">LAST_WRITE_WINS</option>
+                            </select>
+                            <button class="secondary" type="submit">Resolve</button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel">
+                <h2>Recent Events</h2>
+                <ol class="events">
+                    <li th:each="event : ${snapshot.recentEvents()}" th:text="${event}">event</li>
+                </ol>
+            </section>
+        </section>
+    </section>
+</main>
+</body>
+</html>
