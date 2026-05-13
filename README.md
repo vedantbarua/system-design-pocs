@@ -2,7 +2,7 @@
 
 Proof-of-concepts for distributed systems, infrastructure patterns, and product-style architectures. This repository is meant to read like a working systems portfolio, not just a list of folders.
 
-There are currently `72` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
+There are currently `73` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
 
 ## What Makes This Repo Useful
 
@@ -28,6 +28,7 @@ If a reviewer only opens a dozen projects, these are the best entry points.
 | [distributed-lock-manager-poc](distributed-lock-manager-poc/README.md) | Practical coordination demo using leases, safe release, and fencing tokens. |
 | [fault-tolerant-leader-election-poc](fault-tolerant-leader-election-poc/README.md) | Good cluster coordination and failover fundamentals. |
 | [database-replication-quorum-poc](database-replication-quorum-poc/README.md) | Strong consistency tradeoff demo with quorum reads and writes, stale replicas, and repair paths. |
+| [multi-region-active-active-poc](multi-region-active-active-poc/README.md) | Geo-distributed write availability, async replication, outages, vector clocks, and conflict resolution. |
 | [distributed-job-scheduler-poc](distributed-job-scheduler-poc/README.md) | Useful control-plane example with timing, sharding, and worker assignment. |
 | [feature-flag-config-poc](feature-flag-config-poc/README.md) | Good production-focused system for rollout control and config propagation. |
 | [service-discovery-load-balancing-poc](service-discovery-load-balancing-poc/README.md) | Lease-based discovery, routing, sticky sessions, draining, and temporary ejection. |
@@ -49,17 +50,18 @@ This path moves from core primitives to more layered systems.
 6. [distributed-lock-manager-poc](distributed-lock-manager-poc/README.md)
 7. [fault-tolerant-leader-election-poc](fault-tolerant-leader-election-poc/README.md)
 8. [database-replication-quorum-poc](database-replication-quorum-poc/README.md)
-9. [service-discovery-load-balancing-poc](service-discovery-load-balancing-poc/README.md)
-10. [message-queue-poc](message-queue-poc/README.md)
-11. [distributed-stream-processing-poc](distributed-stream-processing-poc/README.md)
-12. [event-sourcing-cqrs-poc](event-sourcing-cqrs-poc/README.md)
-13. [write-ahead-log-poc](write-ahead-log-poc/README.md)
-14. [saga-pattern-orchestrator-poc](saga-pattern-orchestrator-poc/README.md)
-15. [transactional-outbox-poc](transactional-outbox-poc/README.md)
-16. [object-storage-poc](object-storage-poc/README.md)
-17. [cdn-poc](cdn-poc/README.md)
-18. [search-engine-poc](search-engine-poc/README.md)
-19. [stock-exchange-poc](stock-exchange-poc/README.md)
+9. [multi-region-active-active-poc](multi-region-active-active-poc/README.md)
+10. [service-discovery-load-balancing-poc](service-discovery-load-balancing-poc/README.md)
+11. [message-queue-poc](message-queue-poc/README.md)
+12. [distributed-stream-processing-poc](distributed-stream-processing-poc/README.md)
+13. [event-sourcing-cqrs-poc](event-sourcing-cqrs-poc/README.md)
+14. [write-ahead-log-poc](write-ahead-log-poc/README.md)
+15. [saga-pattern-orchestrator-poc](saga-pattern-orchestrator-poc/README.md)
+16. [transactional-outbox-poc](transactional-outbox-poc/README.md)
+17. [object-storage-poc](object-storage-poc/README.md)
+18. [cdn-poc](cdn-poc/README.md)
+19. [search-engine-poc](search-engine-poc/README.md)
+20. [stock-exchange-poc](stock-exchange-poc/README.md)
 
 ## Repo Layout
 
@@ -74,6 +76,7 @@ This path moves from core primitives to more layered systems.
 - [feature-flag-config-poc](feature-flag-config-poc/README.md)
 - [key-value-store-poc](key-value-store-poc/README.md)
 - [message-queue-poc](message-queue-poc/README.md)
+- [multi-region-active-active-poc](multi-region-active-active-poc/README.md)
 - [rate-limiter-poc](rate-limiter-poc/README.md)
 - [resilient-flow-poc](resilient-flow-poc/README.md)
 - [saga-pattern-orchestrator-poc](saga-pattern-orchestrator-poc/README.md)
@@ -161,8 +164,8 @@ For the strongest review signal, open files in this order:
 
 The repository direction is to make every project easy to scan in under two minutes and deep enough to discuss in an interview or portfolio review.
 
-- `72/72` POCs have a `README.md`
-- `70/72` POCs have a technical companion doc
-- `62/72` POCs have an `IMPROVEMENTS.md`
+- `73/73` POCs have a `README.md`
+- `71/73` POCs have a technical companion doc
+- `63/73` POCs have an `IMPROVEMENTS.md`
 
 Use [POC_STANDARDS.md](POC_STANDARDS.md) as the baseline for future additions and cleanup.
