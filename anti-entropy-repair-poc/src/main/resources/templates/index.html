@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Anti-Entropy Repair POC</title>
+    <style>
+        :root {
+            --ink: #182235;
+            --muted: #5c6678;
+            --line: #d9dfeb;
+            --surface: #ffffff;
+            --band: #f5f7fb;
+            --accent: #155e75;
+            --accent-soft: #cffafe;
+            --blue: #2563eb;
+            --blue-soft: #dbeafe;
+            --ok: #047857;
+            --ok-soft: #d1fae5;
+            --warn: #b45309;
+            --warn-soft: #ffedd5;
+            --danger: #b91c1c;
+            --danger-soft: #fee2e2;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            background: #eef2f7;
+            color: var(--ink);
+            font-family: "Inter", "Segoe UI", sans-serif;
+        }
+        .page {
+            max-width: 1480px;
+            margin: 0 auto;
+            padding: 28px 20px 56px;
+        }
+        h1, h2, h3 { margin: 0; letter-spacing: 0; }
+        h1 { font-size: 30px; }
+        h2 { font-size: 18px; }
+        h3 { font-size: 15px; }
+        p {
+            margin: 8px 0 0;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            gap: 18px;
+            align-items: flex-start;
+            margin-bottom: 18px;
+        }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 7px 10px;
+            border-radius: 999px;
+            background: var(--accent-soft);
+            color: #164e63;
+            font-size: 12px;
+            font-weight: 800;
+        }
+        .message {
+            margin-bottom: 18px;
+            padding: 12px 14px;
+            background: var(--blue-soft);
+            color: #1e3a8a;
+            border: 1px solid #93c5fd;
+            border-radius: 8px;
+            font-weight: 700;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+        .stat, .panel, .replica {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            box-shadow: 0 16px 42px rgba(24, 34, 53, 0.07);
+        }
+        .stat { padding: 14px; }
+        .stat span {
+            display: block;
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        .stat strong {
+            display: block;
+            margin-top: 6px;
+            font-size: 26px;
+        }
+        .layout {
+            display: grid;
+            gap: 18px;
+        }
+        @media (min-width: 1120px) {
+            .layout-main { grid-template-columns: 390px minmax(0, 1fr); }
+            .replicas { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+            .ops { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+        .panel, .replica { padding: 18px; }
+        form {
+            display: grid;
+            gap: 12px;
+            margin-top: 14px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #2b3548;
+            font-size: 13px;
+            font-weight: 800;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px 11px;
+            border: 1px solid #c8d0dd;
+            border-radius: 6px;
+            background: #fff;
+            color: var(--ink);
+            font: inherit;
+        }
+        button {
+            border: 0;
+            border-radius: 6px;
+            background: var(--accent);
+            color: #fff;
+            padding: 10px 12px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+        button.secondary { background: var(--blue); }
+        button.warn { background: var(--warn); }
+        button.danger { background: var(--danger); }
+        .button-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .replicas {
+            display: grid;
+            gap: 14px;
+        }
+        .replica-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .status {
+            display: inline-flex;
+            border-radius: 999px;
+            padding: 5px 9px;
+            font-size: 12px;
+            font-weight: 800;
+        }
+        .status.ok { background: var(--ok-soft); color: var(--ok); }
+        .status.warn { background: var(--warn-soft); color: var(--warn); }
+        .status.down { background: var(--danger-soft); color: var(--danger); }
+        .status.info { background: var(--blue-soft); color: #1e40af; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+        }
+        th, td {
+            border-bottom: 1px solid var(--line);
+            padding: 9px 7px;
+            text-align: left;
+            vertical-align: top;
+        }
+        th {
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        .mono {
+            font-family: "SFMono-Regular", Consolas, monospace;
+            font-size: 12px;
+            overflow-wrap: anywhere;
+        }
+        .empty {
+            padding: 12px;
+            margin-top: 10px;
+            background: var(--band);
+            border: 1px dashed #c8d0dd;
+            border-radius: 8px;
+            color: var(--muted);
+        }
+        .range {
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: var(--band);
+            padding: 12px;
+            margin-top: 10px;
+        }
+        .range-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            align-items: center;
+        }
+        .events {
+            margin: 0;
+            padding-left: 18px;
+            color: var(--muted);
+            line-height: 1.55;
+        }
+    </style>
+</head>
+<body>
+<main class="page">
+    <section class="topbar">
+        <div>
+            <h1>Anti-Entropy Repair POC</h1>
+            <p>Replica divergence detection with Merkle-style range hashes and targeted repair.</p>
+        </div>
+        <span class="badge" th:text="${snapshot.consistencyPercent()} + '% consistent'">100% consistent</span>
+    </section>
+
+    <div class="message" th:if="${message}" th:text="${message}"></div>
+
+    <section class="stats">
+        <div class="stat">
+            <span>Replicas</span>
+            <strong th:text="${snapshot.healthyReplicas()} + '/' + ${snapshot.replicaCount()}">3/3</strong>
+        </div>
+        <div class="stat">
+            <span>Logical Keys</span>
+            <strong th:text="${snapshot.totalLogicalKeys()}">8</strong>
+        </div>
+        <div class="stat">
+            <span>Divergent Keys</span>
+            <strong th:text="${snapshot.divergentKeys()}">0</strong>
+        </div>
+        <div class="stat">
+            <span>Divergent Ranges</span>
+            <strong th:text="${snapshot.latestRepairPlan().divergentRanges()}">0</strong>
+        </div>
+    </section>
+
+    <section class="layout layout-main">
+        <aside class="layout">
+            <div class="panel">
+                <h2>Write With Optional Miss</h2>
+                <form method="post" action="/ui/write">
+                    <div>
+                        <label for="key">Key</label>
+                        <input id="key" name="key" value="cart:2001">
+                    </div>
+                    <div>
+                        <label for="value">Value</label>
+                        <input id="value" name="value" value="headphones=1">
+                    </div>
+                    <div>
+                        <label for="skipReplicaId">Skip Replica</label>
+                        <select id="skipReplicaId" name="skipReplicaId">
+                            <option value="">none</option>
+                            <option th:each="replica : ${snapshot.replicas()}" th:value="${replica.replicaId()}" th:text="${replica.replicaId()}"></option>
+                        </select>
+                    </div>
+                    <button type="submit">Write Key</button>
+                </form>
+            </div>
+
+            <div class="panel">
+                <h2>Inject Divergence</h2>
+                <form method="post" action="/ui/replicas/corrupt">
+                    <div>
+                        <label for="corruptReplica">Replica</label>
+                        <select id="corruptReplica" name="replicaId">
+                            <option th:each="replica : ${snapshot.replicas()}" th:value="${replica.replicaId()}" th:text="${replica.replicaId()}"></option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="corruptKey">Key</label>
+                        <input id="corruptKey" name="key" value="cart:1002">
+                    </div>
+                    <div>
+                        <label for="corruptValue">Corrupt Value</label>
+                        <input id="corruptValue" name="value" value="monitor=99">
+                    </div>
+                    <button class="warn" type="submit">Corrupt Replica</button>
+                </form>
+
+                <form method="post" action="/ui/replicas/delete-key">
+                    <div>
+                        <label for="deleteReplica">Replica</label>
+                        <select id="deleteReplica" name="replicaId">
+                            <option th:each="replica : ${snapshot.replicas()}" th:value="${replica.replicaId()}" th:text="${replica.replicaId()}"></option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="deleteKey">Key</label>
+                        <input id="deleteKey" name="key" value="profile:42">
+                    </div>
+                    <button class="danger" type="submit">Delete Local Copy</button>
+                </form>
+            </div>
+
+            <div class="panel">
+                <h2>Compare And Repair</h2>
+                <form method="post" action="/ui/anti-entropy/compare">
+                    <button class="secondary" type="submit">Compare Range Hashes</button>
+                </form>
+                <form method="post" action="/ui/anti-entropy/repair">
+                    <div>
+                        <label for="sourceReplicaId">Source Replica</label>
+                        <select id="sourceReplicaId" name="sourceReplicaId">
+                            <option value="">newest healthy version</option>
+                            <option th:each="replica : ${snapshot.replicas()}" th:value="${replica.replicaId()}" th:text="${replica.replicaId()}"></option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="targetReplicaId">Target Replica</label>
+                        <select id="targetReplicaId" name="targetReplicaId">
+                            <option value="">all healthy replicas</option>
+                            <option th:each="replica : ${snapshot.replicas()}" th:value="${replica.replicaId()}" th:text="${replica.replicaId()}"></option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="rangeStart">Range Start</label>
+                        <input id="rangeStart" name="rangeStart" placeholder="optional">
+                    </div>
+                    <div>
+                        <label for="rangeEnd">Range End</label>
+                        <input id="rangeEnd" name="rangeEnd" placeholder="optional">
+                    </div>
+                    <button type="submit">Repair Divergence</button>
+                </form>
+            </div>
+        </aside>
+
+        <section class="layout">
+            <div class="replicas">
+                <article class="replica" th:each="replica : ${snapshot.replicas()}">
+                    <div class="replica-head">
+                        <div>
+                            <h2 th:text="${replica.replicaId()}">replica-a</h2>
+                            <div class="mono" th:text="'root=' + ${replica.rootHash()}">root=abc</div>
+                        </div>
+                        <span th:class="${replica.mode().name() == 'HEALTHY' ? 'status ok' : (replica.mode().name() == 'LAGGING' ? 'status warn' : 'status down')}"
+                              th:text="${replica.mode()}">HEALTHY</span>
+                    </div>
+
+                    <form method="post" action="/ui/replicas/mode">
+                        <input type="hidden" name="replicaId" th:value="${replica.replicaId()}">
+                        <select name="mode">
+                            <option th:each="mode : ${modes}" th:value="${mode}" th:text="${mode}" th:selected="${mode == replica.mode()}"></option>
+                        </select>
+                        <button class="secondary" type="submit">Set Mode</button>
+                    </form>
+
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Key</th>
+                            <th>Value</th>
+                            <th>Version</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="entry : ${replica.entries()}">
+                            <td class="mono" th:text="${entry.key()}">key</td>
+                            <td th:text="${entry.value()}">value</td>
+                            <td class="mono" th:text="${entry.version()}">1</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </article>
+            </div>
+
+            <section class="layout ops">
+                <div class="panel">
+                    <h2>Repair Plan</h2>
+                    <p th:text="${snapshot.latestRepairPlan().consistent() ? 'All compared ranges match.' : 'One or more ranges differ across replicas.'}">status</p>
+                    <div class="range" th:each="range : ${snapshot.latestRepairPlan().ranges()}">
+                        <div class="range-head">
+                            <h3 th:text="${range.rangeStart()} + ' - ' + ${range.rangeEnd()}">range</h3>
+                            <span th:class="${range.consistent() ? 'status ok' : 'status warn'}"
+                                  th:text="${range.consistent() ? 'consistent' : 'divergent'}">status</span>
+                        </div>
+                        <table>
+                            <tbody>
+                            <tr th:each="hash : ${range.replicaHashes()}">
+                                <td th:text="${hash.replicaId()}">replica</td>
+                                <td class="mono" th:text="${hash.hash()}">hash</td>
+                                <td th:text="${hash.keyCount()} + ' keys'">count</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <div class="mono" th:if="${!#lists.isEmpty(range.divergentKeys())}"
+                             th:text="'keys=' + ${range.divergentKeys()}">keys</div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h2>Recent Events</h2>
+                    <ol class="events">
+                        <li th:each="event : ${snapshot.recentEvents()}" th:text="${event}">event</li>
+                    </ol>
+                </div>
+            </section>
+        </section>
+    </section>
+</main>
+</body>
+</html>
