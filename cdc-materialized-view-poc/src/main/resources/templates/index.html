@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>CDC Materialized View POC</title>
+    <style>
+        :root {
+            --ink: #172033;
+            --muted: #5a6475;
+            --line: #d9dee8;
+            --surface: #ffffff;
+            --band: #f5f7fb;
+            --accent: #1f6f5b;
+            --accent-soft: #d1fae5;
+            --blue: #2563eb;
+            --blue-soft: #dbeafe;
+            --warn: #b45309;
+            --warn-soft: #ffedd5;
+            --danger: #b91c1c;
+            --danger-soft: #fee2e2;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            color: var(--ink);
+            background: #eef2f7;
+            font-family: "Inter", "Segoe UI", sans-serif;
+        }
+        .page { max-width: 1500px; margin: 0 auto; padding: 28px 20px 56px; }
+        h1, h2, h3 { margin: 0; letter-spacing: 0; }
+        h1 { font-size: 30px; }
+        h2 { font-size: 18px; }
+        h3 { font-size: 15px; }
+        p { margin: 8px 0 0; color: var(--muted); line-height: 1.5; }
+        .topbar { display: flex; justify-content: space-between; gap: 18px; align-items: flex-start; margin-bottom: 18px; }
+        .badge {
+            display: inline-flex;
+            padding: 7px 10px;
+            border-radius: 999px;
+            background: var(--accent-soft);
+            color: #14532d;
+            font-size: 12px;
+            font-weight: 800;
+        }
+        .message {
+            margin-bottom: 18px;
+            padding: 12px 14px;
+            background: var(--blue-soft);
+            color: #1e3a8a;
+            border: 1px solid #93c5fd;
+            border-radius: 8px;
+            font-weight: 700;
+        }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 18px; }
+        .stat, .panel {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            box-shadow: 0 16px 42px rgba(23, 32, 51, 0.07);
+        }
+        .stat { padding: 14px; }
+        .stat span {
+            display: block;
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        .stat strong { display: block; margin-top: 6px; font-size: 26px; }
+        .layout { display: grid; gap: 18px; }
+        @media (min-width: 1160px) {
+            .layout-main { grid-template-columns: 390px minmax(0, 1fr); }
+            .two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        }
+        .panel { padding: 18px; min-width: 0; }
+        form { display: grid; gap: 12px; margin-top: 14px; }
+        label { display: block; margin-bottom: 5px; color: #2b3548; font-size: 13px; font-weight: 800; }
+        input, select {
+            width: 100%;
+            padding: 10px 11px;
+            border: 1px solid #c8d0dd;
+            border-radius: 6px;
+            background: #fff;
+            color: var(--ink);
+            font: inherit;
+        }
+        button {
+            border: 0;
+            border-radius: 6px;
+            background: var(--accent);
+            color: #fff;
+            padding: 10px 12px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+        button.secondary { background: var(--blue); }
+        button.warn { background: var(--warn); }
+        button.danger { background: var(--danger); }
+        .button-row { display: flex; flex-wrap: wrap; gap: 8px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+        th, td { border-bottom: 1px solid var(--line); padding: 9px 7px; text-align: left; vertical-align: top; }
+        th {
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        .mono { font-family: "SFMono-Regular", Consolas, monospace; font-size: 12px; overflow-wrap: anywhere; }
+        .status { display: inline-flex; border-radius: 999px; padding: 5px 9px; font-size: 12px; font-weight: 800; }
+        .status.ok { background: var(--accent-soft); color: #047857; }
+        .status.warn { background: var(--warn-soft); color: var(--warn); }
+        .status.danger { background: var(--danger-soft); color: var(--danger); }
+        .empty { padding: 12px; margin-top: 10px; background: var(--band); border: 1px dashed #c8d0dd; border-radius: 8px; color: var(--muted); }
+        .events { margin: 0; padding-left: 18px; color: var(--muted); line-height: 1.55; }
+    </style>
+</head>
+<body>
+<main class="page">
+    <section class="topbar">
+        <div>
+            <h1>CDC Materialized View POC</h1>
+            <p>Source table changes flow through a CDC log into idempotent downstream projections.</p>
+        </div>
+        <span th:class="${snapshot.connector().paused() ? 'status warn' : 'badge'}"
+              th:text="${snapshot.connector().paused() ? 'paused' : 'connector running'}">connector running</span>
+    </section>
+
+    <div class="message" th:if="${message}" th:text="${message}"></div>
+
+    <section class="stats">
+        <div class="stat"><span>Committed Offset</span><strong th:text="${snapshot.connector().committedOffset()}">0</strong></div>
+        <div class="stat"><span>Latest Sequence</span><strong th:text="${snapshot.connector().latestSequence()}">0</strong></div>
+        <div class="stat"><span>CDC Lag</span><strong th:text="${snapshot.connector().lag()}">0</strong></div>
+        <div class="stat"><span>Duplicates</span><strong th:text="${snapshot.connector().duplicateEvents()}">0</strong></div>
+        <div class="stat"><span>Source Orders</span><strong th:text="${snapshot.sourceOrderCount()}">0</strong></div>
+    </section>
+
+    <section class="layout layout-main">
+        <aside class="layout">
+            <div class="panel">
+                <h2>Create Source Order</h2>
+                <form method="post" action="/ui/orders">
+                    <div><label for="customerId">Customer</label><input id="customerId" name="customerId" value="customer-3"></div>
+                    <div><label for="sku">SKU</label><input id="sku" name="sku" value="sku-desk"></div>
+                    <div><label for="quantity">Quantity</label><input id="quantity" name="quantity" type="number" min="1" value="1"></div>
+                    <div><label for="unitPrice">Unit Price</label><input id="unitPrice" name="unitPrice" type="number" min="0.01" step="0.01" value="499.00"></div>
+                    <button type="submit">Insert Order</button>
+                </form>
+            </div>
+
+            <div class="panel">
+                <h2>Mutate Source Row</h2>
+                <form method="post" action="/ui/orders/update">
+                    <div><label for="updateOrderId">Order</label><input id="updateOrderId" name="orderId" value="order-1"></div>
+                    <div><label for="updateSku">SKU</label><input id="updateSku" name="sku" placeholder="leave blank to keep"></div>
+                    <div><label for="updateQuantity">Quantity</label><input id="updateQuantity" name="quantity" type="number" min="1" placeholder="keep"></div>
+                    <div><label for="updatePrice">Unit Price</label><input id="updatePrice" name="unitPrice" type="number" min="0.01" step="0.01" placeholder="keep"></div>
+                    <div>
+                        <label for="status">Status</label>
+                        <select id="status" name="status">
+                            <option value="">keep</option>
+                            <option th:each="status : ${statuses}" th:value="${status}" th:text="${status}"></option>
+                        </select>
+                    </div>
+                    <button class="secondary" type="submit">Update Order</button>
+                </form>
+                <form method="post" action="/ui/orders/delete">
+                    <div><label for="deleteOrderId">Order To Delete</label><input id="deleteOrderId" name="orderId" value="order-2"></div>
+                    <button class="danger" type="submit">Delete Order</button>
+                </form>
+            </div>
+
+            <div class="panel">
+                <h2>Connector Controls</h2>
+                <div class="button-row">
+                    <form method="post" action="/ui/cdc/pause"><button class="warn" type="submit">Pause</button></form>
+                    <form method="post" action="/ui/cdc/resume"><button class="secondary" type="submit">Resume</button></form>
+                    <form method="post" action="/ui/cdc/backfill"><button type="submit">Backfill</button></form>
+                </div>
+                <form method="post" action="/ui/cdc/poll">
+                    <div><label for="maxEvents">Max Events</label><input id="maxEvents" name="maxEvents" type="number" min="1" max="100" value="5"></div>
+                    <button type="submit">Poll CDC Log</button>
+                </form>
+                <form method="post" action="/ui/cdc/duplicate">
+                    <div><label for="sequence">Duplicate Sequence</label><input id="sequence" name="sequence" type="number" placeholder="latest"></div>
+                    <button class="warn" type="submit">Inject Duplicate</button>
+                </form>
+                <form method="post" action="/ui/cdc/replay">
+                    <div><label for="fromOffset">Replay From Offset</label><input id="fromOffset" name="fromOffset" type="number" min="0" value="0"></div>
+                    <label><input type="checkbox" name="clearProjections" value="true"> Clear projections first</label>
+                    <button class="secondary" type="submit">Reset Offset</button>
+                </form>
+            </div>
+        </aside>
+
+        <section class="layout">
+            <div class="layout two">
+                <div class="panel">
+                    <h2>Source Orders</h2>
+                    <table>
+                        <thead><tr><th>Order</th><th>Customer</th><th>SKU</th><th>Total</th><th>Status</th></tr></thead>
+                        <tbody>
+                        <tr th:each="order : ${snapshot.sourceOrders()}">
+                            <td class="mono" th:text="${order.orderId()}">order</td>
+                            <td th:text="${order.customerId()}">customer</td>
+                            <td th:text="${order.sku()} + ' x' + ${order.quantity()}">sku</td>
+                            <td th:text="${order.total()}">0</td>
+                            <td>
+                                <span th:class="${order.deleted() ? 'status danger' : 'status ok'}"
+                                      th:text="${order.deleted() ? 'DELETED' : order.status()}">CREATED</span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="panel">
+                    <h2>Recent Change Log</h2>
+                    <table>
+                        <thead><tr><th>Seq</th><th>Op</th><th>Order</th><th>Total</th><th>Source</th></tr></thead>
+                        <tbody>
+                        <tr th:each="event : ${snapshot.changeLog()}">
+                            <td class="mono" th:text="${event.sequence()}">1</td>
+                            <td>
+                                <span th:class="${event.duplicate() ? 'status warn' : 'status ok'}"
+                                      th:text="${event.duplicate() ? event.operation() + ' duplicate' : event.operation()}">INSERT</span>
+                            </td>
+                            <td class="mono" th:text="${event.orderId()}">order</td>
+                            <td th:text="${event.total()}">0</td>
+                            <td th:text="${event.source()}">source</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="layout three">
+                <div class="panel">
+                    <h2>Order Summary View</h2>
+                    <div class="empty" th:if="${#lists.isEmpty(snapshot.projections().orderSummaries())}">No projected orders.</div>
+                    <table th:unless="${#lists.isEmpty(snapshot.projections().orderSummaries())}">
+                        <thead><tr><th>Order</th><th>Customer</th><th>Total</th><th>Offset</th></tr></thead>
+                        <tbody>
+                        <tr th:each="order : ${snapshot.projections().orderSummaries()}">
+                            <td class="mono" th:text="${order.orderId()}">order</td>
+                            <td th:text="${order.customerId()}">customer</td>
+                            <td th:text="${order.total()}">0</td>
+                            <td class="mono" th:text="${order.sourceSequence()}">1</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="panel">
+                    <h2>Customer Totals View</h2>
+                    <table>
+                        <thead><tr><th>Customer</th><th>Orders</th><th>Total</th></tr></thead>
+                        <tbody>
+                        <tr th:each="customer : ${snapshot.projections().customerTotals()}">
+                            <td th:text="${customer.customerId()}">customer</td>
+                            <td th:text="${customer.orderCount()}">0</td>
+                            <td th:text="${customer.activeTotal()}">0</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="panel">
+                    <h2>Search Index View</h2>
+                    <table>
+                        <thead><tr><th>Order</th><th>Document</th></tr></thead>
+                        <tbody>
+                        <tr th:each="doc : ${snapshot.projections().searchIndex()}">
+                            <td class="mono" th:text="${doc.orderId()}">order</td>
+                            <td th:text="${doc.document()}">document</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <section class="panel">
+                <h2>Recent Events</h2>
+                <ol class="events">
+                    <li th:each="event : ${snapshot.recentEvents()}" th:text="${event}">event</li>
+                </ol>
+            </section>
+        </section>
+    </section>
+</main>
+</body>
+</html>

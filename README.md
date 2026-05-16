@@ -2,7 +2,7 @@
 
 Proof-of-concepts for distributed systems, infrastructure patterns, and product-style architectures. This repository is meant to read like a working systems portfolio, not just a list of folders.
 
-There are currently `74` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
+There are currently `75` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
 
 ## What Makes This Repo Useful
 
@@ -21,6 +21,7 @@ If a reviewer only opens a dozen projects, these are the best entry points.
 | [message-queue-poc](message-queue-poc/README.md) | Good event backbone example with partitions, consumer groups, retry, replay, and DLQ behavior. |
 | [distributed-stream-processing-poc](distributed-stream-processing-poc/README.md) | Useful continuation of queueing concepts with windows, checkpoints, and replay. |
 | [event-sourcing-cqrs-poc](event-sourcing-cqrs-poc/README.md) | Clear write/read separation, snapshotting, and rebuild mechanics. |
+| [cdc-materialized-view-poc](cdc-materialized-view-poc/README.md) | Change Data Capture with connector offsets, replay, backfill, duplicate delivery, and read models. |
 | [write-ahead-log-poc](write-ahead-log-poc/README.md) | Compact durability demo with append-before-apply commands, checkpoints, replay, idempotency, and compaction. |
 | [object-storage-poc](object-storage-poc/README.md) | Strong storage-system coverage: buckets, multipart uploads, versioning, and presigned access. |
 | [cdn-poc](cdn-poc/README.md) | Good edge caching story with invalidation, TTLs, and regional cache behavior. |
@@ -57,13 +58,14 @@ This path moves from core primitives to more layered systems.
 12. [message-queue-poc](message-queue-poc/README.md)
 13. [distributed-stream-processing-poc](distributed-stream-processing-poc/README.md)
 14. [event-sourcing-cqrs-poc](event-sourcing-cqrs-poc/README.md)
-15. [write-ahead-log-poc](write-ahead-log-poc/README.md)
-16. [saga-pattern-orchestrator-poc](saga-pattern-orchestrator-poc/README.md)
-17. [transactional-outbox-poc](transactional-outbox-poc/README.md)
-18. [object-storage-poc](object-storage-poc/README.md)
-19. [cdn-poc](cdn-poc/README.md)
-20. [search-engine-poc](search-engine-poc/README.md)
-21. [stock-exchange-poc](stock-exchange-poc/README.md)
+15. [cdc-materialized-view-poc](cdc-materialized-view-poc/README.md)
+16. [write-ahead-log-poc](write-ahead-log-poc/README.md)
+17. [saga-pattern-orchestrator-poc](saga-pattern-orchestrator-poc/README.md)
+18. [transactional-outbox-poc](transactional-outbox-poc/README.md)
+19. [object-storage-poc](object-storage-poc/README.md)
+20. [cdn-poc](cdn-poc/README.md)
+21. [search-engine-poc](search-engine-poc/README.md)
+22. [stock-exchange-poc](stock-exchange-poc/README.md)
 
 ## Repo Layout
 
@@ -89,6 +91,7 @@ This path moves from core primitives to more layered systems.
 
 ### Data, Search, and Storage
 
+- [cdc-materialized-view-poc](cdc-materialized-view-poc/README.md)
 - [cdn-poc](cdn-poc/README.md)
 - [design-dropbox-poc](design-dropbox-poc/README.md)
 - [distributed-stream-processing-poc](distributed-stream-processing-poc/README.md)
@@ -167,8 +170,8 @@ For the strongest review signal, open files in this order:
 
 The repository direction is to make every project easy to scan in under two minutes and deep enough to discuss in an interview or portfolio review.
 
-- `74/74` POCs have a `README.md`
-- `72/74` POCs have a technical companion doc
-- `64/74` POCs have an `IMPROVEMENTS.md`
+- `75/75` POCs have a `README.md`
+- `73/75` POCs have a technical companion doc
+- `65/75` POCs have an `IMPROVEMENTS.md`
 
 Use [POC_STANDARDS.md](POC_STANDARDS.md) as the baseline for future additions and cleanup.
