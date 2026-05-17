@@ -2,7 +2,7 @@
 
 Proof-of-concepts for distributed systems, infrastructure patterns, and product-style architectures. This repository is meant to read like a working systems portfolio, not just a list of folders.
 
-There are currently `75` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
+There are currently `76` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
 
 ## What Makes This Repo Useful
 
@@ -22,6 +22,7 @@ If a reviewer only opens a dozen projects, these are the best entry points.
 | [distributed-stream-processing-poc](distributed-stream-processing-poc/README.md) | Useful continuation of queueing concepts with windows, checkpoints, and replay. |
 | [event-sourcing-cqrs-poc](event-sourcing-cqrs-poc/README.md) | Clear write/read separation, snapshotting, and rebuild mechanics. |
 | [cdc-materialized-view-poc](cdc-materialized-view-poc/README.md) | Change Data Capture with connector offsets, replay, backfill, duplicate delivery, and read models. |
+| [feature-store-poc](feature-store-poc/README.md) | Python ML platform demo with offline features, online serving, freshness, point-in-time training sets, and skew checks. |
 | [write-ahead-log-poc](write-ahead-log-poc/README.md) | Compact durability demo with append-before-apply commands, checkpoints, replay, idempotency, and compaction. |
 | [object-storage-poc](object-storage-poc/README.md) | Strong storage-system coverage: buckets, multipart uploads, versioning, and presigned access. |
 | [cdn-poc](cdn-poc/README.md) | Good edge caching story with invalidation, TTLs, and regional cache behavior. |
@@ -109,6 +110,7 @@ This path moves from core primitives to more layered systems.
 - [distributed-job-scheduler-poc](distributed-job-scheduler-poc/README.md)
 - [distributed-log-monitoring-and-alerting-system-poc](distributed-log-monitoring-and-alerting-system-poc/README.md)
 - [distributed-tracing-observability-poc](distributed-tracing-observability-poc/README.md)
+- [feature-store-poc](feature-store-poc/README.md)
 - [llm-ai-poc](llm-ai-poc/README.md)
 - [llm-context-gateway-poc](llm-context-gateway-poc/README.md)
 - [llm-prompt-router-poc](llm-prompt-router-poc/README.md)
@@ -170,8 +172,8 @@ For the strongest review signal, open files in this order:
 
 The repository direction is to make every project easy to scan in under two minutes and deep enough to discuss in an interview or portfolio review.
 
-- `75/75` POCs have a `README.md`
-- `73/75` POCs have a technical companion doc
-- `65/75` POCs have an `IMPROVEMENTS.md`
+- `76/76` POCs have a `README.md`
+- `74/76` POCs have a technical companion doc
+- `66/76` POCs have an `IMPROVEMENTS.md`
 
 Use [POC_STANDARDS.md](POC_STANDARDS.md) as the baseline for future additions and cleanup.
