@@ -2,7 +2,7 @@
 
 Proof-of-concepts for distributed systems, infrastructure patterns, and product-style architectures. This repository is meant to read like a working systems portfolio, not just a list of folders.
 
-There are currently `78` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
+There are currently `79` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
 
 ## What Makes This Repo Useful
 
@@ -25,6 +25,7 @@ If a reviewer only opens a dozen projects, these are the best entry points.
 | [feature-store-poc](feature-store-poc/README.md) | Python ML platform demo with offline features, online serving, freshness, point-in-time training sets, and skew checks. |
 | [fastapi-redis-task-queue-poc](fastapi-redis-task-queue-poc/README.md) | FastAPI + Redis queue with delayed jobs, rate limits, retries, idempotency, visibility timeouts, and DLQ behavior. |
 | [schema-registry-event-contract-poc](schema-registry-event-contract-poc/README.md) | Event schema governance with versioning, compatibility checks, validation, consumer support, and rollout readiness. |
+| [policy-as-code-authorization-poc](policy-as-code-authorization-poc/README.md) | Centralized authorization decisions with RBAC, ABAC conditions, deny precedence, dry-run policies, and audit logs. |
 | [write-ahead-log-poc](write-ahead-log-poc/README.md) | Compact durability demo with append-before-apply commands, checkpoints, replay, idempotency, and compaction. |
 | [object-storage-poc](object-storage-poc/README.md) | Strong storage-system coverage: buckets, multipart uploads, versioning, and presigned access. |
 | [cdn-poc](cdn-poc/README.md) | Good edge caching story with invalidation, TTLs, and regional cache behavior. |
@@ -117,6 +118,7 @@ This path moves from core primitives to more layered systems.
 - [llm-ai-poc](llm-ai-poc/README.md)
 - [llm-context-gateway-poc](llm-context-gateway-poc/README.md)
 - [llm-prompt-router-poc](llm-prompt-router-poc/README.md)
+- [policy-as-code-authorization-poc](policy-as-code-authorization-poc/README.md)
 - [python-ollama-poc](python-ollama-poc/README.md)
 - [schema-registry-event-contract-poc](schema-registry-event-contract-poc/README.md)
 - [service-discovery-load-balancing-poc](service-discovery-load-balancing-poc/README.md)
@@ -176,8 +178,8 @@ For the strongest review signal, open files in this order:
 
 The repository direction is to make every project easy to scan in under two minutes and deep enough to discuss in an interview or portfolio review.
 
-- `78/78` POCs have a `README.md`
-- `76/78` POCs have a technical companion doc
-- `68/78` POCs have an `IMPROVEMENTS.md`
+- `79/79` POCs have a `README.md`
+- `77/79` POCs have a technical companion doc
+- `69/79` POCs have an `IMPROVEMENTS.md`
 
 Use [POC_STANDARDS.md](POC_STANDARDS.md) as the baseline for future additions and cleanup.
