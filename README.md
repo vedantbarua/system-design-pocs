@@ -2,7 +2,7 @@
 
 Proof-of-concepts for distributed systems, infrastructure patterns, and product-style architectures. This repository is meant to read like a working systems portfolio, not just a list of folders.
 
-There are currently `79` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
+There are currently `80` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
 
 ## What Makes This Repo Useful
 
@@ -38,6 +38,7 @@ If a reviewer only opens a dozen projects, these are the best entry points.
 | [distributed-job-scheduler-poc](distributed-job-scheduler-poc/README.md) | Useful control-plane example with timing, sharding, and worker assignment. |
 | [feature-flag-config-poc](feature-flag-config-poc/README.md) | Good production-focused system for rollout control and config propagation. |
 | [service-discovery-load-balancing-poc](service-discovery-load-balancing-poc/README.md) | Lease-based discovery, routing, sticky sessions, draining, and temporary ejection. |
+| [service-mesh-control-plane-poc](service-mesh-control-plane-poc/README.md) | East-west traffic control with sidecars, mTLS identity, canary splits, retries, circuit breakers, and ejection. |
 | [distributed-tracing-observability-poc](distributed-tracing-observability-poc/README.md) | Important operational visibility story across services. |
 | [stock-exchange-poc](stock-exchange-poc/README.md) | Strong deterministic processing example with ordered ingress and live market updates. |
 | [saga-pattern-orchestrator-poc](saga-pattern-orchestrator-poc/README.md) | Distributed workflow coordination with compensation logic. |
@@ -122,6 +123,7 @@ This path moves from core primitives to more layered systems.
 - [python-ollama-poc](python-ollama-poc/README.md)
 - [schema-registry-event-contract-poc](schema-registry-event-contract-poc/README.md)
 - [service-discovery-load-balancing-poc](service-discovery-load-balancing-poc/README.md)
+- [service-mesh-control-plane-poc](service-mesh-control-plane-poc/README.md)
 - [notification-system-poc](notification-system-poc/README.md)
 - [stock-exchange-poc](stock-exchange-poc/README.md)
 
@@ -178,8 +180,8 @@ For the strongest review signal, open files in this order:
 
 The repository direction is to make every project easy to scan in under two minutes and deep enough to discuss in an interview or portfolio review.
 
-- `79/79` POCs have a `README.md`
-- `77/79` POCs have a technical companion doc
-- `69/79` POCs have an `IMPROVEMENTS.md`
+- `80/80` POCs have a `README.md`
+- `78/80` POCs have a technical companion doc
+- `70/80` POCs have an `IMPROVEMENTS.md`
 
 Use [POC_STANDARDS.md](POC_STANDARDS.md) as the baseline for future additions and cleanup.
