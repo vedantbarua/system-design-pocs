@@ -2,7 +2,7 @@
 
 Proof-of-concepts for distributed systems, infrastructure patterns, and product-style architectures. This repository is meant to read like a working systems portfolio, not just a list of folders.
 
-There are currently `80` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
+There are currently `81` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
 
 ## What Makes This Repo Useful
 
@@ -37,6 +37,7 @@ If a reviewer only opens a dozen projects, these are the best entry points.
 | [anti-entropy-repair-poc](anti-entropy-repair-poc/README.md) | Merkle-style range comparison and targeted repair for divergent replicas. |
 | [distributed-job-scheduler-poc](distributed-job-scheduler-poc/README.md) | Useful control-plane example with timing, sharding, and worker assignment. |
 | [feature-flag-config-poc](feature-flag-config-poc/README.md) | Good production-focused system for rollout control and config propagation. |
+| [kubernetes-controller-reconciliation-poc](kubernetes-controller-reconciliation-poc/README.md) | Desired-state control loop with replica convergence, rolling updates, crash backoff, autoscaling, and events. |
 | [service-discovery-load-balancing-poc](service-discovery-load-balancing-poc/README.md) | Lease-based discovery, routing, sticky sessions, draining, and temporary ejection. |
 | [service-mesh-control-plane-poc](service-mesh-control-plane-poc/README.md) | East-west traffic control with sidecars, mTLS identity, canary splits, retries, circuit breakers, and ejection. |
 | [distributed-tracing-observability-poc](distributed-tracing-observability-poc/README.md) | Important operational visibility story across services. |
@@ -116,6 +117,7 @@ This path moves from core primitives to more layered systems.
 - [distributed-tracing-observability-poc](distributed-tracing-observability-poc/README.md)
 - [fastapi-redis-task-queue-poc](fastapi-redis-task-queue-poc/README.md)
 - [feature-store-poc](feature-store-poc/README.md)
+- [kubernetes-controller-reconciliation-poc](kubernetes-controller-reconciliation-poc/README.md)
 - [llm-ai-poc](llm-ai-poc/README.md)
 - [llm-context-gateway-poc](llm-context-gateway-poc/README.md)
 - [llm-prompt-router-poc](llm-prompt-router-poc/README.md)
@@ -180,8 +182,8 @@ For the strongest review signal, open files in this order:
 
 The repository direction is to make every project easy to scan in under two minutes and deep enough to discuss in an interview or portfolio review.
 
-- `80/80` POCs have a `README.md`
-- `78/80` POCs have a technical companion doc
-- `70/80` POCs have an `IMPROVEMENTS.md`
+- `81/81` POCs have a `README.md`
+- `79/81` POCs have a technical companion doc
+- `71/81` POCs have an `IMPROVEMENTS.md`
 
 Use [POC_STANDARDS.md](POC_STANDARDS.md) as the baseline for future additions and cleanup.
