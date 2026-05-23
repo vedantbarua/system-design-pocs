@@ -2,7 +2,7 @@
 
 Proof-of-concepts for distributed systems, infrastructure patterns, and product-style architectures. This repository is meant to read like a working systems portfolio, not just a list of folders.
 
-There are currently `81` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
+There are currently `82` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
 
 ## What Makes This Repo Useful
 
@@ -41,6 +41,7 @@ If a reviewer only opens a dozen projects, these are the best entry points.
 | [service-discovery-load-balancing-poc](service-discovery-load-balancing-poc/README.md) | Lease-based discovery, routing, sticky sessions, draining, and temporary ejection. |
 | [service-mesh-control-plane-poc](service-mesh-control-plane-poc/README.md) | East-west traffic control with sidecars, mTLS identity, canary splits, retries, circuit breakers, and ejection. |
 | [distributed-tracing-observability-poc](distributed-tracing-observability-poc/README.md) | Important operational visibility story across services. |
+| [incident-management-oncall-poc](incident-management-oncall-poc/README.md) | Human operations layer with alert deduplication, on-call escalation, incident timelines, SLO breaches, and action items. |
 | [stock-exchange-poc](stock-exchange-poc/README.md) | Strong deterministic processing example with ordered ingress and live market updates. |
 | [saga-pattern-orchestrator-poc](saga-pattern-orchestrator-poc/README.md) | Distributed workflow coordination with compensation logic. |
 | [transactional-outbox-poc](transactional-outbox-poc/README.md) | Practical reliability pattern for atomic state writes, async publishing, idempotent consumers, duplicate delivery, and DLQ handling. |
@@ -117,6 +118,7 @@ This path moves from core primitives to more layered systems.
 - [distributed-tracing-observability-poc](distributed-tracing-observability-poc/README.md)
 - [fastapi-redis-task-queue-poc](fastapi-redis-task-queue-poc/README.md)
 - [feature-store-poc](feature-store-poc/README.md)
+- [incident-management-oncall-poc](incident-management-oncall-poc/README.md)
 - [kubernetes-controller-reconciliation-poc](kubernetes-controller-reconciliation-poc/README.md)
 - [llm-ai-poc](llm-ai-poc/README.md)
 - [llm-context-gateway-poc](llm-context-gateway-poc/README.md)
@@ -182,8 +184,8 @@ For the strongest review signal, open files in this order:
 
 The repository direction is to make every project easy to scan in under two minutes and deep enough to discuss in an interview or portfolio review.
 
-- `81/81` POCs have a `README.md`
-- `79/81` POCs have a technical companion doc
-- `71/81` POCs have an `IMPROVEMENTS.md`
+- `82/82` POCs have a `README.md`
+- `80/82` POCs have a technical companion doc
+- `72/82` POCs have an `IMPROVEMENTS.md`
 
 Use [POC_STANDARDS.md](POC_STANDARDS.md) as the baseline for future additions and cleanup.
