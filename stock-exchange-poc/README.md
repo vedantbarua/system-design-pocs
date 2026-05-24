@@ -75,5 +75,5 @@ Frontend runs on `http://localhost:3000`.
 
 ## Related Docs
 
-- [TECHNICAL_DOC.md](TECHNICAL_DOC.md)
+- [TECHNICAL_README.md](TECHNICAL_README.md)
 - [IMPROVEMENTS.md](IMPROVEMENTS.md)
