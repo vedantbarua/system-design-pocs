@@ -120,6 +120,5 @@ The fastest repo-wide improvement is to bring these lagging projects up to the s
 - `distributed-tracing-observability-poc`
 - `fault-tolerant-leader-election-poc`
 - `notification-system-poc`
-- `stock-exchange-poc`
 
 These are good topics. They should look as complete in documentation as the strongest Spring Boot POCs.
