@@ -62,3 +62,8 @@ Frontend runs on `http://localhost:5174`.
 - No CRDT or OT conflict-resolution layer
 - No auth or board permissions
 - Restarting the backend clears all board state
+
+## Related Docs
+
+- [TECHNICAL_README.md](TECHNICAL_README.md)
+- [IMPROVEMENTS.md](IMPROVEMENTS.md)
