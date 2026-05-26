@@ -52,3 +52,8 @@ curl -X POST http://localhost:8106/api/ai/ask \
 ## Notes
 
 The default model settings keep chat, embedding, image, moderation, and audio model auto-configuration in `none` mode so the app is runnable without secrets. Set `SPRING_AI_CHAT_MODEL=openai` and `OPENAI_API_KEY` to let Spring AI auto-configure only the OpenAI chat model used by this POC.
+
+## Related Docs
+
+- [TECHNICAL_README.md](TECHNICAL_README.md)
+- [IMPROVEMENTS.md](IMPROVEMENTS.md)
