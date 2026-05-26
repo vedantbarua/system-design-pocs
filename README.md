@@ -185,7 +185,7 @@ For the strongest review signal, open files in this order:
 The repository direction is to make every project easy to scan in under two minutes and deep enough to discuss in an interview or portfolio review.
 
 - `83/83` POCs have a `README.md`
-- `82/83` POCs have a technical companion doc
-- `73/83` POCs have an `IMPROVEMENTS.md`
+- `83/83` POCs have a technical companion doc
+- `74/83` POCs have an `IMPROVEMENTS.md`
 
 Use [POC_STANDARDS.md](POC_STANDARDS.md) as the baseline for future additions and cleanup.
