@@ -2,7 +2,7 @@
 
 Proof-of-concepts for distributed systems, infrastructure patterns, and product-style architectures. This repository is meant to read like a working systems portfolio, not just a list of folders.
 
-There are currently `84` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
+There are currently `85` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
 
 ## What Makes This Repo Useful
 
@@ -27,6 +27,7 @@ If a reviewer only opens a dozen projects, these are the best entry points.
 | [schema-registry-event-contract-poc](schema-registry-event-contract-poc/README.md) | Event schema governance with versioning, compatibility checks, validation, consumer support, and rollout readiness. |
 | [policy-as-code-authorization-poc](policy-as-code-authorization-poc/README.md) | Centralized authorization decisions with RBAC, ABAC conditions, deny precedence, dry-run policies, and audit logs. |
 | [secrets-management-kms-poc](secrets-management-kms-poc/README.md) | Secrets platform with envelope encryption, key rotation, access policies, leases, break-glass access, and audits. |
+| [artifact-registry-supply-chain-security-poc](artifact-registry-supply-chain-security-poc/README.md) | Artifact trust with immutable digests, provenance, SBOMs, signatures, scans, promotions, admission gates, and audits. |
 | [write-ahead-log-poc](write-ahead-log-poc/README.md) | Compact durability demo with append-before-apply commands, checkpoints, replay, idempotency, and compaction. |
 | [object-storage-poc](object-storage-poc/README.md) | Strong storage-system coverage: buckets, multipart uploads, versioning, and presigned access. |
 | [cdn-poc](cdn-poc/README.md) | Good edge caching story with invalidation, TTLs, and regional cache behavior. |
@@ -113,6 +114,7 @@ This path moves from core primitives to more layered systems.
 
 - [ad-click-aggregator-poc](ad-click-aggregator-poc/README.md)
 - [api-gateway-dynamic-routing-poc](api-gateway-dynamic-routing-poc/README.md)
+- [artifact-registry-supply-chain-security-poc](artifact-registry-supply-chain-security-poc/README.md)
 - [dark-mode-plugin-poc](dark-mode-plugin-poc/README.md)
 - [distributed-job-scheduler-poc](distributed-job-scheduler-poc/README.md)
 - [distributed-log-monitoring-and-alerting-system-poc](distributed-log-monitoring-and-alerting-system-poc/README.md)
@@ -186,8 +188,8 @@ For the strongest review signal, open files in this order:
 
 The repository direction is to make every project easy to scan in under two minutes and deep enough to discuss in an interview or portfolio review.
 
-- `84/84` POCs have a `README.md`
-- `84/84` POCs have a technical companion doc
-- `75/84` POCs have an `IMPROVEMENTS.md`
+- `85/85` POCs have a `README.md`
+- `85/85` POCs have a technical companion doc
+- `76/85` POCs have an `IMPROVEMENTS.md`
 
 Use [POC_STANDARDS.md](POC_STANDARDS.md) as the baseline for future additions and cleanup.
