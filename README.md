@@ -2,7 +2,7 @@
 
 Proof-of-concepts for distributed systems, infrastructure patterns, and product-style architectures. This repository is meant to read like a working systems portfolio, not just a list of folders.
 
-There are currently `85` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
+There are currently `86` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
 
 ## What Makes This Repo Useful
 
@@ -23,6 +23,7 @@ If a reviewer only opens a dozen projects, these are the best entry points.
 | [event-sourcing-cqrs-poc](event-sourcing-cqrs-poc/README.md) | Clear write/read separation, snapshotting, and rebuild mechanics. |
 | [cdc-materialized-view-poc](cdc-materialized-view-poc/README.md) | Change Data Capture with connector offsets, replay, backfill, duplicate delivery, and read models. |
 | [feature-store-poc](feature-store-poc/README.md) | Python ML platform demo with offline features, online serving, freshness, point-in-time training sets, and skew checks. |
+| [data-lineage-governance-poc](data-lineage-governance-poc/README.md) | Data governance with dataset ownership, column PII tags, lineage graph, quality checks, freshness SLAs, policy gates, and impact analysis. |
 | [fastapi-redis-task-queue-poc](fastapi-redis-task-queue-poc/README.md) | FastAPI + Redis queue with delayed jobs, rate limits, retries, idempotency, visibility timeouts, and DLQ behavior. |
 | [schema-registry-event-contract-poc](schema-registry-event-contract-poc/README.md) | Event schema governance with versioning, compatibility checks, validation, consumer support, and rollout readiness. |
 | [policy-as-code-authorization-poc](policy-as-code-authorization-poc/README.md) | Centralized authorization decisions with RBAC, ABAC conditions, deny precedence, dry-run policies, and audit logs. |
@@ -102,6 +103,7 @@ This path moves from core primitives to more layered systems.
 
 - [cdc-materialized-view-poc](cdc-materialized-view-poc/README.md)
 - [cdn-poc](cdn-poc/README.md)
+- [data-lineage-governance-poc](data-lineage-governance-poc/README.md)
 - [design-dropbox-poc](design-dropbox-poc/README.md)
 - [distributed-stream-processing-poc](distributed-stream-processing-poc/README.md)
 - [google-docs-poc](google-docs-poc/README.md)
@@ -188,8 +190,8 @@ For the strongest review signal, open files in this order:
 
 The repository direction is to make every project easy to scan in under two minutes and deep enough to discuss in an interview or portfolio review.
 
-- `85/85` POCs have a `README.md`
-- `85/85` POCs have a technical companion doc
-- `76/85` POCs have an `IMPROVEMENTS.md`
+- `86/86` POCs have a `README.md`
+- `86/86` POCs have a technical companion doc
+- `77/86` POCs have an `IMPROVEMENTS.md`
 
 Use [POC_STANDARDS.md](POC_STANDARDS.md) as the baseline for future additions and cleanup.
