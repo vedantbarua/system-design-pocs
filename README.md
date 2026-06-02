@@ -2,7 +2,7 @@
 
 Proof-of-concepts for distributed systems, infrastructure patterns, and product-style architectures. This repository is meant to read like a working systems portfolio, not just a list of folders.
 
-There are currently `89` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
+There are currently `90` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
 
 ## What Makes This Repo Useful
 
@@ -27,6 +27,7 @@ If a reviewer only opens a dozen projects, these are the best entry points.
 | [privacy-consent-preferences-poc](privacy-consent-preferences-poc/README.md) | Consent and privacy enforcement with regional defaults, purpose-based decisions, revocation, DSAR workflows, and audit history. |
 | [data-retention-lifecycle-poc](data-retention-lifecycle-poc/README.md) | Data retention lifecycle control with policy matching, legal holds, archive/anonymize/delete jobs, and audit history. |
 | [data-subject-rights-orchestrator-poc](data-subject-rights-orchestrator-poc/README.md) | DSAR orchestration with service fanout, retries, blockers, export bundles, deletion receipts, SLA tracking, and audit history. |
+| [compliance-evidence-automation-poc](compliance-evidence-automation-poc/README.md) | Compliance evidence automation with control registry, evidence freshness, exceptions, audit packages, checksums, and readiness status. |
 | [fastapi-redis-task-queue-poc](fastapi-redis-task-queue-poc/README.md) | FastAPI + Redis queue with delayed jobs, rate limits, retries, idempotency, visibility timeouts, and DLQ behavior. |
 | [schema-registry-event-contract-poc](schema-registry-event-contract-poc/README.md) | Event schema governance with versioning, compatibility checks, validation, consumer support, and rollout readiness. |
 | [policy-as-code-authorization-poc](policy-as-code-authorization-poc/README.md) | Centralized authorization decisions with RBAC, ABAC conditions, deny precedence, dry-run policies, and audit logs. |
@@ -120,6 +121,7 @@ This path moves from core primitives to more layered systems.
 - [ad-click-aggregator-poc](ad-click-aggregator-poc/README.md)
 - [api-gateway-dynamic-routing-poc](api-gateway-dynamic-routing-poc/README.md)
 - [artifact-registry-supply-chain-security-poc](artifact-registry-supply-chain-security-poc/README.md)
+- [compliance-evidence-automation-poc](compliance-evidence-automation-poc/README.md)
 - [dark-mode-plugin-poc](dark-mode-plugin-poc/README.md)
 - [distributed-job-scheduler-poc](distributed-job-scheduler-poc/README.md)
 - [distributed-log-monitoring-and-alerting-system-poc](distributed-log-monitoring-and-alerting-system-poc/README.md)
@@ -196,8 +198,8 @@ For the strongest review signal, open files in this order:
 
 The repository direction is to make every project easy to scan in under two minutes and deep enough to discuss in an interview or portfolio review.
 
-- `89/89` POCs have a `README.md`
-- `89/89` POCs have a technical companion doc
-- `80/89` POCs have an `IMPROVEMENTS.md`
+- `90/90` POCs have a `README.md`
+- `90/90` POCs have a technical companion doc
+- `81/90` POCs have an `IMPROVEMENTS.md`
 
 Use [POC_STANDARDS.md](POC_STANDARDS.md) as the baseline for future additions and cleanup.
