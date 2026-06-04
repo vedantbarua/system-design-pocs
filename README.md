@@ -2,7 +2,7 @@
 
 Proof-of-concepts for distributed systems, infrastructure patterns, and product-style architectures. This repository is meant to read like a working systems portfolio, not just a list of folders.
 
-There are currently `90` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
+There are currently `91` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
 
 ## What Makes This Repo Useful
 
@@ -53,6 +53,7 @@ If a reviewer only opens a dozen projects, these are the best entry points.
 | [saga-pattern-orchestrator-poc](saga-pattern-orchestrator-poc/README.md) | Distributed workflow coordination with compensation logic. |
 | [transactional-outbox-poc](transactional-outbox-poc/README.md) | Practical reliability pattern for atomic state writes, async publishing, idempotent consumers, duplicate delivery, and DLQ handling. |
 | [notification-system-poc](notification-system-poc/README.md) | Real messaging-system concerns: queueing, provider routing, delivery semantics, and rate limits. |
+| [subscription-billing-reminder-poc](subscription-billing-reminder-poc/README.md) | Practical recurring billing workflow with subscriptions, invoices, payment attempts, dunning retries, reminders, grace periods, and cancellations. |
 
 ## Suggested Review Path
 
@@ -166,6 +167,7 @@ This path moves from core primitives to more layered systems.
 - [point-of-sale-poc](point-of-sale-poc/README.md)
 - [price-tracker-poc](price-tracker-poc/README.md)
 - [restaurant-booking-system-poc](restaurant-booking-system-poc/README.md)
+- [subscription-billing-reminder-poc](subscription-billing-reminder-poc/README.md)
 - [ticketmaster-poc](ticketmaster-poc/README.md)
 - [uber-poc](uber-poc/README.md)
 - [yelp-poc](yelp-poc/README.md)
@@ -198,8 +200,8 @@ For the strongest review signal, open files in this order:
 
 The repository direction is to make every project easy to scan in under two minutes and deep enough to discuss in an interview or portfolio review.
 
-- `90/90` POCs have a `README.md`
-- `90/90` POCs have a technical companion doc
-- `81/90` POCs have an `IMPROVEMENTS.md`
+- `91/91` POCs have a `README.md`
+- `91/91` POCs have a technical companion doc
+- `82/91` POCs have an `IMPROVEMENTS.md`
 
 Use [POC_STANDARDS.md](POC_STANDARDS.md) as the baseline for future additions and cleanup.
