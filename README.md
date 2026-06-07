@@ -2,7 +2,7 @@
 
 Proof-of-concepts for distributed systems, infrastructure patterns, and product-style architectures. This repository is meant to read like a working systems portfolio, not just a list of folders.
 
-There are currently `91` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
+There are currently `92` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
 
 ## What Makes This Repo Useful
 
@@ -54,6 +54,7 @@ If a reviewer only opens a dozen projects, these are the best entry points.
 | [transactional-outbox-poc](transactional-outbox-poc/README.md) | Practical reliability pattern for atomic state writes, async publishing, idempotent consumers, duplicate delivery, and DLQ handling. |
 | [notification-system-poc](notification-system-poc/README.md) | Real messaging-system concerns: queueing, provider routing, delivery semantics, and rate limits. |
 | [subscription-billing-reminder-poc](subscription-billing-reminder-poc/README.md) | Practical recurring billing workflow with subscriptions, invoices, payment attempts, dunning retries, reminders, grace periods, and cancellations. |
+| [appointment-scheduling-reminder-poc](appointment-scheduling-reminder-poc/README.md) | Everyday scheduling with availability, expiring holds, conflict-safe booking, rescheduling, waitlist promotion, reminders, and utilization. |
 
 ## Suggested Review Path
 
@@ -160,6 +161,7 @@ This path moves from core primitives to more layered systems.
 ### Marketplace, Commerce, and Financial Flows
 
 - [backmarket-poc](backmarket-poc/README.md)
+- [appointment-scheduling-reminder-poc](appointment-scheduling-reminder-poc/README.md)
 - [local-delivery-service-poc](local-delivery-service-poc/README.md)
 - [online-auction-poc](online-auction-poc/README.md)
 - [online-shopping-poc](online-shopping-poc/README.md)
@@ -200,8 +202,8 @@ For the strongest review signal, open files in this order:
 
 The repository direction is to make every project easy to scan in under two minutes and deep enough to discuss in an interview or portfolio review.
 
-- `91/91` POCs have a `README.md`
-- `91/91` POCs have a technical companion doc
-- `82/91` POCs have an `IMPROVEMENTS.md`
+- `92/92` POCs have a `README.md`
+- `92/92` POCs have a technical companion doc
+- `83/92` POCs have an `IMPROVEMENTS.md`
 
 Use [POC_STANDARDS.md](POC_STANDARDS.md) as the baseline for future additions and cleanup.
