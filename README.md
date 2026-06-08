@@ -2,7 +2,7 @@
 
 Proof-of-concepts for distributed systems, infrastructure patterns, and product-style architectures. This repository is meant to read like a working systems portfolio, not just a list of folders.
 
-There are currently `92` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
+There are currently `93` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
 
 ## What Makes This Repo Useful
 
@@ -55,6 +55,7 @@ If a reviewer only opens a dozen projects, these are the best entry points.
 | [notification-system-poc](notification-system-poc/README.md) | Real messaging-system concerns: queueing, provider routing, delivery semantics, and rate limits. |
 | [subscription-billing-reminder-poc](subscription-billing-reminder-poc/README.md) | Practical recurring billing workflow with subscriptions, invoices, payment attempts, dunning retries, reminders, grace periods, and cancellations. |
 | [appointment-scheduling-reminder-poc](appointment-scheduling-reminder-poc/README.md) | Everyday scheduling with availability, expiring holds, conflict-safe booking, rescheduling, waitlist promotion, reminders, and utilization. |
+| [shared-expense-splitting-poc](shared-expense-splitting-poc/README.md) | React, Node, and Express shared-expense ledger with multiple split methods, multi-payer expenses, reversals, settlements, recurring costs, and reminders. |
 
 ## Suggested Review Path
 
@@ -169,6 +170,7 @@ This path moves from core primitives to more layered systems.
 - [point-of-sale-poc](point-of-sale-poc/README.md)
 - [price-tracker-poc](price-tracker-poc/README.md)
 - [restaurant-booking-system-poc](restaurant-booking-system-poc/README.md)
+- [shared-expense-splitting-poc](shared-expense-splitting-poc/README.md)
 - [subscription-billing-reminder-poc](subscription-billing-reminder-poc/README.md)
 - [ticketmaster-poc](ticketmaster-poc/README.md)
 - [uber-poc](uber-poc/README.md)
@@ -202,8 +204,8 @@ For the strongest review signal, open files in this order:
 
 The repository direction is to make every project easy to scan in under two minutes and deep enough to discuss in an interview or portfolio review.
 
-- `92/92` POCs have a `README.md`
-- `92/92` POCs have a technical companion doc
-- `83/92` POCs have an `IMPROVEMENTS.md`
+- `93/93` POCs have a `README.md`
+- `93/93` POCs have a technical companion doc
+- `84/93` POCs have an `IMPROVEMENTS.md`
 
 Use [POC_STANDARDS.md](POC_STANDARDS.md) as the baseline for future additions and cleanup.
