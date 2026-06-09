@@ -56,6 +56,7 @@ If a reviewer only opens a dozen projects, these are the best entry points.
 | [subscription-billing-reminder-poc](subscription-billing-reminder-poc/README.md) | Practical recurring billing workflow with subscriptions, invoices, payment attempts, dunning retries, reminders, grace periods, and cancellations. |
 | [appointment-scheduling-reminder-poc](appointment-scheduling-reminder-poc/README.md) | Everyday scheduling with availability, expiring holds, conflict-safe booking, rescheduling, waitlist promotion, reminders, and utilization. |
 | [shared-expense-splitting-poc](shared-expense-splitting-poc/README.md) | React, Node, and Express shared-expense ledger with multiple split methods, multi-payer expenses, reversals, settlements, recurring costs, and reminders. |
+| [home-maintenance-reminder-poc](home-maintenance-reminder-poc/README.md) | React, Node, and Express home maintenance tracker with recurring schedules, warranties, service history, reminders, asset health, and spending. |
 
 ## Suggested Review Path
 
@@ -181,6 +182,7 @@ This path moves from core primitives to more layered systems.
 - [facebook-news-feed-poc](facebook-news-feed-poc/README.md)
 - [bar-menu-poc](bar-menu-poc/README.md)
 - [flight-tracking-poc](flight-tracking-poc/README.md)
+- [home-maintenance-reminder-poc](home-maintenance-reminder-poc/README.md)
 - [leetcode-poc](leetcode-poc/README.md)
 - [medium-poc](medium-poc/README.md)
 - [netflix-poc](netflix-poc/README.md)
@@ -204,8 +206,8 @@ For the strongest review signal, open files in this order:
 
 The repository direction is to make every project easy to scan in under two minutes and deep enough to discuss in an interview or portfolio review.
 
-- `93/93` POCs have a `README.md`
-- `93/93` POCs have a technical companion doc
-- `84/93` POCs have an `IMPROVEMENTS.md`
+- `94/94` POCs have a `README.md`
+- `94/94` POCs have a technical companion doc
+- `85/94` POCs have an `IMPROVEMENTS.md`
 
 Use [POC_STANDARDS.md](POC_STANDARDS.md) as the baseline for future additions and cleanup.
