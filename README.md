@@ -58,6 +58,7 @@ If a reviewer only opens a dozen projects, these are the best entry points.
 | [shared-expense-splitting-poc](shared-expense-splitting-poc/README.md) | React, Node, and Express shared-expense ledger with multiple split methods, multi-payer expenses, reversals, settlements, recurring costs, and reminders. |
 | [home-maintenance-reminder-poc](home-maintenance-reminder-poc/README.md) | React, Node, and Express home maintenance tracker with recurring schedules, warranties, service history, reminders, asset health, and spending. |
 | [package-delivery-tracker-poc](package-delivery-tracker-poc/README.md) | React, Node, Express, and Redis parcel tracker with carrier normalization, idempotent event ingestion, out-of-order protection, polling, and delivery alerts. |
+| [returns-refunds-tracker-poc](returns-refunds-tracker-poc/README.md) | React, Node, PostgreSQL, and Redis return workflow with deadlines, reverse logistics, provider webhooks, partial refunds, and financial reconciliation. |
 
 ## Suggested Review Path
 
@@ -172,6 +173,7 @@ This path moves from core primitives to more layered systems.
 - [point-of-sale-poc](point-of-sale-poc/README.md)
 - [price-tracker-poc](price-tracker-poc/README.md)
 - [restaurant-booking-system-poc](restaurant-booking-system-poc/README.md)
+- [returns-refunds-tracker-poc](returns-refunds-tracker-poc/README.md)
 - [shared-expense-splitting-poc](shared-expense-splitting-poc/README.md)
 - [subscription-billing-reminder-poc](subscription-billing-reminder-poc/README.md)
 - [ticketmaster-poc](ticketmaster-poc/README.md)
@@ -208,8 +210,8 @@ For the strongest review signal, open files in this order:
 
 The repository direction is to make every project easy to scan in under two minutes and deep enough to discuss in an interview or portfolio review.
 
-- `95/95` POCs have a `README.md`
-- `95/95` POCs have a technical companion doc
-- `86/95` POCs have an `IMPROVEMENTS.md`
+- `96/96` POCs have a `README.md`
+- `96/96` POCs have a technical companion doc
+- `87/96` POCs have an `IMPROVEMENTS.md`
 
 Use [POC_STANDARDS.md](POC_STANDARDS.md) as the baseline for future additions and cleanup.
