@@ -57,6 +57,7 @@ If a reviewer only opens a dozen projects, these are the best entry points.
 | [appointment-scheduling-reminder-poc](appointment-scheduling-reminder-poc/README.md) | Everyday scheduling with availability, expiring holds, conflict-safe booking, rescheduling, waitlist promotion, reminders, and utilization. |
 | [shared-expense-splitting-poc](shared-expense-splitting-poc/README.md) | React, Node, and Express shared-expense ledger with multiple split methods, multi-payer expenses, reversals, settlements, recurring costs, and reminders. |
 | [home-maintenance-reminder-poc](home-maintenance-reminder-poc/README.md) | React, Node, and Express home maintenance tracker with recurring schedules, warranties, service history, reminders, asset health, and spending. |
+| [package-delivery-tracker-poc](package-delivery-tracker-poc/README.md) | React, Node, Express, and Redis parcel tracker with carrier normalization, idempotent event ingestion, out-of-order protection, polling, and delivery alerts. |
 
 ## Suggested Review Path
 
@@ -187,6 +188,7 @@ This path moves from core primitives to more layered systems.
 - [medium-poc](medium-poc/README.md)
 - [netflix-poc](netflix-poc/README.md)
 - [news-feed-system-poc](news-feed-system-poc/README.md)
+- [package-delivery-tracker-poc](package-delivery-tracker-poc/README.md)
 - [parking-meter-poc](parking-meter-poc/README.md)
 - [strava-poc](strava-poc/README.md)
 - [tinder-poc](tinder-poc/README.md)
@@ -206,8 +208,8 @@ For the strongest review signal, open files in this order:
 
 The repository direction is to make every project easy to scan in under two minutes and deep enough to discuss in an interview or portfolio review.
 
-- `94/94` POCs have a `README.md`
-- `94/94` POCs have a technical companion doc
-- `85/94` POCs have an `IMPROVEMENTS.md`
+- `95/95` POCs have a `README.md`
+- `95/95` POCs have a technical companion doc
+- `86/95` POCs have an `IMPROVEMENTS.md`
 
 Use [POC_STANDARDS.md](POC_STANDARDS.md) as the baseline for future additions and cleanup.

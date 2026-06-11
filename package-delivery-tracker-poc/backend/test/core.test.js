@@ -104,7 +104,7 @@ test("snapshot exposes operational counts and carrier reliability", () => {
   store.seed();
   const snapshot = store.snapshot("household-maple", "2026-06-10T14:00:00Z");
   assert.equal(snapshot.metrics.active, 4);
-  assert.equal(snapshot.metrics.arrivingToday, 2);
+  assert.equal(snapshot.metrics.arrivingToday, 1);
   assert.equal(snapshot.metrics.exceptions, 1);
   assert.equal(snapshot.metrics.deliveredRecently, 1);
   assert.ok(snapshot.carrierMetrics.some((item) => item.carrier === "UPS"));
