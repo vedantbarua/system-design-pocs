@@ -59,6 +59,7 @@ If a reviewer only opens a dozen projects, these are the best entry points.
 | [home-maintenance-reminder-poc](home-maintenance-reminder-poc/README.md) | React, Node, and Express home maintenance tracker with recurring schedules, warranties, service history, reminders, asset health, and spending. |
 | [package-delivery-tracker-poc](package-delivery-tracker-poc/README.md) | React, Node, Express, and Redis parcel tracker with carrier normalization, idempotent event ingestion, out-of-order protection, polling, and delivery alerts. |
 | [returns-refunds-tracker-poc](returns-refunds-tracker-poc/README.md) | React, Node, PostgreSQL, and Redis return workflow with deadlines, reverse logistics, provider webhooks, partial refunds, and financial reconciliation. |
+| [personal-document-renewal-vault-poc](personal-document-renewal-vault-poc/README.md) | React and FastAPI document vault with short-lived grants, immutable versions, MinIO objects, scan/OCR jobs, access controls, audits, and renewal reminders. |
 
 ## Suggested Review Path
 
@@ -192,6 +193,7 @@ This path moves from core primitives to more layered systems.
 - [news-feed-system-poc](news-feed-system-poc/README.md)
 - [package-delivery-tracker-poc](package-delivery-tracker-poc/README.md)
 - [parking-meter-poc](parking-meter-poc/README.md)
+- [personal-document-renewal-vault-poc](personal-document-renewal-vault-poc/README.md)
 - [strava-poc](strava-poc/README.md)
 - [tinder-poc](tinder-poc/README.md)
 - [url-shortner-poc](url-shortner-poc/README.md)
@@ -210,8 +212,8 @@ For the strongest review signal, open files in this order:
 
 The repository direction is to make every project easy to scan in under two minutes and deep enough to discuss in an interview or portfolio review.
 
-- `96/96` POCs have a `README.md`
-- `96/96` POCs have a technical companion doc
-- `87/96` POCs have an `IMPROVEMENTS.md`
+- `97/97` POCs have a `README.md`
+- `97/97` POCs have a technical companion doc
+- `88/97` POCs have an `IMPROVEMENTS.md`
 
 Use [POC_STANDARDS.md](POC_STANDARDS.md) as the baseline for future additions and cleanup.
