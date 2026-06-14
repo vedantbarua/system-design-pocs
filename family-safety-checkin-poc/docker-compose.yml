@@ -1,0 +1,23 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: family_safety
+      POSTGRES_USER: safety
+      POSTGRES_PASSWORD: safety
+    ports:
+      - "5434:5432"
+    volumes:
+      - safety-postgres:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    ports:
+      - "6381:6379"
+    volumes:
+      - safety-redis:/data
+
+volumes:
+  safety-postgres:
+  safety-redis:
