@@ -2,7 +2,7 @@
 
 Proof-of-concepts for distributed systems, infrastructure patterns, and product-style architectures. This repository is meant to read like a working systems portfolio, not just a list of folders.
 
-There are currently `100` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
+There are currently `101` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
 
 ## What Makes This Repo Useful
 
@@ -63,6 +63,7 @@ If a reviewer only opens a dozen projects, these are the best entry points.
 | [medication-refill-adherence-poc](medication-refill-adherence-poc/README.md) | React and FastAPI medication workflow with timezone-safe dose schedules, idempotent inventory, refill forecasting, caregiver escalation, and retryable Redis jobs. |
 | [family-safety-checkin-poc](family-safety-checkin-poc/README.md) | React and FastAPI safety coordination with deadline state machines, offline acknowledgements, expiring location shares, trusted-contact escalation, retries, and WebSockets. |
 | [home-utility-usage-monitor-poc](home-utility-usage-monitor-poc/README.md) | React, Node, Express, Kafka, TimescaleDB, and Redis utility monitor with smart-meter ingestion, rollups, anomaly detection, corrections, and retryable alerts. |
+| [smart-home-automation-rules-poc](smart-home-automation-rules-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis automation rule engine with event triggers, command dedupe, safety overrides, retries, acknowledgements, and audit history. |
 
 ## Suggested Review Path
 
@@ -200,6 +201,7 @@ This path moves from core primitives to more layered systems.
 - [package-delivery-tracker-poc](package-delivery-tracker-poc/README.md)
 - [parking-meter-poc](parking-meter-poc/README.md)
 - [personal-document-renewal-vault-poc](personal-document-renewal-vault-poc/README.md)
+- [smart-home-automation-rules-poc](smart-home-automation-rules-poc/README.md)
 - [strava-poc](strava-poc/README.md)
 - [tinder-poc](tinder-poc/README.md)
 - [url-shortner-poc](url-shortner-poc/README.md)
@@ -218,8 +220,8 @@ For the strongest review signal, open files in this order:
 
 The repository direction is to make every project easy to scan in under two minutes and deep enough to discuss in an interview or portfolio review.
 
-- `100/100` POCs have a `README.md`
-- `100/100` POCs have a technical companion doc
-- `91/100` POCs have an `IMPROVEMENTS.md`
+- `101/101` POCs have a `README.md`
+- `101/101` POCs have a technical companion doc
+- `92/101` POCs have an `IMPROVEMENTS.md`
 
 Use [POC_STANDARDS.md](POC_STANDARDS.md) as the baseline for future additions and cleanup.
