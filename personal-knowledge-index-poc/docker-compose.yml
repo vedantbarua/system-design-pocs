@@ -1,0 +1,42 @@
+services:
+  kafka:
+    image: redpandadata/redpanda:v24.3.6
+    command:
+      - redpanda
+      - start
+      - --overprovisioned
+      - --smp
+      - "1"
+      - --memory
+      - 512M
+      - --reserve-memory
+      - 0M
+      - --node-id
+      - "0"
+      - --check=false
+      - --kafka-addr
+      - PLAINTEXT://0.0.0.0:9092
+      - --advertise-kafka-addr
+      - PLAINTEXT://127.0.0.1:9095
+    ports:
+      - "9095:9092"
+      - "9647:9644"
+
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: knowledge_index
+      POSTGRES_USER: knowledge
+      POSTGRES_PASSWORD: knowledge
+    ports:
+      - "5438:5432"
+    volumes:
+      - knowledge-postgres-data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6385:6379"
+
+volumes:
+  knowledge-postgres-data:
