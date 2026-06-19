@@ -2,7 +2,7 @@
 
 Proof-of-concepts for distributed systems, infrastructure patterns, and product-style architectures. This repository is meant to read like a working systems portfolio, not just a list of folders.
 
-There are currently `103` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
+There are currently `104` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
 
 ## What Makes This Repo Useful
 
@@ -66,6 +66,7 @@ If a reviewer only opens a dozen projects, these are the best entry points.
 | [smart-home-automation-rules-poc](smart-home-automation-rules-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis automation rule engine with event triggers, command dedupe, safety overrides, retries, acknowledgements, and audit history. |
 | [personal-backup-sync-poc](personal-backup-sync-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis personal backup sync with chunk dedupe, versioned manifests, snapshots, restore jobs, conflicts, retries, and retention. |
 | [personal-knowledge-index-poc](personal-knowledge-index-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis personal knowledge index with document ingestion, full-text search, semantic simulation, access grants, stale scans, retries, and audits. |
+| [smart-pantry-inventory-poc](smart-pantry-inventory-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis household inventory with lot-level expiry, FEFO consumption, low-stock shopping projections, retries, and audits. |
 
 ## Suggested Review Path
 
@@ -206,6 +207,7 @@ This path moves from core primitives to more layered systems.
 - [parking-meter-poc](parking-meter-poc/README.md)
 - [personal-document-renewal-vault-poc](personal-document-renewal-vault-poc/README.md)
 - [smart-home-automation-rules-poc](smart-home-automation-rules-poc/README.md)
+- [smart-pantry-inventory-poc](smart-pantry-inventory-poc/README.md)
 - [strava-poc](strava-poc/README.md)
 - [tinder-poc](tinder-poc/README.md)
 - [url-shortner-poc](url-shortner-poc/README.md)
@@ -224,8 +226,8 @@ For the strongest review signal, open files in this order:
 
 The repository direction is to make every project easy to scan in under two minutes and deep enough to discuss in an interview or portfolio review.
 
-- `103/103` POCs have a `README.md`
-- `103/103` POCs have a technical companion doc
-- `94/103` POCs have an `IMPROVEMENTS.md`
+- `104/104` POCs have a `README.md`
+- `104/104` POCs have a technical companion doc
+- `95/104` POCs have an `IMPROVEMENTS.md`
 
 Use [POC_STANDARDS.md](POC_STANDARDS.md) as the baseline for future additions and cleanup.
