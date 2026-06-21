@@ -2,7 +2,7 @@
 
 Proof-of-concepts for distributed systems, infrastructure patterns, and product-style architectures. This repository is meant to read like a working systems portfolio, not just a list of folders.
 
-There are currently `105` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
+There are currently `106` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
 
 ## What Makes This Repo Useful
 
@@ -68,6 +68,7 @@ If a reviewer only opens a dozen projects, these are the best entry points.
 | [personal-knowledge-index-poc](personal-knowledge-index-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis personal knowledge index with document ingestion, full-text search, semantic simulation, access grants, stale scans, retries, and audits. |
 | [smart-pantry-inventory-poc](smart-pantry-inventory-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis household inventory with lot-level expiry, FEFO consumption, low-stock shopping projections, retries, and audits. |
 | [household-chore-coordinator-poc](household-chore-coordinator-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis chore coordination with recurrence, fair assignment, lease fencing, offline replay, overdue escalation, retries, and audits. |
+| [personal-cash-flow-forecast-poc](personal-cash-flow-forecast-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis cash-flow forecasting with bank event reconciliation, recurring detection, budgets, projection rebuilds, retries, and audits. |
 
 ## Suggested Review Path
 
@@ -181,6 +182,7 @@ This path moves from core primitives to more layered systems.
 - [online-auction-poc](online-auction-poc/README.md)
 - [online-shopping-poc](online-shopping-poc/README.md)
 - [payment-system-poc](payment-system-poc/README.md)
+- [personal-cash-flow-forecast-poc](personal-cash-flow-forecast-poc/README.md)
 - [point-of-sale-poc](point-of-sale-poc/README.md)
 - [price-tracker-poc](price-tracker-poc/README.md)
 - [restaurant-booking-system-poc](restaurant-booking-system-poc/README.md)
@@ -228,8 +230,8 @@ For the strongest review signal, open files in this order:
 
 The repository direction is to make every project easy to scan in under two minutes and deep enough to discuss in an interview or portfolio review.
 
-- `105/105` POCs have a `README.md`
-- `105/105` POCs have a technical companion doc
-- `96/105` POCs have an `IMPROVEMENTS.md`
+- `106/106` POCs have a `README.md`
+- `106/106` POCs have a technical companion doc
+- `97/106` POCs have an `IMPROVEMENTS.md`
 
 Use [POC_STANDARDS.md](POC_STANDARDS.md) as the baseline for future additions and cleanup.
