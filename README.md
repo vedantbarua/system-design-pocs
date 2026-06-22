@@ -2,7 +2,7 @@
 
 Proof-of-concepts for distributed systems, infrastructure patterns, and product-style architectures. This repository is meant to read like a working systems portfolio, not just a list of folders.
 
-There are currently `106` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
+There are currently `107` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
 
 ## What Makes This Repo Useful
 
@@ -69,6 +69,7 @@ If a reviewer only opens a dozen projects, these are the best entry points.
 | [smart-pantry-inventory-poc](smart-pantry-inventory-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis household inventory with lot-level expiry, FEFO consumption, low-stock shopping projections, retries, and audits. |
 | [household-chore-coordinator-poc](household-chore-coordinator-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis chore coordination with recurrence, fair assignment, lease fencing, offline replay, overdue escalation, retries, and audits. |
 | [personal-cash-flow-forecast-poc](personal-cash-flow-forecast-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis cash-flow forecasting with bank event reconciliation, recurring detection, budgets, projection rebuilds, retries, and audits. |
+| [vehicle-maintenance-fuel-tracker-poc](vehicle-maintenance-fuel-tracker-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis vehicle care with ordered telemetry, fuel economy, service schedules, quarantine, retries, and audits. |
 
 ## Suggested Review Path
 
@@ -215,6 +216,7 @@ This path moves from core primitives to more layered systems.
 - [strava-poc](strava-poc/README.md)
 - [tinder-poc](tinder-poc/README.md)
 - [url-shortner-poc](url-shortner-poc/README.md)
+- [vehicle-maintenance-fuel-tracker-poc](vehicle-maintenance-fuel-tracker-poc/README.md)
 - [workout-tracker-poc](workout-tracker-poc/README.md)
 - [youTube-top-K-poc](youTube-top-K-poc/README.md)
 
@@ -230,8 +232,8 @@ For the strongest review signal, open files in this order:
 
 The repository direction is to make every project easy to scan in under two minutes and deep enough to discuss in an interview or portfolio review.
 
-- `106/106` POCs have a `README.md`
-- `106/106` POCs have a technical companion doc
-- `97/106` POCs have an `IMPROVEMENTS.md`
+- `107/107` POCs have a `README.md`
+- `107/107` POCs have a technical companion doc
+- `98/107` POCs have an `IMPROVEMENTS.md`
 
 Use [POC_STANDARDS.md](POC_STANDARDS.md) as the baseline for future additions and cleanup.
