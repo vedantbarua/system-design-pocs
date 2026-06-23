@@ -2,7 +2,7 @@
 
 Proof-of-concepts for distributed systems, infrastructure patterns, and product-style architectures. This repository is meant to read like a working systems portfolio, not just a list of folders.
 
-There are currently `107` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
+There are currently `108` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
 
 ## What Makes This Repo Useful
 
@@ -31,6 +31,7 @@ If a reviewer only opens a dozen projects, these are the best entry points.
 | [fastapi-redis-task-queue-poc](fastapi-redis-task-queue-poc/README.md) | FastAPI + Redis queue with delayed jobs, rate limits, retries, idempotency, visibility timeouts, and DLQ behavior. |
 | [schema-registry-event-contract-poc](schema-registry-event-contract-poc/README.md) | Event schema governance with versioning, compatibility checks, validation, consumer support, and rollout readiness. |
 | [policy-as-code-authorization-poc](policy-as-code-authorization-poc/README.md) | Centralized authorization decisions with RBAC, ABAC conditions, deny precedence, dry-run policies, and audit logs. |
+| [identity-access-lifecycle-poc](identity-access-lifecycle-poc/README.md) | React, Node, Kafka, PostgreSQL, and Redis identity control plane with SCIM-style synchronization, JIT access, session revocation, access reviews, retries, and audits. |
 | [secrets-management-kms-poc](secrets-management-kms-poc/README.md) | Secrets platform with envelope encryption, key rotation, access policies, leases, break-glass access, and audits. |
 | [artifact-registry-supply-chain-security-poc](artifact-registry-supply-chain-security-poc/README.md) | Artifact trust with immutable digests, provenance, SBOMs, signatures, scans, promotions, admission gates, and audits. |
 | [write-ahead-log-poc](write-ahead-log-poc/README.md) | Compact durability demo with append-before-apply commands, checkpoints, replay, idempotency, and compaction. |
@@ -148,6 +149,7 @@ This path moves from core primitives to more layered systems.
 - [fastapi-redis-task-queue-poc](fastapi-redis-task-queue-poc/README.md)
 - [feature-store-poc](feature-store-poc/README.md)
 - [incident-management-oncall-poc](incident-management-oncall-poc/README.md)
+- [identity-access-lifecycle-poc](identity-access-lifecycle-poc/README.md)
 - [kubernetes-controller-reconciliation-poc](kubernetes-controller-reconciliation-poc/README.md)
 - [llm-ai-poc](llm-ai-poc/README.md)
 - [llm-context-gateway-poc](llm-context-gateway-poc/README.md)
@@ -232,8 +234,8 @@ For the strongest review signal, open files in this order:
 
 The repository direction is to make every project easy to scan in under two minutes and deep enough to discuss in an interview or portfolio review.
 
-- `107/107` POCs have a `README.md`
-- `107/107` POCs have a technical companion doc
-- `98/107` POCs have an `IMPROVEMENTS.md`
+- `108/108` POCs have a `README.md`
+- `108/108` POCs have a technical companion doc
+- `99/108` POCs have an `IMPROVEMENTS.md`
 
 Use [POC_STANDARDS.md](POC_STANDARDS.md) as the baseline for future additions and cleanup.
