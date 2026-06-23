@@ -1,0 +1,25 @@
+import assert from "node:assert/strict";
+import {describe,it} from "node:test";
+import {addHours,createSeededLifecycle,syncKey} from "../src/core.js";
+
+const NOW=new Date("2026-06-23T18:00:00Z");
+describe("IdentityLifecycle",()=>{
+  it("seeds identities, grants, sessions, and a review",()=>{const lifecycle=createSeededLifecycle(NOW),snapshot=lifecycle.snapshot();assert.equal(snapshot.metrics.activeUsers,2);assert.equal(snapshot.campaigns.length,1);assert.ok(snapshot.metrics.privilegedUsers>0)});
+  it("builds stable source event keys",()=>assert.equal(syncKey("workday","event-1"),"workday:event-1"));
+  it("deduplicates directory events",()=>{const lifecycle=createSeededLifecycle(NOW),input={eventId:"evt-1",source:"workday",operation:"UPSERT_USER" as const,externalId:"scim-2001",email:"new@northstar.example",name:"New User"};assert.equal(lifecycle.ingest(input).duplicate,false);assert.equal(lifecycle.ingest(input).duplicate,true)});
+  it("upserts an existing user by external id",()=>{const lifecycle=createSeededLifecycle(NOW);lifecycle.ingest({eventId:"evt-2",operation:"UPSERT_USER",externalId:"scim-1002",email:"robert@northstar.example",name:"Robert Rivera",department:"Finance"});assert.equal(lifecycle.findUser("user-bob").email,"robert@northstar.example")});
+  it("rejects malformed sync events without losing the event record",()=>{const lifecycle=createSeededLifecycle(NOW),result=lifecycle.ingest({eventId:"bad",operation:"ADD_MEMBERSHIP",userId:"missing",groupId:"group-finance"});assert.equal(result.event?.status,"REJECTED");assert.equal(lifecycle.syncEvents.length,1)});
+  it("adds memberships idempotently",()=>{const lifecycle=createSeededLifecycle(NOW);lifecycle.ingest({eventId:"membership-1",operation:"ADD_MEMBERSHIP",userId:"user-bob",groupId:"group-engineering"});lifecycle.ingest({eventId:"membership-2",operation:"ADD_MEMBERSHIP",userId:"user-bob",groupId:"group-engineering"});assert.equal(lifecycle.memberships.filter(row=>row.userId==="user-bob"&&row.groupId==="group-engineering").length,1)});
+  it("prevents sessions for suspended users",()=>{const lifecycle=createSeededLifecycle(NOW);assert.throws(()=>lifecycle.openSession("user-maya","10.0.0.1"),/not active/)});
+  it("suspends users and marks sessions for revocation",()=>{const lifecycle=createSeededLifecycle(NOW);lifecycle.suspend("user-alice");assert.equal(lifecycle.findUser("user-alice").status,"SUSPENDED");assert.equal(lifecycle.sessions.find(row=>row.userId==="user-alice")?.status,"REVOCATION_PENDING")});
+  it("deprovisions users and removes group membership",()=>{const lifecycle=createSeededLifecycle(NOW);lifecycle.deprovision("user-bob");assert.equal(lifecycle.findUser("user-bob").status,"DEPROVISIONED");assert.equal(lifecycle.memberships.some(row=>row.userId==="user-bob"),false);assert.ok(lifecycle.grants.filter(row=>row.userId==="user-bob").every(row=>row.status==="PENDING_REVOKE"))});
+  it("creates bounded just-in-time access",()=>{const lifecycle=createSeededLifecycle(NOW),grant=lifecycle.grantJit("user-alice","ent-support",4,"Incident INC-999");assert.equal(grant.source,"JIT");assert.ok(grant.expiresAt)});
+  it("validates JIT duration",()=>{const lifecycle=createSeededLifecycle(NOW);assert.throws(()=>lifecycle.grantJit("user-alice","ent-support",48,"too long"),/between 1 and 24/)});
+  it("expires time-limited access",()=>{const lifecycle=createSeededLifecycle(NOW);const result=lifecycle.expireAccess(addHours(5,NOW));assert.equal(result.expired,1);assert.equal(lifecycle.findGrant("grant-bob-support").status,"EXPIRED")});
+  it("requires every access review item to be decided",()=>{const lifecycle=createSeededLifecycle(NOW),campaign=lifecycle.campaigns[0];assert.throws(()=>lifecycle.completeReview(campaign.id),/all review items/)});
+  it("review rejection schedules grant revocation",()=>{const lifecycle=createSeededLifecycle(NOW),item=lifecycle.reviewItems[0];lifecycle.decideReview(item.id,"REVOKED","manager@northstar.example");assert.equal(lifecycle.findGrant(item.grantId).status,"PENDING_REVOKE");assert.ok(lifecycle.jobs.some(row=>row.payload.grantId===item.grantId))});
+  it("propagates pending revocations",()=>{const lifecycle=createSeededLifecycle(NOW);lifecycle.suspend("user-alice");lifecycle.drainJobs();assert.equal(lifecycle.sessions.find(row=>row.userId==="user-alice")?.status,"REVOKED")});
+  it("retries downstream failures",()=>{const lifecycle=createSeededLifecycle(NOW);lifecycle.ensureJob("DIRECTORY_SYNC",{},"test-job");lifecycle.failNextJob=true;assert.equal(lifecycle.dispatchNextJob().job?.status,"RETRY");assert.equal(lifecycle.dispatchNextJob().job?.status,"COMPLETED")});
+  it("deduplicates jobs",()=>{const lifecycle=createSeededLifecycle(NOW);assert.equal(lifecycle.ensureJob("REVIEW_REMINDER",{},"same").id,lifecycle.ensureJob("REVIEW_REMINDER",{},"same").id)});
+  it("exports and restores state",()=>{const lifecycle=createSeededLifecycle(NOW),restored=createSeededLifecycle(NOW);restored.importState(lifecycle.exportState());assert.equal(restored.users.length,lifecycle.users.length);assert.equal(restored.reviewItems.length,lifecycle.reviewItems.length)});
+});
