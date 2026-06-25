@@ -1,0 +1,66 @@
+services:
+  kafka:
+    image: redpandadata/redpanda:v24.1.7
+    command:
+      - redpanda
+      - start
+      - --overprovisioned
+      - --smp
+      - "1"
+      - --memory
+      - 512M
+      - --reserve-memory
+      - 0M
+      - --node-id
+      - "0"
+      - --check=false
+      - --kafka-addr
+      - PLAINTEXT://0.0.0.0:9092
+      - --advertise-kafka-addr
+      - PLAINTEXT://kafka:9092
+    ports:
+      - "9101:9092"
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: sleep
+      POSTGRES_PASSWORD: sleep
+      POSTGRES_DB: sleep
+    ports:
+      - "5444:5432"
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6391:6379"
+
+  api:
+    image: node:20-alpine
+    working_dir: /app
+    command: sh -c "npm install && npm run start"
+    environment:
+      PORT: 8193
+      HOST: 0.0.0.0
+      SLEEP_DATABASE_URL: postgres://sleep:sleep@postgres:5432/sleep
+      SLEEP_REDIS_URL: redis://redis:6379
+      SLEEP_KAFKA_BROKERS: kafka:9092
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8193:8193"
+    depends_on:
+      - kafka
+      - postgres
+      - redis
+
+  frontend:
+    image: node:20-alpine
+    working_dir: /app
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    volumes:
+      - ./frontend:/app
+    ports:
+      - "5193:5193"
+    depends_on:
+      - api
