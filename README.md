@@ -2,7 +2,7 @@
 
 Proof-of-concepts for distributed systems, infrastructure patterns, and product-style architectures. This repository is meant to read like a working systems portfolio, not just a list of folders.
 
-There are currently `110` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
+There are currently `111` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
 
 ## What Makes This Repo Useful
 
@@ -73,6 +73,7 @@ If a reviewer only opens a dozen projects, these are the best entry points.
 | [vehicle-maintenance-fuel-tracker-poc](vehicle-maintenance-fuel-tracker-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis vehicle care with ordered telemetry, fuel economy, service schedules, quarantine, retries, and audits. |
 | [home-network-health-monitor-poc](home-network-health-monitor-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis connectivity monitoring with event-time rollups, outage correlation, alert deduplication, retention, and retries. |
 | [personal-sleep-recovery-tracker-poc](personal-sleep-recovery-tracker-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis sleep recovery tracker with wearable event ingestion, session rebuilds, recovery scoring, alerts, retries, and audits. |
+| [home-air-quality-monitor-poc](home-air-quality-monitor-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis room-level air quality monitoring with sensor ingestion, rollups, stale detection, incident correlation, alerts, and retries. |
 
 ## Suggested Review Path
 
@@ -204,6 +205,7 @@ This path moves from core primitives to more layered systems.
 - [family-safety-checkin-poc](family-safety-checkin-poc/README.md)
 - [bar-menu-poc](bar-menu-poc/README.md)
 - [flight-tracking-poc](flight-tracking-poc/README.md)
+- [home-air-quality-monitor-poc](home-air-quality-monitor-poc/README.md)
 - [home-maintenance-reminder-poc](home-maintenance-reminder-poc/README.md)
 - [home-network-health-monitor-poc](home-network-health-monitor-poc/README.md)
 - [home-utility-usage-monitor-poc](home-utility-usage-monitor-poc/README.md)
@@ -238,8 +240,8 @@ For the strongest review signal, open files in this order:
 
 The repository direction is to make every project easy to scan in under two minutes and deep enough to discuss in an interview or portfolio review.
 
-- `110/110` POCs have a `README.md`
-- `110/110` POCs have a technical companion doc
-- `101/110` POCs have an `IMPROVEMENTS.md`
+- `111/111` POCs have a `README.md`
+- `111/111` POCs have a technical companion doc
+- `102/111` POCs have an `IMPROVEMENTS.md`
 
 Use [POC_STANDARDS.md](POC_STANDARDS.md) as the baseline for future additions and cleanup.
