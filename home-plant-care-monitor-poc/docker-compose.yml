@@ -1,0 +1,46 @@
+services:
+  kafka:
+    image: redpandadata/redpanda:v24.1.7
+    command: ["redpanda", "start", "--overprovisioned", "--smp", "1", "--memory", "512M", "--reserve-memory", "0M", "--node-id", "0", "--check=false", "--kafka-addr", "PLAINTEXT://0.0.0.0:9092", "--advertise-kafka-addr", "PLAINTEXT://kafka:9092"]
+    ports:
+      - "9106:9092"
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: plant
+      POSTGRES_PASSWORD: plant
+      POSTGRES_DB: plant
+    ports:
+      - "5449:5432"
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6396:6379"
+  api:
+    image: node:20-alpine
+    working_dir: /app
+    command: sh -c "npm install && npm run start"
+    environment:
+      PORT: 8198
+      HOST: 0.0.0.0
+      PLANT_DATABASE_URL: postgres://plant:plant@postgres:5432/plant
+      PLANT_REDIS_URL: redis://redis:6379
+      PLANT_KAFKA_BROKERS: kafka:9092
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8198:8198"
+    depends_on:
+      - kafka
+      - postgres
+      - redis
+  frontend:
+    image: node:20-alpine
+    working_dir: /app
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    volumes:
+      - ./frontend:/app
+    ports:
+      - "5198:5198"
+    depends_on:
+      - api
