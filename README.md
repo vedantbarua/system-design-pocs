@@ -212,6 +212,7 @@ This path moves from core primitives to more layered systems.
 - [bar-menu-poc](bar-menu-poc/README.md)
 - [flight-tracking-poc](flight-tracking-poc/README.md)
 - [home-air-quality-monitor-poc](home-air-quality-monitor-poc/README.md)
+- [household-laundry-coordinator-poc](household-laundry-coordinator-poc/README.md)
 - [home-maintenance-reminder-poc](home-maintenance-reminder-poc/README.md)
 - [home-warranty-receipt-vault-poc](home-warranty-receipt-vault-poc/README.md)
 - [household-mail-triage-poc](household-mail-triage-poc/README.md)
