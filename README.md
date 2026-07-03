@@ -2,7 +2,7 @@
 
 Proof-of-concepts for distributed systems, infrastructure patterns, and product-style architectures. This repository is meant to read like a working systems portfolio, not just a list of folders.
 
-There are currently `114` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
+There are currently `117` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
 
 ## What Makes This Repo Useful
 
@@ -76,7 +76,10 @@ If a reviewer only opens a dozen projects, these are the best entry points.
 | [home-air-quality-monitor-poc](home-air-quality-monitor-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis room-level air quality monitoring with sensor ingestion, rollups, stale detection, incident correlation, alerts, and retries. |
 | [pet-care-coordination-poc](pet-care-coordination-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis pet care coordination with caregiver events, missed-care detection, reminders, duplicate-log alerts, handoffs, and retries. |
 | [household-waste-pickup-coordinator-poc](household-waste-pickup-coordinator-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis waste pickup coordination with route events, holiday shifts, missed pickups, reminders, alert dedupe, and retries. |
-| [household-laundry-coordinator-poc](household-laundry-coordinator-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis laundry coordination with machine events, stale-load detection, reminders, duplicate-update alerts, handoffs, and retries. |
+| [home-plant-care-monitor-poc](home-plant-care-monitor-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis plant care monitoring with sensor events, watering schedules, stale sensor detection, reminders, alert dedupe, and retries. |
+| [personal-errand-route-planner-poc](personal-errand-route-planner-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis errand route planner with priority routing, location events, missed windows, stale route alerts, reminders, and retries. |
+| [household-mail-triage-poc](household-mail-triage-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis household mail triage with scanned mail events, duplicate notices, stale inbox detection, due-date alerts, reminders, and retries. |
+| [home-warranty-receipt-vault-poc](home-warranty-receipt-vault-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis warranty receipt vault with duplicate receipt detection, return deadlines, warranty alerts, claim workflows, reminders, and retries. |
 
 ## Suggested Review Path
 
@@ -211,8 +214,11 @@ This path moves from core primitives to more layered systems.
 - [home-air-quality-monitor-poc](home-air-quality-monitor-poc/README.md)
 - [household-laundry-coordinator-poc](household-laundry-coordinator-poc/README.md)
 - [home-maintenance-reminder-poc](home-maintenance-reminder-poc/README.md)
+- [home-warranty-receipt-vault-poc](home-warranty-receipt-vault-poc/README.md)
+- [household-mail-triage-poc](household-mail-triage-poc/README.md)
 - [household-waste-pickup-coordinator-poc](household-waste-pickup-coordinator-poc/README.md)
 - [home-network-health-monitor-poc](home-network-health-monitor-poc/README.md)
+- [home-plant-care-monitor-poc](home-plant-care-monitor-poc/README.md)
 - [home-utility-usage-monitor-poc](home-utility-usage-monitor-poc/README.md)
 - [household-chore-coordinator-poc](household-chore-coordinator-poc/README.md)
 - [leetcode-poc](leetcode-poc/README.md)
@@ -223,6 +229,7 @@ This path moves from core primitives to more layered systems.
 - [package-delivery-tracker-poc](package-delivery-tracker-poc/README.md)
 - [parking-meter-poc](parking-meter-poc/README.md)
 - [personal-document-renewal-vault-poc](personal-document-renewal-vault-poc/README.md)
+- [personal-errand-route-planner-poc](personal-errand-route-planner-poc/README.md)
 - [personal-sleep-recovery-tracker-poc](personal-sleep-recovery-tracker-poc/README.md)
 - [pet-care-coordination-poc](pet-care-coordination-poc/README.md)
 - [smart-home-automation-rules-poc](smart-home-automation-rules-poc/README.md)
@@ -246,8 +253,8 @@ For the strongest review signal, open files in this order:
 
 The repository direction is to make every project easy to scan in under two minutes and deep enough to discuss in an interview or portfolio review.
 
-- `114/114` POCs have a `README.md`
-- `114/114` POCs have a technical companion doc
-- `105/114` POCs have an `IMPROVEMENTS.md`
+- `117/117` POCs have a `README.md`
+- `117/117` POCs have a technical companion doc
+- `108/117` POCs have an `IMPROVEMENTS.md`
 
 Use [POC_STANDARDS.md](POC_STANDARDS.md) as the baseline for future additions and cleanup.
