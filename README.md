@@ -2,7 +2,7 @@
 
 Proof-of-concepts for distributed systems, infrastructure patterns, and product-style architectures. This repository is meant to read like a working systems portfolio, not just a list of folders.
 
-There are currently `117` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
+There are currently `118` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
 
 ## What Makes This Repo Useful
 
@@ -80,6 +80,7 @@ If a reviewer only opens a dozen projects, these are the best entry points.
 | [personal-errand-route-planner-poc](personal-errand-route-planner-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis errand route planner with priority routing, location events, missed windows, stale route alerts, reminders, and retries. |
 | [household-mail-triage-poc](household-mail-triage-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis household mail triage with scanned mail events, duplicate notices, stale inbox detection, due-date alerts, reminders, and retries. |
 | [home-warranty-receipt-vault-poc](home-warranty-receipt-vault-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis warranty receipt vault with duplicate receipt detection, return deadlines, warranty alerts, claim workflows, reminders, and retries. |
+| [personal-travel-itinerary-poc](personal-travel-itinerary-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis travel itinerary planner with booking updates, conflict detection, check-in windows, document deadlines, reminders, and retries. |
 
 ## Suggested Review Path
 
@@ -230,6 +231,7 @@ This path moves from core primitives to more layered systems.
 - [parking-meter-poc](parking-meter-poc/README.md)
 - [personal-document-renewal-vault-poc](personal-document-renewal-vault-poc/README.md)
 - [personal-errand-route-planner-poc](personal-errand-route-planner-poc/README.md)
+- [personal-travel-itinerary-poc](personal-travel-itinerary-poc/README.md)
 - [personal-sleep-recovery-tracker-poc](personal-sleep-recovery-tracker-poc/README.md)
 - [pet-care-coordination-poc](pet-care-coordination-poc/README.md)
 - [smart-home-automation-rules-poc](smart-home-automation-rules-poc/README.md)
@@ -253,8 +255,8 @@ For the strongest review signal, open files in this order:
 
 The repository direction is to make every project easy to scan in under two minutes and deep enough to discuss in an interview or portfolio review.
 
-- `117/117` POCs have a `README.md`
-- `117/117` POCs have a technical companion doc
-- `108/117` POCs have an `IMPROVEMENTS.md`
+- `118/118` POCs have a `README.md`
+- `118/118` POCs have a technical companion doc
+- `109/118` POCs have an `IMPROVEMENTS.md`
 
 Use [POC_STANDARDS.md](POC_STANDARDS.md) as the baseline for future additions and cleanup.
