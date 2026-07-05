@@ -2,7 +2,7 @@
 
 Proof-of-concepts for distributed systems, infrastructure patterns, and product-style architectures. This repository is meant to read like a working systems portfolio, not just a list of folders.
 
-There are currently `118` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
+There are currently `119` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
 
 ## What Makes This Repo Useful
 
@@ -81,6 +81,7 @@ If a reviewer only opens a dozen projects, these are the best entry points.
 | [household-mail-triage-poc](household-mail-triage-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis household mail triage with scanned mail events, duplicate notices, stale inbox detection, due-date alerts, reminders, and retries. |
 | [home-warranty-receipt-vault-poc](home-warranty-receipt-vault-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis warranty receipt vault with duplicate receipt detection, return deadlines, warranty alerts, claim workflows, reminders, and retries. |
 | [personal-travel-itinerary-poc](personal-travel-itinerary-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis travel itinerary planner with booking updates, conflict detection, check-in windows, document deadlines, reminders, and retries. |
+| [family-school-activity-coordinator-poc](family-school-activity-coordinator-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis school activity coordinator with assignments, forms, pickup changes, child conflicts, reminders, and retries. |
 
 ## Suggested Review Path
 
@@ -210,6 +211,7 @@ This path moves from core primitives to more layered systems.
 
 - [facebook-news-feed-poc](facebook-news-feed-poc/README.md)
 - [family-safety-checkin-poc](family-safety-checkin-poc/README.md)
+- [family-school-activity-coordinator-poc](family-school-activity-coordinator-poc/README.md)
 - [bar-menu-poc](bar-menu-poc/README.md)
 - [flight-tracking-poc](flight-tracking-poc/README.md)
 - [home-air-quality-monitor-poc](home-air-quality-monitor-poc/README.md)
@@ -255,8 +257,8 @@ For the strongest review signal, open files in this order:
 
 The repository direction is to make every project easy to scan in under two minutes and deep enough to discuss in an interview or portfolio review.
 
-- `118/118` POCs have a `README.md`
-- `118/118` POCs have a technical companion doc
-- `109/118` POCs have an `IMPROVEMENTS.md`
+- `119/119` POCs have a `README.md`
+- `119/119` POCs have a technical companion doc
+- `110/119` POCs have an `IMPROVEMENTS.md`
 
 Use [POC_STANDARDS.md](POC_STANDARDS.md) as the baseline for future additions and cleanup.
