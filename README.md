@@ -2,7 +2,7 @@
 
 Proof-of-concepts for distributed systems, infrastructure patterns, and product-style architectures. This repository is meant to read like a working systems portfolio, not just a list of folders.
 
-There are currently `122` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
+There are currently `123` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
 
 ## What Makes This Repo Useful
 
@@ -85,6 +85,7 @@ If a reviewer only opens a dozen projects, these are the best entry points.
 | [home-insurance-claim-tracker-poc](home-insurance-claim-tracker-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis home insurance claim tracker with provider updates, evidence dedupe, deadlines, stale claim alerts, payments, reminders, and retries. |
 | [personal-bill-payment-coordinator-poc](personal-bill-payment-coordinator-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis bill payment coordinator with statements, autopay failures, duplicate bills, due reminders, confirmations, and retries. |
 | [personal-routine-habit-coordinator-poc](personal-routine-habit-coordinator-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis routine habit coordinator with check-ins, skips, streaks, missed windows, overload alerts, reminders, and retries. |
+| [household-emergency-readiness-poc](household-emergency-readiness-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis emergency readiness tracker with supplies, contacts, documents, incident mode, expiry alerts, reminders, and retries. |
 
 ## Suggested Review Path
 
@@ -219,6 +220,7 @@ This path moves from core primitives to more layered systems.
 - [flight-tracking-poc](flight-tracking-poc/README.md)
 - [home-air-quality-monitor-poc](home-air-quality-monitor-poc/README.md)
 - [home-insurance-claim-tracker-poc](home-insurance-claim-tracker-poc/README.md)
+- [household-emergency-readiness-poc](household-emergency-readiness-poc/README.md)
 - [household-laundry-coordinator-poc](household-laundry-coordinator-poc/README.md)
 - [home-maintenance-reminder-poc](home-maintenance-reminder-poc/README.md)
 - [home-warranty-receipt-vault-poc](home-warranty-receipt-vault-poc/README.md)
@@ -263,8 +265,8 @@ For the strongest review signal, open files in this order:
 
 The repository direction is to make every project easy to scan in under two minutes and deep enough to discuss in an interview or portfolio review.
 
-- `122/122` POCs have a `README.md`
-- `122/122` POCs have a technical companion doc
-- `113/122` POCs have an `IMPROVEMENTS.md`
+- `123/123` POCs have a `README.md`
+- `123/123` POCs have a technical companion doc
+- `114/123` POCs have an `IMPROVEMENTS.md`
 
 Use [POC_STANDARDS.md](POC_STANDARDS.md) as the baseline for future additions and cleanup.
