@@ -2,7 +2,7 @@
 
 Proof-of-concepts for distributed systems, infrastructure patterns, and product-style architectures. This repository is meant to read like a working systems portfolio, not just a list of folders.
 
-There are currently `126` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
+There are currently `127` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
 
 ## What Makes This Repo Useful
 
@@ -89,6 +89,7 @@ If a reviewer only opens a dozen projects, these are the best entry points.
 | [elder-care-coordination-poc](elder-care-coordination-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis elder care coordinator with caregiver tasks, missed-care detection, duplicate care logs, handoffs, reminders, and retries. |
 | [local-community-resource-finder-poc](local-community-resource-finder-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis community resource finder with provider updates, search caching, saved-resource alerts, capacity changes, stale listing scans, and retries. |
 | [personal-tax-document-organizer-poc](personal-tax-document-organizer-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis tax document organizer with checklist projections, duplicate form detection, missing-document alerts, classification jobs, and audits. |
+| [rental-lease-tenant-tracker-poc](rental-lease-tenant-tracker-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis rental lease tracker with rent deadlines, deposit tracking, repair workflows, duplicate notices, move-out alerts, and audits. |
 
 ## Suggested Review Path
 
@@ -250,6 +251,7 @@ This path moves from core primitives to more layered systems.
 - [personal-travel-itinerary-poc](personal-travel-itinerary-poc/README.md)
 - [personal-sleep-recovery-tracker-poc](personal-sleep-recovery-tracker-poc/README.md)
 - [pet-care-coordination-poc](pet-care-coordination-poc/README.md)
+- [rental-lease-tenant-tracker-poc](rental-lease-tenant-tracker-poc/README.md)
 - [smart-home-automation-rules-poc](smart-home-automation-rules-poc/README.md)
 - [smart-pantry-inventory-poc](smart-pantry-inventory-poc/README.md)
 - [strava-poc](strava-poc/README.md)
@@ -271,8 +273,8 @@ For the strongest review signal, open files in this order:
 
 The repository direction is to make every project easy to scan in under two minutes and deep enough to discuss in an interview or portfolio review.
 
-- `126/126` POCs have a `README.md`
-- `126/126` POCs have a technical companion doc
-- `117/126` POCs have an `IMPROVEMENTS.md`
+- `127/127` POCs have a `README.md`
+- `127/127` POCs have a technical companion doc
+- `118/127` POCs have an `IMPROVEMENTS.md`
 
 Use [POC_STANDARDS.md](POC_STANDARDS.md) as the baseline for future additions and cleanup.
