@@ -2,7 +2,7 @@
 
 Proof-of-concepts for distributed systems, infrastructure patterns, and product-style architectures. This repository is meant to read like a working systems portfolio, not just a list of folders.
 
-There are currently `127` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
+There are currently `128` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
 
 ## What Makes This Repo Useful
 
@@ -90,6 +90,7 @@ If a reviewer only opens a dozen projects, these are the best entry points.
 | [local-community-resource-finder-poc](local-community-resource-finder-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis community resource finder with provider updates, search caching, saved-resource alerts, capacity changes, stale listing scans, and retries. |
 | [personal-tax-document-organizer-poc](personal-tax-document-organizer-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis tax document organizer with checklist projections, duplicate form detection, missing-document alerts, classification jobs, and audits. |
 | [rental-lease-tenant-tracker-poc](rental-lease-tenant-tracker-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis rental lease tracker with rent deadlines, deposit tracking, repair workflows, duplicate notices, move-out alerts, and audits. |
+| [job-application-interview-tracker-poc](job-application-interview-tracker-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis job application tracker with interviews, offers, follow-up reminders, duplicate postings, stale scans, and audits. |
 
 ## Suggested Review Path
 
@@ -236,6 +237,7 @@ This path moves from core primitives to more layered systems.
 - [home-plant-care-monitor-poc](home-plant-care-monitor-poc/README.md)
 - [home-utility-usage-monitor-poc](home-utility-usage-monitor-poc/README.md)
 - [household-chore-coordinator-poc](household-chore-coordinator-poc/README.md)
+- [job-application-interview-tracker-poc](job-application-interview-tracker-poc/README.md)
 - [leetcode-poc](leetcode-poc/README.md)
 - [medium-poc](medium-poc/README.md)
 - [medication-refill-adherence-poc](medication-refill-adherence-poc/README.md)
@@ -273,8 +275,8 @@ For the strongest review signal, open files in this order:
 
 The repository direction is to make every project easy to scan in under two minutes and deep enough to discuss in an interview or portfolio review.
 
-- `127/127` POCs have a `README.md`
-- `127/127` POCs have a technical companion doc
-- `118/127` POCs have an `IMPROVEMENTS.md`
+- `128/128` POCs have a `README.md`
+- `128/128` POCs have a technical companion doc
+- `119/128` POCs have an `IMPROVEMENTS.md`
 
 Use [POC_STANDARDS.md](POC_STANDARDS.md) as the baseline for future additions and cleanup.
