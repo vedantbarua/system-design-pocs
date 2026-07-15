@@ -2,7 +2,7 @@
 
 Proof-of-concepts for distributed systems, infrastructure patterns, and product-style architectures. This repository is meant to read like a working systems portfolio, not just a list of folders.
 
-There are currently `128` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
+There are currently `129` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
 
 ## What Makes This Repo Useful
 
@@ -91,6 +91,7 @@ If a reviewer only opens a dozen projects, these are the best entry points.
 | [personal-tax-document-organizer-poc](personal-tax-document-organizer-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis tax document organizer with checklist projections, duplicate form detection, missing-document alerts, classification jobs, and audits. |
 | [rental-lease-tenant-tracker-poc](rental-lease-tenant-tracker-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis rental lease tracker with rent deadlines, deposit tracking, repair workflows, duplicate notices, move-out alerts, and audits. |
 | [job-application-interview-tracker-poc](job-application-interview-tracker-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis job application tracker with interviews, offers, follow-up reminders, duplicate postings, stale scans, and audits. |
+| [personal-moving-coordinator-poc](personal-moving-coordinator-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis moving coordinator with timelines, packing inventory, address changes, movers, deadline scans, reminders, and audits. |
 
 ## Suggested Review Path
 
@@ -248,6 +249,7 @@ This path moves from core primitives to more layered systems.
 - [personal-bill-payment-coordinator-poc](personal-bill-payment-coordinator-poc/README.md)
 - [personal-document-renewal-vault-poc](personal-document-renewal-vault-poc/README.md)
 - [personal-errand-route-planner-poc](personal-errand-route-planner-poc/README.md)
+- [personal-moving-coordinator-poc](personal-moving-coordinator-poc/README.md)
 - [personal-routine-habit-coordinator-poc](personal-routine-habit-coordinator-poc/README.md)
 - [personal-tax-document-organizer-poc](personal-tax-document-organizer-poc/README.md)
 - [personal-travel-itinerary-poc](personal-travel-itinerary-poc/README.md)
@@ -275,8 +277,8 @@ For the strongest review signal, open files in this order:
 
 The repository direction is to make every project easy to scan in under two minutes and deep enough to discuss in an interview or portfolio review.
 
-- `128/128` POCs have a `README.md`
-- `128/128` POCs have a technical companion doc
-- `119/128` POCs have an `IMPROVEMENTS.md`
+- `129/129` POCs have a `README.md`
+- `129/129` POCs have a technical companion doc
+- `120/129` POCs have an `IMPROVEMENTS.md`
 
 Use [POC_STANDARDS.md](POC_STANDARDS.md) as the baseline for future additions and cleanup.
