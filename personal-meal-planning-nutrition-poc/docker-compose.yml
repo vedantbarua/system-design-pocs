@@ -1,0 +1,66 @@
+services:
+  kafka:
+    image: redpandadata/redpanda:v24.1.7
+    command:
+      - redpanda
+      - start
+      - --overprovisioned
+      - --smp
+      - "1"
+      - --memory
+      - 512M
+      - --reserve-memory
+      - 0M
+      - --node-id
+      - "0"
+      - --check=false
+      - --kafka-addr
+      - PLAINTEXT://0.0.0.0:9092
+      - --advertise-kafka-addr
+      - PLAINTEXT://kafka:9092
+    ports:
+      - "9122:9092"
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: meals
+      POSTGRES_PASSWORD: meals
+      POSTGRES_DB: meals
+    ports:
+      - "5465:5432"
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6412:6379"
+
+  api:
+    image: node:20-alpine
+    working_dir: /app
+    command: sh -c "npm install && npm run start"
+    environment:
+      PORT: 8340
+      HOST: 0.0.0.0
+      MEAL_DATABASE_URL: postgres://meals:meals@postgres:5432/meals
+      MEAL_REDIS_URL: redis://redis:6379
+      MEAL_KAFKA_BROKERS: kafka:9092
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8340:8340"
+    depends_on:
+      - kafka
+      - postgres
+      - redis
+
+  frontend:
+    image: node:20-alpine
+    working_dir: /app
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    volumes:
+      - ./frontend:/app
+    ports:
+      - "5340:5340"
+    depends_on:
+      - api
