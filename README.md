@@ -2,7 +2,7 @@
 
 Proof-of-concepts for distributed systems, infrastructure patterns, and product-style architectures. This repository is meant to read like a working systems portfolio, not just a list of folders.
 
-There are currently `130` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
+There are currently `131` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
 
 ## What Makes This Repo Useful
 
@@ -93,6 +93,7 @@ If a reviewer only opens a dozen projects, these are the best entry points.
 | [job-application-interview-tracker-poc](job-application-interview-tracker-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis job application tracker with interviews, offers, follow-up reminders, duplicate postings, stale scans, and audits. |
 | [personal-moving-coordinator-poc](personal-moving-coordinator-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis moving coordinator with timelines, packing inventory, address changes, movers, deadline scans, reminders, and audits. |
 | [personal-meal-planning-nutrition-poc](personal-meal-planning-nutrition-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis meal planning tracker with weekly plans, nutrition scans, pantry-aware groceries, expiring ingredient alerts, duplicate grocery detection, and retries. |
+| [personal-home-inventory-insurance-poc](personal-home-inventory-insurance-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis home inventory tracker with proof-of-ownership records, policy coverage scans, duplicate detection, insurance-ready exports, and retries. |
 
 ## Suggested Review Path
 
@@ -250,6 +251,7 @@ This path moves from core primitives to more layered systems.
 - [personal-bill-payment-coordinator-poc](personal-bill-payment-coordinator-poc/README.md)
 - [personal-document-renewal-vault-poc](personal-document-renewal-vault-poc/README.md)
 - [personal-errand-route-planner-poc](personal-errand-route-planner-poc/README.md)
+- [personal-home-inventory-insurance-poc](personal-home-inventory-insurance-poc/README.md)
 - [personal-meal-planning-nutrition-poc](personal-meal-planning-nutrition-poc/README.md)
 - [personal-moving-coordinator-poc](personal-moving-coordinator-poc/README.md)
 - [personal-routine-habit-coordinator-poc](personal-routine-habit-coordinator-poc/README.md)
@@ -279,8 +281,8 @@ For the strongest review signal, open files in this order:
 
 The repository direction is to make every project easy to scan in under two minutes and deep enough to discuss in an interview or portfolio review.
 
-- `130/130` POCs have a `README.md`
-- `130/130` POCs have a technical companion doc
-- `121/130` POCs have an `IMPROVEMENTS.md`
+- `131/131` POCs have a `README.md`
+- `131/131` POCs have a technical companion doc
+- `122/131` POCs have an `IMPROVEMENTS.md`
 
 Use [POC_STANDARDS.md](POC_STANDARDS.md) as the baseline for future additions and cleanup.
