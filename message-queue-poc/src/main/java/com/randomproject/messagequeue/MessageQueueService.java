@@ -137,9 +137,7 @@ public class MessageQueueService {
             boolean redelivery = cursor.inflight != null;
             int attempt = redelivery ? cursor.inflight.deliveryAttempt : 1;
             if (!redelivery) {
-                cursor.inflight = new InflightDelivery(record.offset, 1, now(), null);
-            } else {
-                cursor.inflight.leasedAtMillis = now();
+                cursor.inflight = new InflightDelivery(record.offset, 1);
             }
             deliveries.add(toPolledMessageView(topicState.name, groupState.groupId, partition.partition, record, attempt, redelivery));
         }
@@ -195,8 +193,6 @@ public class MessageQueueService {
             return new RetryResult(topicState.name, groupState.groupId, partitionState.partition, inflight.offset, inflight.deliveryAttempt, true, normalizedReason);
         }
         inflight.deliveryAttempt = nextAttempt;
-        inflight.lastError = normalizedReason;
-        inflight.leasedAtMillis = now();
         addEvent(
                 "retry",
                 "Scheduled redelivery for " + topicState.name + "[p" + partitionState.partition + "] offset " + inflight.offset + " attempt " + nextAttempt + ".");
@@ -502,14 +498,10 @@ public class MessageQueueService {
     private static final class InflightDelivery {
         private final long offset;
         private int deliveryAttempt;
-        private long leasedAtMillis;
-        private String lastError;
 
-        private InflightDelivery(long offset, int deliveryAttempt, long leasedAtMillis, String lastError) {
+        private InflightDelivery(long offset, int deliveryAttempt) {
             this.offset = offset;
             this.deliveryAttempt = deliveryAttempt;
-            this.leasedAtMillis = leasedAtMillis;
-            this.lastError = lastError;
         }
     }
 
