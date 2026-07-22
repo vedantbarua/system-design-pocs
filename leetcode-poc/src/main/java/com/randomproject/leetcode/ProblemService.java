@@ -105,7 +105,7 @@ public class ProblemService {
                 "sliding window, hash set", LocalDate.now().minusDays(6));
         seedAttempt(longestSubstring, AttemptOutcome.TLE, 125, 58, 45, "Python", "Need optimized window", LocalDate.now().minusDays(5));
 
-        Problem mergeIntervals = seedProblem("Merge Intervals", Difficulty.MEDIUM, ProblemStatus.TODO,
+        seedProblem("Merge Intervals", Difficulty.MEDIUM, ProblemStatus.TODO,
                 "https://leetcode.com/problems/merge-intervals/", "sorting, intervals", LocalDate.now().minusDays(3));
 
         Problem wordBreak = seedProblem("Word Break", Difficulty.HARD, ProblemStatus.IN_PROGRESS,
