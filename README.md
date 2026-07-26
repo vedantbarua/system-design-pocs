@@ -2,7 +2,7 @@
 
 Proof-of-concepts for distributed systems, infrastructure patterns, and product-style architectures. This repository is meant to read like a working systems portfolio, not just a list of folders.
 
-There are currently `132` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
+There are currently `133` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
 
 ## What Makes This Repo Useful
 
@@ -95,6 +95,7 @@ If a reviewer only opens a dozen projects, these are the best entry points.
 | [personal-meal-planning-nutrition-poc](personal-meal-planning-nutrition-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis meal planning tracker with weekly plans, nutrition scans, pantry-aware groceries, expiring ingredient alerts, duplicate grocery detection, and retries. |
 | [personal-home-inventory-insurance-poc](personal-home-inventory-insurance-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis home inventory tracker with proof-of-ownership records, policy coverage scans, duplicate detection, insurance-ready exports, and retries. |
 | [personal-account-security-checkup-poc](personal-account-security-checkup-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis account security dashboard with MFA/recovery checks, breach events, risk scoring, duplicate detection, recovery checklist exports, and retries. |
+| [personal-transaction-fraud-watch-poc](personal-transaction-fraud-watch-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis transaction fraud watch with risk scoring, velocity windows, duplicate charge detection, location anomalies, disputes, card freezes, and retries. |
 
 ## Suggested Review Path
 
@@ -258,6 +259,7 @@ This path moves from core primitives to more layered systems.
 - [personal-moving-coordinator-poc](personal-moving-coordinator-poc/README.md)
 - [personal-routine-habit-coordinator-poc](personal-routine-habit-coordinator-poc/README.md)
 - [personal-tax-document-organizer-poc](personal-tax-document-organizer-poc/README.md)
+- [personal-transaction-fraud-watch-poc](personal-transaction-fraud-watch-poc/README.md)
 - [personal-travel-itinerary-poc](personal-travel-itinerary-poc/README.md)
 - [personal-sleep-recovery-tracker-poc](personal-sleep-recovery-tracker-poc/README.md)
 - [pet-care-coordination-poc](pet-care-coordination-poc/README.md)
@@ -283,8 +285,8 @@ For the strongest review signal, open files in this order:
 
 The repository direction is to make every project easy to scan in under two minutes and deep enough to discuss in an interview or portfolio review.
 
-- `132/132` POCs have a `README.md`
-- `132/132` POCs have a technical companion doc
-- `123/132` POCs have an `IMPROVEMENTS.md`
+- `133/133` POCs have a `README.md`
+- `133/133` POCs have a technical companion doc
+- `124/133` POCs have an `IMPROVEMENTS.md`
 
 Use [POC_STANDARDS.md](POC_STANDARDS.md) as the baseline for future additions and cleanup.
