@@ -1,128 +1,133 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { addMinutes, createSeededFraudWatch, fraudEventKey, transactionFingerprint } from "../src/core.js";
+import { addMinutes, createSeededGroceryCompare, groceryFingerprint, priceEventKey } from "../src/core.js";
 
 const NOW = new Date("2026-07-09T15:00:00Z");
 
-describe("TransactionFraudWatch", () => {
-  it("seeds cards, transactions, alerts, and metrics", () => {
-    const watch = createSeededFraudWatch(NOW);
-    assert.equal(watch.cards.length, 2);
-    assert.equal(watch.transactions.length, 5);
-    assert.ok(watch.alerts.length > 0);
-    assert.ok(watch.snapshot().metrics.highRisk > 0);
+describe("GroceryPriceCompare", () => {
+  it("seeds items, stores, prices, recommendations, and alerts", () => {
+    const compare = createSeededGroceryCompare(NOW);
+    assert.equal(compare.items.length, 5);
+    assert.equal(compare.stores.length, 3);
+    assert.ok(compare.prices.length > 0);
+    assert.equal(compare.recommendations.length, 2);
+    assert.ok(compare.alerts.length > 0);
   });
 
-  it("uses stable event keys and transaction fingerprints", () => {
-    assert.equal(fraudEventKey({ transactionId: "tx-1", eventId: "abc" }), "tx-1:abc");
-    const fingerprint = transactionFingerprint({ cardId: "card-1", merchant: " Big  Shop ", amount: 12.5, currency: "USD", occurredAt: NOW.toISOString() });
-    assert.equal(fingerprint, "card-1:big shop:12.50:USD:2026-07-09T15:00");
+  it("uses stable event keys and grocery fingerprints", () => {
+    assert.equal(priceEventKey({ itemId: "item-1", eventId: "abc" }), "item-1:abc");
+    assert.equal(groceryFingerprint({ name: " Milk  ", preferredBrand: " Any ", unit: "Gallon" }), "milk:any:gallon");
   });
 
-  it("deduplicates transaction events", () => {
-    const watch = createSeededFraudWatch(NOW);
-    const input = { eventId: "dup", transactionId: "tx-grocery", type: "TRANSACTION_SETTLED" as const, occurredAt: NOW.toISOString() };
-    assert.equal(watch.ingest(input).duplicate, false);
-    assert.equal(watch.ingest(input).duplicate, true);
+  it("deduplicates price events", () => {
+    const compare = createSeededGroceryCompare(NOW);
+    const input = { eventId: "dup", itemId: "item-milk", type: "ITEM_UPDATED" as const, occurredAt: NOW.toISOString() };
+    assert.equal(compare.ingest(input).duplicate, false);
+    assert.equal(compare.ingest(input).duplicate, true);
   });
 
-  it("authorizes new transactions", () => {
-    const watch = createSeededFraudWatch(NOW);
-    watch.ingest({ eventId: "auth", transactionId: "tx-shoes", type: "TRANSACTION_AUTHORIZED", cardId: "card-primary", merchant: "Shoe Store", category: "OTHER", amount: 120, currency: "USD", city: "Chicago", country: "US", occurredAt: NOW.toISOString() });
-    assert.equal(watch.transactionById("tx-shoes").merchant, "Shoe Store");
+  it("adds new grocery items", () => {
+    const compare = createSeededGroceryCompare(NOW);
+    compare.ingest({ eventId: "add", itemId: "item-bananas", type: "ITEM_ADDED", name: "Bananas", category: "PRODUCE", quantity: 2, unit: "lb", preferredBrand: "Any", maxPrice: 3, occurredAt: NOW.toISOString() });
+    assert.equal(compare.itemById("item-bananas").name, "Bananas");
   });
 
-  it("ignores stale transaction updates", () => {
-    const watch = createSeededFraudWatch(NOW);
-    const before = watch.transactionById("tx-laptop").merchant;
-    const result = watch.ingest({ eventId: "old", transactionId: "tx-laptop", type: "TRANSACTION_AUTHORIZED", merchant: "Old Merchant", occurredAt: addMinutes(-90, NOW) });
+  it("ignores stale item updates", () => {
+    const compare = createSeededGroceryCompare(NOW);
+    const before = compare.itemById("item-eggs").quantity;
+    const result = compare.ingest({ eventId: "old", itemId: "item-eggs", type: "ITEM_UPDATED", quantity: 9, occurredAt: addMinutes(-120, NOW) });
     assert.equal(result.stale, true);
-    assert.equal(watch.transactionById("tx-laptop").merchant, before);
+    assert.equal(compare.itemById("item-eggs").quantity, before);
   });
 
-  it("detects large and high-risk category transactions", () => {
-    const watch = createSeededFraudWatch(NOW);
-    const tx = watch.transactionById("tx-laptop");
-    assert.ok(tx.riskScore >= 50);
-    assert.ok(watch.alerts.some((alert) => alert.kind === "LARGE_TRANSACTION"));
-    assert.ok(watch.alerts.some((alert) => alert.kind === "MERCHANT_ANOMALY"));
+  it("updates store prices and detects drops", () => {
+    const compare = createSeededGroceryCompare(NOW);
+    compare.ingest({ eventId: "price", itemId: "item-chicken", type: "PRICE_UPDATED", storeId: "store-market", brand: "Store brand", price: 4.99, unit: "lb", available: true, occurredAt: NOW.toISOString() });
+    const price = compare.prices.find((candidate) => candidate.itemId === "item-chicken" && candidate.storeId === "store-market");
+    assert.equal(price?.price, 4.99);
+    assert.ok(compare.alerts.some((alert) => alert.kind === "PRICE_DROP"));
   });
 
-  it("detects location anomalies", () => {
-    const watch = createSeededFraudWatch(NOW);
-    assert.ok(watch.transactionById("tx-paris").riskReasons.includes("foreign location"));
-    assert.ok(watch.alerts.some((alert) => alert.kind === "LOCATION_ANOMALY"));
-  });
-
-  it("detects duplicate transactions", () => {
-    const watch = createSeededFraudWatch(NOW);
-    const occurredAt = addMinutes(1, NOW);
-    watch.ingest({ eventId: "one", transactionId: "tx-dupe-1", type: "TRANSACTION_AUTHORIZED", cardId: "card-primary", merchant: "Corner Shop", category: "GROCERY", amount: 42.1, currency: "USD", city: "Chicago", country: "US", occurredAt });
-    watch.ingest({ eventId: "two", transactionId: "tx-dupe-2", type: "TRANSACTION_AUTHORIZED", cardId: "card-primary", merchant: "Corner  Shop", category: "GROCERY", amount: 42.1, currency: "USD", city: "Chicago", country: "US", occurredAt: addMinutes(0.2, occurredAt) });
-    assert.ok(watch.alerts.some((alert) => alert.kind === "DUPLICATE_TRANSACTION"));
-  });
-
-  it("detects velocity spikes", () => {
-    const watch = createSeededFraudWatch(NOW);
-    for (let index = 0; index < 3; index += 1) {
-      watch.ingest({ eventId: `vel-${index}`, transactionId: `tx-vel-${index}`, type: "TRANSACTION_AUTHORIZED", cardId: "card-travel", merchant: `Kiosk ${index}`, category: "DINING", amount: 12 + index, currency: "USD", city: "Milwaukee", country: "US", occurredAt: addMinutes(index, NOW) });
+  it("updates availability and flags unavailable items", () => {
+    const compare = createSeededGroceryCompare(NOW);
+    for (const store of compare.stores) {
+      compare.ingest({ eventId: `unavailable-${store.id}`, itemId: "item-milk", type: "AVAILABILITY_UPDATED", storeId: store.id, brand: "Any", price: 4.29, unit: "gallon", available: false, occurredAt: NOW.toISOString() });
     }
-    assert.ok(watch.alerts.some((alert) => alert.kind === "VELOCITY_SPIKE"));
+    assert.equal(compare.itemById("item-milk").status, "UNAVAILABLE");
+    assert.ok(compare.alerts.some((alert) => alert.kind === "UNAVAILABLE"));
   });
 
-  it("marks transactions safe", () => {
-    const watch = createSeededFraudWatch(NOW);
-    watch.ingest({ eventId: "safe", transactionId: "tx-paris", type: "TRANSACTION_MARKED_SAFE", occurredAt: NOW.toISOString() });
-    const tx = watch.transactionById("tx-paris");
-    assert.equal(tx.status, "SAFE");
-    assert.equal(tx.riskScore, 0);
+  it("detects duplicate grocery items", () => {
+    const compare = createSeededGroceryCompare(NOW);
+    compare.ingest({ eventId: "dupe", itemId: "item-milk-copy", type: "ITEM_ADDED", name: " milk ", category: "DAIRY", quantity: 1, unit: "gallon", preferredBrand: "any", maxPrice: 4.5, occurredAt: NOW.toISOString() });
+    assert.equal(compare.itemById("item-milk-copy").status, "DUPLICATE");
+    assert.ok(compare.alerts.some((alert) => alert.kind === "DUPLICATE_ITEM"));
   });
 
-  it("opens disputes", () => {
-    const watch = createSeededFraudWatch(NOW);
-    watch.ingest({ eventId: "dispute", transactionId: "tx-laptop", type: "DISPUTE_OPENED", occurredAt: NOW.toISOString() });
-    assert.equal(watch.transactionById("tx-laptop").status, "DISPUTED");
-    assert.ok(watch.alerts.some((alert) => alert.kind === "DISPUTE_OPEN"));
+  it("tracks substitutions", () => {
+    const compare = createSeededGroceryCompare(NOW);
+    compare.ingest({ eventId: "sub", itemId: "item-apples", type: "SUBSTITUTION_FOUND", substituteItemId: "item-pears", notes: "Pears are cheaper today.", occurredAt: NOW.toISOString() });
+    assert.equal(compare.itemById("item-apples").status, "SUBSTITUTED");
+    assert.ok(compare.alerts.some((alert) => alert.kind === "SUBSTITUTION"));
   });
 
-  it("freezes and unfreezes cards", () => {
-    const watch = createSeededFraudWatch(NOW);
-    watch.ingest({ eventId: "freeze", transactionId: "tx-paris", type: "CARD_FROZEN", cardId: "card-primary", occurredAt: NOW.toISOString() });
-    assert.equal(watch.cardById("card-primary").frozen, true);
-    assert.ok(watch.alerts.some((alert) => alert.kind === "CARD_FROZEN"));
-    watch.ingest({ eventId: "unfreeze", transactionId: "tx-paris", type: "CARD_UNFROZEN", cardId: "card-primary", occurredAt: addMinutes(1, NOW) });
-    assert.equal(watch.cardById("card-primary").frozen, false);
+  it("marks items bought", () => {
+    const compare = createSeededGroceryCompare(NOW);
+    compare.ingest({ eventId: "bought", itemId: "item-eggs", type: "ITEM_BOUGHT", occurredAt: NOW.toISOString() });
+    assert.equal(compare.itemById("item-eggs").status, "BOUGHT");
+  });
+
+  it("builds split-store recommendations with savings", () => {
+    const compare = createSeededGroceryCompare(NOW);
+    const split = compare.recommendations.find((rec) => rec.kind === "SPLIT_STORE");
+    const single = compare.recommendations.find((rec) => rec.kind === "SINGLE_STORE");
+    assert.ok(split);
+    assert.ok(single);
+    assert.ok(split!.total <= single!.total);
+  });
+
+  it("selects a preferred store", () => {
+    const compare = createSeededGroceryCompare(NOW);
+    compare.ingest({ eventId: "select", itemId: "item-milk", type: "STORE_SELECTED", storeId: "store-value", occurredAt: NOW.toISOString() });
+    assert.equal(compare.selectedStoreId, "store-value");
+    assert.ok(compare.alerts.some((alert) => alert.kind === "BEST_STORE_CHANGED"));
+  });
+
+  it("simulates price refresh jobs", () => {
+    const compare = createSeededGroceryCompare(NOW);
+    compare.simulatePriceRefresh();
+    assert.ok(compare.alerts.some((alert) => alert.kind === "PRICE_DROP"));
   });
 
   it("dispatches alerts", () => {
-    const watch = createSeededFraudWatch(NOW);
-    assert.ok(watch.dispatchAlerts() > 0);
-    assert.ok(watch.alerts.every((alert) => alert.status === "SENT"));
+    const compare = createSeededGroceryCompare(NOW);
+    assert.ok(compare.dispatchAlerts() > 0);
+    assert.ok(compare.alerts.every((alert) => alert.status === "SENT"));
   });
 
   it("retains recent events and resets processed keys", () => {
-    const watch = createSeededFraudWatch(NOW);
-    watch.ingest({ eventId: "old-event", transactionId: "tx-gas", type: "TRANSACTION_SETTLED", occurredAt: addMinutes(-800 * 24 * 60, NOW) });
-    const result = watch.retain(365, NOW);
+    const compare = createSeededGroceryCompare(NOW);
+    compare.ingest({ eventId: "old-event", itemId: "item-detergent", type: "ITEM_UPDATED", occurredAt: addMinutes(-800 * 24 * 60, NOW) });
+    const result = compare.retain(365, NOW);
     assert.ok(result.deleted > 0);
-    assert.equal(watch.events.length, watch.processed.size);
+    assert.equal(compare.events.length, compare.processed.size);
   });
 
   it("retries failed jobs and then completes them", () => {
-    const watch = createSeededFraudWatch(NOW);
-    watch.ensureJob("RISK_SCAN");
-    watch.failNextJob = true;
-    assert.equal(watch.dispatchNextJob().job?.status, "RETRY");
-    assert.equal(watch.dispatchNextJob().job?.status, "COMPLETED");
+    const compare = createSeededGroceryCompare(NOW);
+    compare.ensureJob("PRICE_REFRESH");
+    compare.failNextJob = true;
+    assert.equal(compare.dispatchNextJob().job?.status, "RETRY");
+    assert.equal(compare.dispatchNextJob().job?.status, "COMPLETED");
   });
 
   it("deduplicates hourly jobs and restores state", () => {
-    const watch = createSeededFraudWatch(NOW);
-    assert.equal(watch.ensureJob("ALERT_DISPATCH").id, watch.ensureJob("ALERT_DISPATCH").id);
-    const restored = createSeededFraudWatch(NOW);
-    restored.importState(watch.exportState());
-    assert.equal(restored.cards.length, watch.cards.length);
-    assert.equal(restored.transactions.length, watch.transactions.length);
-    assert.equal(restored.alerts.length, watch.alerts.length);
+    const compare = createSeededGroceryCompare(NOW);
+    assert.equal(compare.ensureJob("ALERT_DISPATCH").id, compare.ensureJob("ALERT_DISPATCH").id);
+    const restored = createSeededGroceryCompare(NOW);
+    restored.importState(compare.exportState());
+    assert.equal(restored.items.length, compare.items.length);
+    assert.equal(restored.stores.length, compare.stores.length);
+    assert.equal(restored.alerts.length, compare.alerts.length);
   });
 });

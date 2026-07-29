@@ -2,7 +2,7 @@
 
 Proof-of-concepts for distributed systems, infrastructure patterns, and product-style architectures. This repository is meant to read like a working systems portfolio, not just a list of folders.
 
-There are currently `133` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
+There are currently `134` POCs here. Some are infrastructure primitives, some are realtime systems, and some are end-user product simulations. The common goal is the same: make the underlying system behavior visible enough that someone can understand the design tradeoffs quickly.
 
 ## What Makes This Repo Useful
 
@@ -96,6 +96,7 @@ If a reviewer only opens a dozen projects, these are the best entry points.
 | [personal-home-inventory-insurance-poc](personal-home-inventory-insurance-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis home inventory tracker with proof-of-ownership records, policy coverage scans, duplicate detection, insurance-ready exports, and retries. |
 | [personal-account-security-checkup-poc](personal-account-security-checkup-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis account security dashboard with MFA/recovery checks, breach events, risk scoring, duplicate detection, recovery checklist exports, and retries. |
 | [personal-transaction-fraud-watch-poc](personal-transaction-fraud-watch-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis transaction fraud watch with risk scoring, velocity windows, duplicate charge detection, location anomalies, disputes, card freezes, and retries. |
+| [personal-grocery-price-compare-poc](personal-grocery-price-compare-poc/README.md) | React, Node, Express, Kafka, Postgres, and Redis grocery price comparison with cart totals, price updates, availability checks, substitutions, split-store recommendations, alerts, and retries. |
 
 ## Suggested Review Path
 
@@ -254,6 +255,7 @@ This path moves from core primitives to more layered systems.
 - [personal-account-security-checkup-poc](personal-account-security-checkup-poc/README.md)
 - [personal-document-renewal-vault-poc](personal-document-renewal-vault-poc/README.md)
 - [personal-errand-route-planner-poc](personal-errand-route-planner-poc/README.md)
+- [personal-grocery-price-compare-poc](personal-grocery-price-compare-poc/README.md)
 - [personal-home-inventory-insurance-poc](personal-home-inventory-insurance-poc/README.md)
 - [personal-meal-planning-nutrition-poc](personal-meal-planning-nutrition-poc/README.md)
 - [personal-moving-coordinator-poc](personal-moving-coordinator-poc/README.md)
@@ -285,8 +287,8 @@ For the strongest review signal, open files in this order:
 
 The repository direction is to make every project easy to scan in under two minutes and deep enough to discuss in an interview or portfolio review.
 
-- `133/133` POCs have a `README.md`
-- `133/133` POCs have a technical companion doc
-- `124/133` POCs have an `IMPROVEMENTS.md`
+- `134/134` POCs have a `README.md`
+- `134/134` POCs have a technical companion doc
+- `125/134` POCs have an `IMPROVEMENTS.md`
 
 Use [POC_STANDARDS.md](POC_STANDARDS.md) as the baseline for future additions and cleanup.
