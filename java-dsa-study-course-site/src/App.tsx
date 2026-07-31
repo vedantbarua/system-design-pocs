@@ -2,7 +2,10 @@ import { useMemo, useState } from "react";
 import { ArrowUpRight, BookOpen, Brain, CalendarDays, CheckCircle2, ChevronRight, Clock3, Code2, FileText, Flame, ListChecks, PlayCircle, Search, Target, Trophy } from "lucide-react";
 
 type Difficulty = "Warmup" | "Core" | "Interview";
+type View = "learn" | "practice" | "analytics" | "admin";
 type Question = { title: string; platform: string; difficulty: "Easy" | "Medium" | "Hard" | "Practice"; url: string };
+type ConceptLink = { title: string; url: string; source: string };
+type LessonLink = { title: string; duration: string; url: string };
 type Module = {
   id: string;
   title: string;
@@ -10,6 +13,8 @@ type Module = {
   duration: string;
   difficulty: Difficulty;
   topics: string[];
+  concepts: ConceptLink[];
+  lessons: LessonLink[];
   theory: string[];
   javaNotes: string[];
   mistakes: string[];
@@ -18,6 +23,7 @@ type Module = {
 };
 
 const playlistUrl = "https://www.youtube.com/playlist?list=PLfqMhTWNBTe3LtFWcvwpqTkUSlB32kJop";
+const lessonUrl = (index: number) => `${playlistUrl}&index=${index}`;
 
 const modules: Module[] = [
   {
@@ -27,6 +33,22 @@ const modules: Module[] = [
     duration: "5 days",
     difficulty: "Warmup",
     topics: ["JDK setup", "input/output", "conditionals", "loops", "functions", "number patterns"],
+    lessons: [
+      { title: "Java introduction and setup", duration: "Core lecture", url: lessonUrl(1) },
+      { title: "Variables, data types, and operators", duration: "Core lecture", url: lessonUrl(2) },
+      { title: "Conditionals, loops, and patterns", duration: "Practice block", url: lessonUrl(4) },
+      { title: "Functions and scope", duration: "Core lecture", url: lessonUrl(7) }
+    ],
+    concepts: [
+      { title: "Java program structure", source: "Oracle", url: "https://docs.oracle.com/javase/tutorial/getStarted/cupojava/" },
+      { title: "Primitive data types", source: "Oracle", url: "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html" },
+      { title: "Operators", source: "Oracle", url: "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/operators.html" },
+      { title: "If-else control flow", source: "Oracle", url: "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/if.html" },
+      { title: "Switch statements", source: "Oracle", url: "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/switch.html" },
+      { title: "Loops", source: "Oracle", url: "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/while.html" },
+      { title: "Methods", source: "Oracle", url: "https://docs.oracle.com/javase/tutorial/java/javaOO/methods.html" },
+      { title: "Pattern problems", source: "GeeksforGeeks", url: "https://www.geeksforgeeks.org/java/programs-printing-pyramid-patterns-java/" }
+    ],
     theory: [
       "Java programs start from `public static void main(String[] args)`, and the JVM executes bytecode produced by `javac`.",
       "Primitive types store values directly; reference types store object references. Know default values, type widening, and explicit casting.",
@@ -61,6 +83,22 @@ const modules: Module[] = [
     duration: "8 days",
     difficulty: "Core",
     topics: ["1D arrays", "2D arrays", "linear search", "binary search", "basic sorting", "strings", "StringBuilder"],
+    lessons: [
+      { title: "Arrays in Java", duration: "Core lecture", url: lessonUrl(9) },
+      { title: "2D arrays", duration: "Core lecture", url: lessonUrl(10) },
+      { title: "Sorting and binary search", duration: "Algorithm block", url: lessonUrl(12) },
+      { title: "Strings and StringBuilder", duration: "Core lecture", url: lessonUrl(13) }
+    ],
+    concepts: [
+      { title: "Arrays in Java", source: "Oracle", url: "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/arrays.html" },
+      { title: "2D arrays and matrices", source: "GeeksforGeeks", url: "https://www.geeksforgeeks.org/dsa/matrix/" },
+      { title: "Linear search", source: "GeeksforGeeks", url: "https://www.geeksforgeeks.org/dsa/linear-search/" },
+      { title: "Binary search", source: "GeeksforGeeks", url: "https://www.geeksforgeeks.org/dsa/binary-search/" },
+      { title: "Sorting algorithms", source: "GeeksforGeeks", url: "https://www.geeksforgeeks.org/dsa/sorting-algorithms/" },
+      { title: "Strings", source: "Oracle", url: "https://docs.oracle.com/javase/tutorial/java/data/strings.html" },
+      { title: "StringBuilder", source: "Oracle", url: "https://docs.oracle.com/javase/tutorial/java/data/buffers.html" },
+      { title: "Two pointers", source: "GeeksforGeeks", url: "https://www.geeksforgeeks.org/dsa/two-pointers-technique/" }
+    ],
     theory: [
       "Arrays give O(1) index access but fixed size. Most array problems are about traversals, maintaining state, or choosing the right pointer movement.",
       "Binary search requires a monotonic condition. Do not memorize only sorted-array search; learn lower bound and answer-space search.",
@@ -96,6 +134,22 @@ const modules: Module[] = [
     duration: "9 days",
     difficulty: "Core",
     topics: ["classes", "inheritance", "interfaces", "encapsulation", "recursion tree", "backtracking", "N-Queens"],
+    lessons: [
+      { title: "Object-oriented programming", duration: "Java chapter", url: lessonUrl(14) },
+      { title: "Recursion fundamentals", duration: "DSA chapter", url: lessonUrl(15) },
+      { title: "Backtracking patterns", duration: "DSA chapter", url: lessonUrl(16) },
+      { title: "N-Queens and permutations", duration: "Problem walkthrough", url: lessonUrl(17) }
+    ],
+    concepts: [
+      { title: "Object-oriented concepts", source: "Oracle", url: "https://docs.oracle.com/javase/tutorial/java/concepts/" },
+      { title: "Classes", source: "Oracle", url: "https://docs.oracle.com/javase/tutorial/java/javaOO/classes.html" },
+      { title: "Inheritance", source: "Oracle", url: "https://docs.oracle.com/javase/tutorial/java/IandI/subclasses.html" },
+      { title: "Interfaces", source: "Oracle", url: "https://docs.oracle.com/javase/tutorial/java/IandI/createinterface.html" },
+      { title: "Encapsulation", source: "Oracle", url: "https://docs.oracle.com/javase/tutorial/java/javaOO/accesscontrol.html" },
+      { title: "Recursion", source: "GeeksforGeeks", url: "https://www.geeksforgeeks.org/dsa/recursion/" },
+      { title: "Backtracking", source: "GeeksforGeeks", url: "https://www.geeksforgeeks.org/dsa/backtracking-algorithms/" },
+      { title: "N-Queens", source: "GeeksforGeeks", url: "https://www.geeksforgeeks.org/dsa/n-queen-problem-backtracking-3/" }
+    ],
     theory: [
       "OOP organizes data and behavior together. Encapsulation hides representation; inheritance reuses behavior; interfaces define contracts.",
       "Recursion solves a problem by reducing it to a smaller version of itself. Every recursive solution needs a base case and progress toward it.",
@@ -130,6 +184,21 @@ const modules: Module[] = [
     duration: "8 days",
     difficulty: "Interview",
     topics: ["singly linked list", "reverse list", "cycle detection", "stack using arrays/list", "queues", "deque"],
+    lessons: [
+      { title: "Linked list implementation", duration: "Data structure chapter", url: lessonUrl(20) },
+      { title: "Linked list interview patterns", duration: "Problem walkthrough", url: lessonUrl(21) },
+      { title: "Stacks in Java", duration: "Data structure chapter", url: lessonUrl(22) },
+      { title: "Queues and deques", duration: "Data structure chapter", url: lessonUrl(23) }
+    ],
+    concepts: [
+      { title: "Linked lists", source: "GeeksforGeeks", url: "https://www.geeksforgeeks.org/dsa/linked-list-data-structure/" },
+      { title: "Reverse linked list", source: "GeeksforGeeks", url: "https://www.geeksforgeeks.org/dsa/reverse-a-linked-list/" },
+      { title: "Floyd cycle detection", source: "GeeksforGeeks", url: "https://www.geeksforgeeks.org/dsa/floyds-cycle-finding-algorithm/" },
+      { title: "Stack data structure", source: "GeeksforGeeks", url: "https://www.geeksforgeeks.org/dsa/stack-data-structure/" },
+      { title: "Queue data structure", source: "GeeksforGeeks", url: "https://www.geeksforgeeks.org/dsa/queue-data-structure/" },
+      { title: "ArrayDeque", source: "Oracle", url: "https://docs.oracle.com/javase/8/docs/api/java/util/ArrayDeque.html" },
+      { title: "Deque interface", source: "Oracle", url: "https://docs.oracle.com/javase/8/docs/api/java/util/Deque.html" }
+    ],
     theory: [
       "Linked lists trade random access for cheap insertion/removal when you already have the node reference.",
       "Most linked-list bugs come from losing references. Store `next` before rewiring pointers.",
@@ -165,6 +234,21 @@ const modules: Module[] = [
     duration: "10 days",
     difficulty: "Interview",
     topics: ["binary trees", "DFS", "BFS", "height", "diameter", "BST insert/search/delete", "lowest common ancestor"],
+    lessons: [
+      { title: "Binary trees and traversals", duration: "Data structure chapter", url: lessonUrl(24) },
+      { title: "Tree DFS and BFS questions", duration: "Problem walkthrough", url: lessonUrl(25) },
+      { title: "Binary search trees", duration: "Data structure chapter", url: lessonUrl(26) },
+      { title: "Lowest common ancestor patterns", duration: "Problem walkthrough", url: lessonUrl(27) }
+    ],
+    concepts: [
+      { title: "Tree data structure", source: "GeeksforGeeks", url: "https://www.geeksforgeeks.org/dsa/tree-data-structure/" },
+      { title: "Binary tree", source: "GeeksforGeeks", url: "https://www.geeksforgeeks.org/dsa/binary-tree-data-structure/" },
+      { title: "Tree traversals", source: "GeeksforGeeks", url: "https://www.geeksforgeeks.org/dsa/tree-traversals-inorder-preorder-and-postorder/" },
+      { title: "Breadth-first search", source: "GeeksforGeeks", url: "https://www.geeksforgeeks.org/dsa/breadth-first-search-or-bfs-for-a-graph/" },
+      { title: "Binary search tree", source: "GeeksforGeeks", url: "https://www.geeksforgeeks.org/dsa/binary-search-tree-data-structure/" },
+      { title: "BST delete", source: "GeeksforGeeks", url: "https://www.geeksforgeeks.org/dsa/deletion-in-binary-search-tree/" },
+      { title: "Lowest common ancestor", source: "GeeksforGeeks", url: "https://www.geeksforgeeks.org/dsa/lowest-common-ancestor-binary-tree-set-1/" }
+    ],
     theory: [
       "Trees are recursive by nature: solve left subtree, solve right subtree, combine at root.",
       "DFS has preorder, inorder, and postorder; pick traversal based on when you need to process the root.",
@@ -199,6 +283,21 @@ const modules: Module[] = [
     duration: "6 days",
     difficulty: "Interview",
     topics: ["HashMap", "HashSet", "heap", "PriorityQueue", "top K", "sliding frequency"],
+    lessons: [
+      { title: "HashMap and HashSet in Java", duration: "Data structure chapter", url: lessonUrl(28) },
+      { title: "Heap and priority queue", duration: "Data structure chapter", url: lessonUrl(29) },
+      { title: "Top K frequent patterns", duration: "Problem walkthrough", url: lessonUrl(30) },
+      { title: "Sliding window frequency", duration: "Pattern lesson", url: "https://www.youtube.com/watch?v=17rDxH4qXrc" }
+    ],
+    concepts: [
+      { title: "HashMap", source: "Oracle", url: "https://docs.oracle.com/javase/8/docs/api/java/util/HashMap.html" },
+      { title: "HashSet", source: "Oracle", url: "https://docs.oracle.com/javase/8/docs/api/java/util/HashSet.html" },
+      { title: "Hashing data structure", source: "GeeksforGeeks", url: "https://www.geeksforgeeks.org/dsa/hashing-data-structure/" },
+      { title: "Heap data structure", source: "GeeksforGeeks", url: "https://www.geeksforgeeks.org/dsa/heap-data-structure/" },
+      { title: "PriorityQueue", source: "Oracle", url: "https://docs.oracle.com/javase/8/docs/api/java/util/PriorityQueue.html" },
+      { title: "Top K elements", source: "GeeksforGeeks", url: "https://www.geeksforgeeks.org/dsa/k-largestor-smallest-elements-in-an-array/" },
+      { title: "Sliding window", source: "GeeksforGeeks", url: "https://www.geeksforgeeks.org/dsa/window-sliding-technique/" }
+    ],
     theory: [
       "Hash maps give expected O(1) insert, lookup, and delete by hashing keys.",
       "Frequency maps turn counting questions into lookup questions.",
@@ -233,6 +332,21 @@ const modules: Module[] = [
     duration: "10 days",
     difficulty: "Interview",
     topics: ["adjacency list", "DFS", "BFS", "connected components", "cycle detection", "topological sort", "Dijkstra"],
+    lessons: [
+      { title: "Graph representation", duration: "Data structure chapter", url: lessonUrl(31) },
+      { title: "Graph BFS and DFS", duration: "Traversal chapter", url: lessonUrl(32) },
+      { title: "Cycle detection and topological sort", duration: "Interview chapter", url: lessonUrl(33) },
+      { title: "Shortest paths and Dijkstra", duration: "Interview chapter", url: lessonUrl(34) }
+    ],
+    concepts: [
+      { title: "Graph representation", source: "GeeksforGeeks", url: "https://www.geeksforgeeks.org/dsa/graph-and-its-representations/" },
+      { title: "Depth-first search", source: "GeeksforGeeks", url: "https://www.geeksforgeeks.org/dsa/depth-first-search-or-dfs-for-a-graph/" },
+      { title: "Breadth-first search", source: "GeeksforGeeks", url: "https://www.geeksforgeeks.org/dsa/breadth-first-search-or-bfs-for-a-graph/" },
+      { title: "Connected components", source: "GeeksforGeeks", url: "https://www.geeksforgeeks.org/dsa/connected-components-in-an-undirected-graph/" },
+      { title: "Cycle detection", source: "GeeksforGeeks", url: "https://www.geeksforgeeks.org/dsa/detect-cycle-in-a-graph/" },
+      { title: "Topological sort", source: "GeeksforGeeks", url: "https://www.geeksforgeeks.org/dsa/topological-sorting/" },
+      { title: "Dijkstra algorithm", source: "CP-Algorithms", url: "https://cp-algorithms.com/graph/dijkstra.html" }
+    ],
     theory: [
       "Graphs model relationships. The first decision is representation: adjacency list for sparse graphs, matrix for dense or constant edge checks.",
       "DFS explores deeply and is useful for components, cycle detection, and backtracking over graph state.",
@@ -267,6 +381,21 @@ const modules: Module[] = [
     duration: "12 days",
     difficulty: "Interview",
     topics: ["memoization", "tabulation", "knapsack", "LCS", "LIS", "coin change", "activity selection"],
+    lessons: [
+      { title: "Complete Dynamic Programming - Lecture 1", duration: "Dedicated DP lesson", url: "https://www.youtube.com/watch?v=uBA8DkCBdco" },
+      { title: "DP playlist", duration: "Extended series", url: "https://www.youtube.com/playlist?list=PLfqMhTWNBTe137I_EPQd34TsgV6IO55pt" },
+      { title: "Greedy algorithms module", duration: "Practice chapter", url: lessonUrl(35) },
+      { title: "Activity selection and interval patterns", duration: "Interview chapter", url: lessonUrl(36) }
+    ],
+    concepts: [
+      { title: "Dynamic programming", source: "GeeksforGeeks", url: "https://www.geeksforgeeks.org/dsa/dynamic-programming/" },
+      { title: "Memoization", source: "GeeksforGeeks", url: "https://www.geeksforgeeks.org/dsa/memoization-1d-2d-and-3d/" },
+      { title: "Tabulation vs memoization", source: "GeeksforGeeks", url: "https://www.geeksforgeeks.org/dsa/tabulation-vs-memoization/" },
+      { title: "0/1 knapsack", source: "GeeksforGeeks", url: "https://www.geeksforgeeks.org/dsa/0-1-knapsack-problem-dp-10/" },
+      { title: "Longest common subsequence", source: "GeeksforGeeks", url: "https://www.geeksforgeeks.org/dsa/longest-common-subsequence-dp-4/" },
+      { title: "Longest increasing subsequence", source: "GeeksforGeeks", url: "https://www.geeksforgeeks.org/dsa/longest-increasing-subsequence-dp-3/" },
+      { title: "Greedy algorithms", source: "GeeksforGeeks", url: "https://www.geeksforgeeks.org/dsa/greedy-algorithms/" }
+    ],
     theory: [
       "Dynamic programming applies when overlapping subproblems and optimal substructure exist.",
       "State design is the core skill: define exactly what `dp[i]` or `dp[i][j]` means before writing transitions.",
@@ -314,38 +443,82 @@ const resources = [
   ["LeetCode problemset", "https://leetcode.com/problemset/"]
 ];
 
+const learnerTasks = [
+  "Finish active theory notes",
+  "Submit two Medium solutions",
+  "Review binary search mistakes",
+  "Join Saturday mock interview"
+];
+
+const cohorts = [
+  { name: "July Placement Sprint", learners: 184, completion: 62, atRisk: 19 },
+  { name: "Weekend Java Batch", learners: 96, completion: 48, atRisk: 14 },
+  { name: "Interview Revision Group", learners: 71, completion: 78, atRisk: 6 }
+];
+
+const assessments = [
+  { title: "Java Basics Check", questions: 20, due: "Today", status: "Open" },
+  { title: "Arrays Timed Drill", questions: 12, due: "Tomorrow", status: "Scheduled" },
+  { title: "Graph Template Review", questions: 8, due: "Friday", status: "Draft" }
+];
+
+const platformNotes = [
+  "Every module carries theory, implementation notes, common mistakes, checkpoint work, and linked practice questions.",
+  "Progress is modeled at module level here, but the UI is structured for lesson, quiz, assignment, and cohort-level backend data.",
+  "The admin view shows the operational surface a production learning platform needs: cohorts, grading, content health, and interventions."
+];
+
 export default function App() {
   const [activeId, setActiveId] = useState(modules[0].id);
   const [query, setQuery] = useState("");
   const [completed, setCompleted] = useState<string[]>(["java-basics"]);
+  const [view, setView] = useState<View>("learn");
   const active = modules.find((module) => module.id === activeId) || modules[0];
   const allQuestionCount = modules.reduce((sum, module) => sum + module.questions.length, 0);
-  const filtered = useMemo(() => modules.filter((module) => `${module.title} ${module.focus} ${module.topics.join(" ")} ${module.theory.join(" ")} ${module.questions.map((question) => question.title).join(" ")}`.toLowerCase().includes(query.toLowerCase())), [query]);
+  const filtered = useMemo(() => modules.filter((module) => `${module.title} ${module.focus} ${module.topics.join(" ")} ${module.lessons.map((lesson) => lesson.title).join(" ")} ${module.theory.join(" ")} ${module.questions.map((question) => question.title).join(" ")}`.toLowerCase().includes(query.toLowerCase())), [query]);
   const completion = Math.round((completed.length / modules.length) * 100);
   const totalDays = modules.reduce((sum, module) => sum + Number(module.duration.split(" ")[0]), 0);
+  const solvedQuestions = completed.length * 6 + 11;
+  const mastery = Math.round((solvedQuestions / allQuestionCount) * 100);
 
   function toggleComplete(id: string) {
     setCompleted((current) => current.includes(id) ? current.filter((entry) => entry !== id) : [...current, id]);
   }
 
   return (
-    <main className="page">
-      <section className="hero">
+    <main className="page platform">
+      <header className="topbar">
+        <div className="brand">
+          <span><Flame /></span>
+          <div><strong>CourseOS</strong><small>Java + DSA learning platform</small></div>
+        </div>
+        <nav className="platform-nav">
+          {(["learn", "practice", "analytics", "admin"] as const).map((item) => <button key={item} className={view === item ? "active" : ""} onClick={() => setView(item)}>{item}</button>)}
+        </nav>
+        <a className="playlist-link" href={playlistUrl} target="_blank" rel="noreferrer"><PlayCircle /> Playlist</a>
+      </header>
+
+      <section className="hero platform-hero">
         <div className="hero-copy">
-          <span className="eyebrow"><Flame /> Java + DSA placement path</span>
-          <h1>Study companion for Apna College Java + DSA</h1>
-          <p>Each module now includes theory, Java notes, common mistakes, checkpoints, and direct practice-question links.</p>
+          <span className="eyebrow"><Flame /> Production learning workspace</span>
+          <h1>Java + DSA platform for structured placement prep</h1>
+          <p>Run the course like a real learning product: curriculum, theory, linked questions, assessments, learner progress, cohort analytics, notes, and admin operations.</p>
           <div className="hero-actions">
-            <a href={playlistUrl} target="_blank" rel="noreferrer"><PlayCircle /> Open playlist</a>
-            <button onClick={() => toggleComplete(active.id)}><CheckCircle2 /> {completed.includes(active.id) ? "Mark open" : "Mark done"}</button>
+            <button onClick={() => setView("learn")}><BookOpen /> Resume lesson</button>
+            <button onClick={() => setView("practice")}><ListChecks /> Open question bank</button>
           </div>
         </div>
-        <div className="course-shot" aria-label="Course preview visual">
+        <div className="course-shot platform-card" aria-label="Course operations preview">
           <img src="https://img.youtube.com/vi/yRpLlJmRo2w/maxresdefault.jpg" alt="Java DSA course thumbnail" />
           <div>
             <strong>{completion}% complete</strong>
-            <span>{completed.length}/{modules.length} modules</span>
+            <span>{solvedQuestions}/{allQuestionCount} questions solved</span>
           </div>
+          <ul>
+            <li><CheckCircle2 /> Active cohort: July Placement Sprint</li>
+            <li><Clock3 /> Next assessment: Java Basics Check</li>
+            <li><Target /> Mastery target: 85%</li>
+          </ul>
         </div>
       </section>
 
@@ -353,10 +526,10 @@ export default function App() {
         <Metric icon={CalendarDays} label="Roadmap" value={`${totalDays} days`} />
         <Metric icon={BookOpen} label="Modules" value={`${modules.length}`} />
         <Metric icon={Code2} label="Questions" value={`${allQuestionCount}`} />
-        <Metric icon={Trophy} label="Goal" value="Placement prep" />
+        <Metric icon={Trophy} label="Mastery" value={`${mastery}%`} />
       </section>
 
-      <section className="workspace">
+      <section className="workspace platform-workspace">
         <aside className="sidebar">
           <label className="search"><Search /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search theory or questions" /></label>
           <div className="module-list">
@@ -379,29 +552,20 @@ export default function App() {
             <button onClick={() => toggleComplete(active.id)}>{completed.includes(active.id) ? "Completed" : "Complete module"}</button>
           </header>
 
-          <div className="detail-grid">
-            <Panel title="Theory" icon={BookOpen} wide>
-              {active.theory.map((point) => <StudyPoint key={point}>{point}</StudyPoint>)}
-            </Panel>
-            <Panel title="Watch And Learn" icon={PlayCircle}>
-              {active.topics.map((topic) => <Tag key={topic}>{topic}</Tag>)}
-            </Panel>
-            <Panel title="Java Notes" icon={Code2}>
-              {active.javaNotes.map((note) => <Task key={note}>{note}</Task>)}
-            </Panel>
-            <Panel title="Common Mistakes" icon={Brain}>
-              {active.mistakes.map((mistake) => <Task key={mistake}>{mistake}</Task>)}
-            </Panel>
-            <Panel title="Checkpoint" icon={Target}>
-              <p className="checkpoint">{active.checkpoint}</p>
-            </Panel>
-            <Panel title="Linked Question Bank" icon={ListChecks} wide>
-              <div className="questions">
-                {active.questions.map((question) => <QuestionLink key={question.url} question={question} />)}
-              </div>
-            </Panel>
-          </div>
+          {view === "learn" ? <LearnView active={active} /> : null}
+          {view === "practice" ? <PracticeView active={active} modules={modules} /> : null}
+          {view === "analytics" ? <AnalyticsView modules={modules} completed={completed} solvedQuestions={solvedQuestions} allQuestionCount={allQuestionCount} /> : null}
+          {view === "admin" ? <AdminView /> : null}
         </section>
+
+        <aside className="right-rail">
+          <Panel title="Due Work" icon={Clock3}>
+            {learnerTasks.map((task) => <Task key={task}>{task}</Task>)}
+          </Panel>
+          <Panel title="Platform Notes" icon={FileText}>
+            {platformNotes.map((note) => <StudyPoint key={note}>{note}</StudyPoint>)}
+          </Panel>
+        </aside>
       </section>
 
       <section className="plan">
@@ -429,6 +593,115 @@ function Panel({ title, icon: Icon, children, wide = false }: { title: string; i
   return <article className={wide ? "panel wide" : "panel"}><h3><Icon />{title}</h3><div>{children}</div></article>;
 }
 
+function LearnView({ active }: { active: Module }) {
+  return (
+    <div className="detail-grid">
+      <Panel title="Lesson Player" icon={PlayCircle} wide>
+        <div className="lesson-player">
+          <div>
+            <strong>{active.title}</strong>
+            <p>{active.focus}</p>
+          </div>
+          <a href={active.lessons[0].url} target="_blank" rel="noreferrer"><PlayCircle /> Start module</a>
+        </div>
+        <div className="lesson-links">
+          {active.lessons.map((lesson, index) => <LessonCard key={lesson.url} lesson={lesson} index={index} />)}
+        </div>
+      </Panel>
+      <Panel title="Theory" icon={BookOpen} wide>
+        {active.theory.map((point) => <StudyPoint key={point}>{point}</StudyPoint>)}
+      </Panel>
+      <Panel title="Deep-Dive Concepts" icon={ArrowUpRight}>
+        <div className="concept-links">
+          {active.concepts.map((concept) => <ConceptLinkCard key={concept.url} concept={concept} />)}
+        </div>
+      </Panel>
+      <Panel title="Module Questions" icon={ListChecks}>
+        <div className="compact-questions">
+          {active.questions.map((question) => <QuestionLink key={question.url} question={question} />)}
+        </div>
+      </Panel>
+      <Panel title="Watch And Learn" icon={PlayCircle}>
+        {active.topics.map((topic) => <Tag key={topic}>{topic}</Tag>)}
+      </Panel>
+      <Panel title="Java Notes" icon={Code2}>
+        {active.javaNotes.map((note) => <Task key={note}>{note}</Task>)}
+      </Panel>
+      <Panel title="Common Mistakes" icon={Brain}>
+        {active.mistakes.map((mistake) => <Task key={mistake}>{mistake}</Task>)}
+      </Panel>
+      <Panel title="Checkpoint" icon={Target}>
+        <p className="checkpoint">{active.checkpoint}</p>
+      </Panel>
+    </div>
+  );
+}
+
+function PracticeView({ active, modules }: { active: Module; modules: Module[] }) {
+  const allQuestions = modules.flatMap((module) => module.questions.map((question) => ({ ...question, module: module.title })));
+  return (
+    <div className="detail-grid">
+      <Panel title="Active Module Questions" icon={ListChecks} wide>
+        <div className="questions">
+          {active.questions.map((question) => <QuestionLink key={question.url} question={question} />)}
+        </div>
+      </Panel>
+      <Panel title="Full Question Bank" icon={Search} wide>
+        <div className="question-table">
+          {allQuestions.map((question) => <a key={`${question.module}-${question.url}`} href={question.url} target="_blank" rel="noreferrer"><strong>{question.title}</strong><span>{question.module}</span><span>{question.difficulty}</span><ArrowUpRight /></a>)}
+        </div>
+      </Panel>
+    </div>
+  );
+}
+
+function AnalyticsView({ modules, completed, solvedQuestions, allQuestionCount }: { modules: Module[]; completed: string[]; solvedQuestions: number; allQuestionCount: number }) {
+  return (
+    <div className="detail-grid">
+      <Panel title="Learner Health" icon={Trophy} wide>
+        <div className="health-grid">
+          <Health label="Module completion" value={`${Math.round((completed.length / modules.length) * 100)}%`} />
+          <Health label="Question progress" value={`${Math.round((solvedQuestions / allQuestionCount) * 100)}%`} />
+          <Health label="Current streak" value="11 days" />
+          <Health label="Mock readiness" value="72%" />
+        </div>
+      </Panel>
+      <Panel title="Module Mastery" icon={Target} wide>
+        <div className="mastery-list">
+          {modules.map((module, index) => <div key={module.id}><span>{module.title}</span><b>{completed.includes(module.id) ? 100 : 42 + index * 5}%</b><meter min="0" max="100" value={completed.includes(module.id) ? 100 : 42 + index * 5} /></div>)}
+        </div>
+      </Panel>
+    </div>
+  );
+}
+
+function AdminView() {
+  return (
+    <div className="detail-grid">
+      <Panel title="Cohort Operations" icon={Brain} wide>
+        <div className="cohorts">
+          {cohorts.map((cohort) => <article key={cohort.name}><strong>{cohort.name}</strong><span>{cohort.learners} learners</span><span>{cohort.completion}% complete</span><b>{cohort.atRisk} at risk</b></article>)}
+        </div>
+      </Panel>
+      <Panel title="Assessments" icon={FileText} wide>
+        <div className="assessment-list">
+          {assessments.map((assessment) => <article key={assessment.title}><strong>{assessment.title}</strong><span>{assessment.questions} questions</span><span>{assessment.due}</span><b>{assessment.status}</b></article>)}
+        </div>
+      </Panel>
+      <Panel title="Production Controls" icon={Target}>
+        <Task>Content versioning: v2026.07</Task>
+        <Task>Feature flags: cohort analytics, timed mocks, notes export</Task>
+        <Task>Data model ready for users, enrollments, lessons, attempts, submissions, and audits</Task>
+      </Panel>
+      <Panel title="Quality Signals" icon={CheckCircle2}>
+        <Task>Question links validated in content review</Task>
+        <Task>At-risk learners surfaced by completion and question velocity</Task>
+        <Task>Assessment drafts require instructor approval</Task>
+      </Panel>
+    </div>
+  );
+}
+
 function Tag({ children }: { children: React.ReactNode }) {
   return <span className="tag">{children}</span>;
 }
@@ -451,4 +724,33 @@ function QuestionLink({ question }: { question: Question }) {
       <ArrowUpRight />
     </a>
   );
+}
+
+function ConceptLinkCard({ concept }: { concept: ConceptLink }) {
+  return (
+    <a className="concept-link" href={concept.url} target="_blank" rel="noreferrer">
+      <span>
+        <strong>{concept.title}</strong>
+        <small>{concept.source} deep dive</small>
+      </span>
+      <ArrowUpRight />
+    </a>
+  );
+}
+
+function LessonCard({ lesson, index }: { lesson: LessonLink; index: number }) {
+  return (
+    <a className="lesson-link" href={lesson.url} target="_blank" rel="noreferrer">
+      <span>{String(index + 1).padStart(2, "0")}</span>
+      <div>
+        <strong>{lesson.title}</strong>
+        <small>{lesson.duration}</small>
+      </div>
+      <ArrowUpRight />
+    </a>
+  );
+}
+
+function Health({ label, value }: { label: string; value: string }) {
+  return <article><small>{label}</small><strong>{value}</strong></article>;
 }
