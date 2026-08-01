@@ -37,6 +37,79 @@ svg {
   min-height: 100vh;
 }
 
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  min-height: 68px;
+  display: grid;
+  grid-template-columns: 260px 1fr auto;
+  align-items: center;
+  gap: 18px;
+  padding: 12px clamp(18px, 5vw, 72px);
+  background: rgba(251, 252, 253, 0.94);
+  border-bottom: 1px solid #d9e3e8;
+  backdrop-filter: blur(12px);
+}
+
+.brand,
+.playlist-link,
+.platform-nav,
+.lesson-player,
+.health-grid,
+.cohorts article,
+.assessment-list article,
+.question-table a,
+.question-row,
+.concept-link,
+.lesson-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand > span {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: #1c3f52;
+  color: #f8fbfc;
+}
+
+.brand div {
+  display: grid;
+  gap: 2px;
+}
+
+.platform-nav {
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.platform-nav button,
+.playlist-link {
+  min-height: 38px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 0 12px;
+  text-transform: capitalize;
+  text-decoration: none;
+  color: #23343c;
+  background: transparent;
+}
+
+.platform-nav button.active {
+  border-color: #cfe0e5;
+  background: #e8f3f0;
+}
+
+.playlist-link {
+  background: #1c3f52;
+  color: #f8fbfc;
+}
+
 .hero {
   min-height: 78vh;
   display: grid;
@@ -47,6 +120,10 @@ svg {
   background: linear-gradient(120deg, rgba(245, 247, 250, 0.88), rgba(238, 242, 245, 0.78)), url("https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&w=1800&q=80");
   background-size: cover;
   background-position: center;
+}
+
+.platform-hero {
+  min-height: 68vh;
 }
 
 .hero-copy {
@@ -148,6 +225,21 @@ h1 {
   padding: 16px;
 }
 
+.platform-card ul {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0 16px 16px;
+  list-style: none;
+}
+
+.platform-card li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #38505a;
+}
+
 .course-shot strong {
   font-size: 24px;
 }
@@ -204,9 +296,21 @@ small {
   gap: 18px;
 }
 
+.platform-workspace {
+  width: min(1420px, calc(100% - 36px));
+  grid-template-columns: 320px minmax(0, 1fr) 320px;
+  align-items: start;
+}
+
 .sidebar,
-.detail {
+.detail,
+.right-rail {
   overflow: hidden;
+}
+
+.right-rail {
+  display: grid;
+  gap: 16px;
 }
 
 .search {
@@ -293,6 +397,97 @@ small {
   min-height: auto;
 }
 
+.lesson-player {
+  justify-content: space-between;
+  min-height: 118px;
+  padding: 18px;
+  border-radius: 8px;
+  color: #f7fbfc;
+  background: #1c3f52;
+}
+
+.lesson-player div {
+  display: grid;
+  gap: 8px;
+}
+
+.lesson-player p {
+  color: #c7d8dd;
+}
+
+.lesson-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.lesson-actions a,
+.lesson-actions button {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 8px;
+  color: #19312c;
+  background: #c6eadf;
+  text-decoration: none;
+}
+
+.lesson-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.lesson-links {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.lesson-link {
+  min-height: 76px;
+  justify-content: space-between;
+  padding: 12px;
+  border: 1px solid #dfe8ec;
+  border-radius: 8px;
+  color: #1f343d;
+  background: #f7fafb;
+  text-decoration: none;
+  text-align: left;
+}
+
+.lesson-link.selected {
+  border-color: #83c9b5;
+  background: #e8f3f0;
+}
+
+.lesson-link > span {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  color: #f8fbfc;
+  background: #1c3f52;
+  font-weight: 800;
+  font-size: 13px;
+}
+
+.lesson-link div {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+  flex: 1;
+}
+
+.lesson-link strong {
+  overflow-wrap: anywhere;
+}
+
 .tag {
   display: inline-flex;
   margin: 0 8px 8px 0;
@@ -338,6 +533,13 @@ small {
   gap: 10px;
 }
 
+.compact-questions,
+.concept-links,
+.notes-pad {
+  display: grid;
+  gap: 10px;
+}
+
 .question {
   min-height: 66px;
   justify-content: space-between;
@@ -349,6 +551,16 @@ small {
   text-decoration: none;
 }
 
+.question.interactive {
+  display: flex;
+}
+
+.question.solved,
+.question-row.solved {
+  border-color: #9fd8c8;
+  background: #eef8f4;
+}
+
 .question span {
   min-width: 0;
   display: grid;
@@ -357,6 +569,158 @@ small {
 
 .question strong {
   overflow-wrap: anywhere;
+}
+
+.concept-link {
+  min-height: 62px;
+  justify-content: space-between;
+  padding: 12px;
+  border: 1px solid #dfe8ec;
+  border-radius: 8px;
+  color: #1f343d;
+  background: #f7fafb;
+  text-decoration: none;
+}
+
+.concept-link span {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.concept-link strong {
+  overflow-wrap: anywhere;
+}
+
+.concept-link svg,
+.lesson-link svg,
+.question svg,
+.question-row svg,
+.resources svg:last-child {
+  color: #23705f;
+}
+
+.question-table,
+.mastery-list,
+.cohorts,
+.assessment-list {
+  display: grid;
+  gap: 10px;
+}
+
+.question-table a,
+.question-row,
+.cohorts article,
+.assessment-list article {
+  min-height: 56px;
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 0.7fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid #dfe8ec;
+  border-radius: 8px;
+  background: #f7fafb;
+  color: #1f343d;
+  text-decoration: none;
+}
+
+.question-actions,
+.filter-bar,
+.notes-pad div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.question-actions {
+  justify-content: flex-end;
+}
+
+.question-actions button,
+.question-actions a,
+.filter-bar button,
+.notes-pad button {
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #cfe0e5;
+  border-radius: 8px;
+  padding: 0 10px;
+  color: #24463e;
+  background: #ffffff;
+  text-decoration: none;
+}
+
+.question-actions button.active,
+.filter-bar button.active {
+  border-color: #83c9b5;
+  background: #c6eadf;
+}
+
+.filter-bar {
+  justify-content: space-between;
+}
+
+.filter-bar span,
+.notes-pad span {
+  color: #667981;
+  font-size: 13px;
+}
+
+.notes-pad textarea {
+  width: 100%;
+  min-height: 132px;
+  resize: vertical;
+  border: 1px solid #dfe8ec;
+  border-radius: 8px;
+  padding: 12px;
+  color: #1f343d;
+  background: #f7fafb;
+  line-height: 1.5;
+}
+
+.question-table span,
+.question-row span,
+.cohorts span,
+.assessment-list span {
+  color: #667981;
+  font-size: 13px;
+}
+
+.health-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.health-grid article {
+  min-height: 96px;
+  display: grid;
+  align-content: center;
+  gap: 6px;
+  padding: 14px;
+  border-radius: 8px;
+  background: #eef5f2;
+}
+
+.health-grid strong {
+  font-size: 28px;
+}
+
+.mastery-list div {
+  display: grid;
+  grid-template-columns: 1fr 54px;
+  gap: 8px 12px;
+  align-items: center;
+}
+
+.mastery-list meter {
+  grid-column: 1 / -1;
+  width: 100%;
+  height: 12px;
 }
 
 .checkpoint {
@@ -418,12 +782,24 @@ small {
 @media (max-width: 920px) {
   .hero,
   .workspace,
+  .platform-workspace,
+  .topbar,
   .stats,
   .resources,
   .days,
   .detail-grid,
-  .questions {
+  .questions,
+  .lesson-links,
+  .health-grid,
+  .question-table a,
+  .question-row,
+  .cohorts article,
+  .assessment-list article {
     grid-template-columns: 1fr;
+  }
+
+  .platform-nav {
+    justify-content: flex-start;
   }
 
   .hero {
@@ -432,5 +808,11 @@ small {
 
   .course-shot {
     justify-self: stretch;
+  }
+
+  .lesson-player,
+  .detail header {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }
