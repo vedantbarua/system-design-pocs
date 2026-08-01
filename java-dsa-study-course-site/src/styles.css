@@ -60,6 +60,7 @@ svg {
 .cohorts article,
 .assessment-list article,
 .question-table a,
+.question-row,
 .concept-link,
 .lesson-link {
   display: flex;
@@ -414,16 +415,30 @@ small {
   color: #c7d8dd;
 }
 
-.lesson-player a {
+.lesson-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.lesson-actions a,
+.lesson-actions button {
   min-height: 42px;
   display: inline-flex;
   align-items: center;
   gap: 8px;
   padding: 0 12px;
+  border: 0;
   border-radius: 8px;
   color: #19312c;
   background: #c6eadf;
   text-decoration: none;
+}
+
+.lesson-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
 }
 
 .lesson-links {
@@ -442,6 +457,12 @@ small {
   color: #1f343d;
   background: #f7fafb;
   text-decoration: none;
+  text-align: left;
+}
+
+.lesson-link.selected {
+  border-color: #83c9b5;
+  background: #e8f3f0;
 }
 
 .lesson-link > span {
@@ -513,7 +534,8 @@ small {
 }
 
 .compact-questions,
-.concept-links {
+.concept-links,
+.notes-pad {
   display: grid;
   gap: 10px;
 }
@@ -527,6 +549,16 @@ small {
   background: #f7fafb;
   color: #1f343d;
   text-decoration: none;
+}
+
+.question.interactive {
+  display: flex;
+}
+
+.question.solved,
+.question-row.solved {
+  border-color: #9fd8c8;
+  background: #eef8f4;
 }
 
 .question span {
@@ -563,7 +595,7 @@ small {
 .concept-link svg,
 .lesson-link svg,
 .question svg,
-.question-table svg,
+.question-row svg,
 .resources svg:last-child {
   color: #23705f;
 }
@@ -577,6 +609,7 @@ small {
 }
 
 .question-table a,
+.question-row,
 .cohorts article,
 .assessment-list article {
   min-height: 56px;
@@ -592,7 +625,65 @@ small {
   text-decoration: none;
 }
 
+.question-actions,
+.filter-bar,
+.notes-pad div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.question-actions {
+  justify-content: flex-end;
+}
+
+.question-actions button,
+.question-actions a,
+.filter-bar button,
+.notes-pad button {
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #cfe0e5;
+  border-radius: 8px;
+  padding: 0 10px;
+  color: #24463e;
+  background: #ffffff;
+  text-decoration: none;
+}
+
+.question-actions button.active,
+.filter-bar button.active {
+  border-color: #83c9b5;
+  background: #c6eadf;
+}
+
+.filter-bar {
+  justify-content: space-between;
+}
+
+.filter-bar span,
+.notes-pad span {
+  color: #667981;
+  font-size: 13px;
+}
+
+.notes-pad textarea {
+  width: 100%;
+  min-height: 132px;
+  resize: vertical;
+  border: 1px solid #dfe8ec;
+  border-radius: 8px;
+  padding: 12px;
+  color: #1f343d;
+  background: #f7fafb;
+  line-height: 1.5;
+}
+
 .question-table span,
+.question-row span,
 .cohorts span,
 .assessment-list span {
   color: #667981;
@@ -701,6 +792,7 @@ small {
   .lesson-links,
   .health-grid,
   .question-table a,
+  .question-row,
   .cohorts article,
   .assessment-list article {
     grid-template-columns: 1fr;

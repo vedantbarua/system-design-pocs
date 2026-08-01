@@ -13,6 +13,7 @@ The site turns the playlist into a structured placement-prep product with learne
 - Java + DSA module roadmap
 - Searchable lesson/topic list
 - Module-specific lesson player links that open the relevant course segment
+- Interactive lesson selection with previous/next controls
 - Module completion tracking in UI state
 - Theory notes for every module
 - In-depth concept hyperlinks for every explained topic
@@ -22,6 +23,8 @@ The site turns the playlist into a structured placement-prep product with learne
 - Practice queue for each module
 - Learner dashboard with active tasks and progress health
 - Practice workspace with module-level and full-course question banks
+- Solved/bookmarked question tracking and difficulty filters
+- Editable session notes for active study work
 - Analytics view for mastery and question progress
 - Admin view for cohorts, assessments, quality signals, and production controls
 - Weekly study loop

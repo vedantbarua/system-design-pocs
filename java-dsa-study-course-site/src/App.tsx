@@ -473,16 +473,35 @@ export default function App() {
   const [query, setQuery] = useState("");
   const [completed, setCompleted] = useState<string[]>(["java-basics"]);
   const [view, setView] = useState<View>("learn");
+  const [activeLessonIndex, setActiveLessonIndex] = useState(0);
+  const [solved, setSolved] = useState<string[]>([modules[0].questions[0].url, modules[0].questions[1].url]);
+  const [bookmarked, setBookmarked] = useState<string[]>([]);
+  const [practiceDifficulty, setPracticeDifficulty] = useState<"All" | Question["difficulty"]>("All");
+  const [sessionNotes, setSessionNotes] = useState("Map one mistake per solved question before moving to the next module.");
   const active = modules.find((module) => module.id === activeId) || modules[0];
+  const selectedLessonIndex = Math.min(activeLessonIndex, active.lessons.length - 1);
   const allQuestionCount = modules.reduce((sum, module) => sum + module.questions.length, 0);
   const filtered = useMemo(() => modules.filter((module) => `${module.title} ${module.focus} ${module.topics.join(" ")} ${module.lessons.map((lesson) => lesson.title).join(" ")} ${module.theory.join(" ")} ${module.questions.map((question) => question.title).join(" ")}`.toLowerCase().includes(query.toLowerCase())), [query]);
   const completion = Math.round((completed.length / modules.length) * 100);
   const totalDays = modules.reduce((sum, module) => sum + Number(module.duration.split(" ")[0]), 0);
-  const solvedQuestions = completed.length * 6 + 11;
+  const solvedQuestions = solved.length;
   const mastery = Math.round((solvedQuestions / allQuestionCount) * 100);
+
+  function selectModule(id: string) {
+    setActiveId(id);
+    setActiveLessonIndex(0);
+  }
 
   function toggleComplete(id: string) {
     setCompleted((current) => current.includes(id) ? current.filter((entry) => entry !== id) : [...current, id]);
+  }
+
+  function toggleQuestionSolved(url: string) {
+    setSolved((current) => current.includes(url) ? current.filter((entry) => entry !== url) : [...current, url]);
+  }
+
+  function toggleBookmark(url: string) {
+    setBookmarked((current) => current.includes(url) ? current.filter((entry) => entry !== url) : [...current, url]);
   }
 
   return (
@@ -534,8 +553,8 @@ export default function App() {
           <label className="search"><Search /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search theory or questions" /></label>
           <div className="module-list">
             {filtered.map((module) => (
-              <button key={module.id} className={module.id === active.id ? "selected" : ""} onClick={() => setActiveId(module.id)}>
-                <span><strong>{module.title}</strong><small>{module.duration} · {module.questions.length} linked questions</small></span>
+              <button key={module.id} className={module.id === active.id ? "selected" : ""} onClick={() => selectModule(module.id)}>
+                <span><strong>{module.title}</strong><small>{module.lessons.length} lessons · {module.questions.length} questions</small></span>
                 {completed.includes(module.id) ? <CheckCircle2 /> : <ChevronRight />}
               </button>
             ))}
@@ -552,8 +571,8 @@ export default function App() {
             <button onClick={() => toggleComplete(active.id)}>{completed.includes(active.id) ? "Completed" : "Complete module"}</button>
           </header>
 
-          {view === "learn" ? <LearnView active={active} /> : null}
-          {view === "practice" ? <PracticeView active={active} modules={modules} /> : null}
+          {view === "learn" ? <LearnView active={active} selectedLessonIndex={selectedLessonIndex} onSelectLesson={setActiveLessonIndex} solved={solved} bookmarked={bookmarked} onToggleSolved={toggleQuestionSolved} onToggleBookmark={toggleBookmark} sessionNotes={sessionNotes} onSessionNotesChange={setSessionNotes} /> : null}
+          {view === "practice" ? <PracticeView active={active} modules={modules} solved={solved} bookmarked={bookmarked} difficulty={practiceDifficulty} onDifficultyChange={setPracticeDifficulty} onToggleSolved={toggleQuestionSolved} onToggleBookmark={toggleBookmark} /> : null}
           {view === "analytics" ? <AnalyticsView modules={modules} completed={completed} solvedQuestions={solvedQuestions} allQuestionCount={allQuestionCount} /> : null}
           {view === "admin" ? <AdminView /> : null}
         </section>
@@ -593,19 +612,45 @@ function Panel({ title, icon: Icon, children, wide = false }: { title: string; i
   return <article className={wide ? "panel wide" : "panel"}><h3><Icon />{title}</h3><div>{children}</div></article>;
 }
 
-function LearnView({ active }: { active: Module }) {
+function LearnView({
+  active,
+  selectedLessonIndex,
+  onSelectLesson,
+  solved,
+  bookmarked,
+  onToggleSolved,
+  onToggleBookmark,
+  sessionNotes,
+  onSessionNotesChange
+}: {
+  active: Module;
+  selectedLessonIndex: number;
+  onSelectLesson: (index: number) => void;
+  solved: string[];
+  bookmarked: string[];
+  onToggleSolved: (url: string) => void;
+  onToggleBookmark: (url: string) => void;
+  sessionNotes: string;
+  onSessionNotesChange: (value: string) => void;
+}) {
+  const selectedLesson = active.lessons[selectedLessonIndex];
   return (
     <div className="detail-grid">
       <Panel title="Lesson Player" icon={PlayCircle} wide>
         <div className="lesson-player">
           <div>
-            <strong>{active.title}</strong>
-            <p>{active.focus}</p>
+            <small>Lesson {selectedLessonIndex + 1} of {active.lessons.length}</small>
+            <strong>{selectedLesson.title}</strong>
+            <p>{selectedLesson.duration} · {active.focus}</p>
           </div>
-          <a href={active.lessons[0].url} target="_blank" rel="noreferrer"><PlayCircle /> Start module</a>
+          <div className="lesson-actions">
+            <button disabled={selectedLessonIndex === 0} onClick={() => onSelectLesson(selectedLessonIndex - 1)}>Previous</button>
+            <button disabled={selectedLessonIndex === active.lessons.length - 1} onClick={() => onSelectLesson(selectedLessonIndex + 1)}>Next</button>
+            <a href={selectedLesson.url} target="_blank" rel="noreferrer"><PlayCircle /> Open lesson</a>
+          </div>
         </div>
         <div className="lesson-links">
-          {active.lessons.map((lesson, index) => <LessonCard key={lesson.url} lesson={lesson} index={index} />)}
+          {active.lessons.map((lesson, index) => <LessonCard key={lesson.url} lesson={lesson} index={index} selected={index === selectedLessonIndex} onSelect={() => onSelectLesson(index)} />)}
         </div>
       </Panel>
       <Panel title="Theory" icon={BookOpen} wide>
@@ -618,7 +663,16 @@ function LearnView({ active }: { active: Module }) {
       </Panel>
       <Panel title="Module Questions" icon={ListChecks}>
         <div className="compact-questions">
-          {active.questions.map((question) => <QuestionLink key={question.url} question={question} />)}
+          {active.questions.map((question) => <QuestionLink key={question.url} question={question} solved={solved.includes(question.url)} bookmarked={bookmarked.includes(question.url)} onToggleSolved={onToggleSolved} onToggleBookmark={onToggleBookmark} />)}
+        </div>
+      </Panel>
+      <Panel title="Session Notes" icon={FileText}>
+        <div className="notes-pad">
+          <textarea value={sessionNotes} onChange={(event) => onSessionNotesChange(event.target.value)} />
+          <div>
+            <span>{sessionNotes.length} chars</span>
+            <button onClick={() => onSessionNotesChange("")}>Clear</button>
+          </div>
         </div>
       </Panel>
       <Panel title="Watch And Learn" icon={PlayCircle}>
@@ -637,18 +691,43 @@ function LearnView({ active }: { active: Module }) {
   );
 }
 
-function PracticeView({ active, modules }: { active: Module; modules: Module[] }) {
+function PracticeView({
+  active,
+  modules,
+  solved,
+  bookmarked,
+  difficulty,
+  onDifficultyChange,
+  onToggleSolved,
+  onToggleBookmark
+}: {
+  active: Module;
+  modules: Module[];
+  solved: string[];
+  bookmarked: string[];
+  difficulty: "All" | Question["difficulty"];
+  onDifficultyChange: (value: "All" | Question["difficulty"]) => void;
+  onToggleSolved: (url: string) => void;
+  onToggleBookmark: (url: string) => void;
+}) {
   const allQuestions = modules.flatMap((module) => module.questions.map((question) => ({ ...question, module: module.title })));
+  const filteredQuestions = difficulty === "All" ? allQuestions : allQuestions.filter((question) => question.difficulty === difficulty);
   return (
     <div className="detail-grid">
       <Panel title="Active Module Questions" icon={ListChecks} wide>
         <div className="questions">
-          {active.questions.map((question) => <QuestionLink key={question.url} question={question} />)}
+          {active.questions.map((question) => <QuestionLink key={question.url} question={question} solved={solved.includes(question.url)} bookmarked={bookmarked.includes(question.url)} onToggleSolved={onToggleSolved} onToggleBookmark={onToggleBookmark} />)}
+        </div>
+      </Panel>
+      <Panel title="Practice Filters" icon={Target} wide>
+        <div className="filter-bar">
+          {(["All", "Easy", "Medium", "Hard", "Practice"] as const).map((item) => <button key={item} className={difficulty === item ? "active" : ""} onClick={() => onDifficultyChange(item)}>{item}</button>)}
+          <span>{filteredQuestions.length} questions shown · {solved.length} solved · {bookmarked.length} bookmarked</span>
         </div>
       </Panel>
       <Panel title="Full Question Bank" icon={Search} wide>
         <div className="question-table">
-          {allQuestions.map((question) => <a key={`${question.module}-${question.url}`} href={question.url} target="_blank" rel="noreferrer"><strong>{question.title}</strong><span>{question.module}</span><span>{question.difficulty}</span><ArrowUpRight /></a>)}
+          {filteredQuestions.map((question) => <QuestionRow key={`${question.module}-${question.url}`} question={question} solved={solved.includes(question.url)} bookmarked={bookmarked.includes(question.url)} onToggleSolved={onToggleSolved} onToggleBookmark={onToggleBookmark} />)}
         </div>
       </Panel>
     </div>
@@ -714,7 +793,35 @@ function StudyPoint({ children }: { children: React.ReactNode }) {
   return <p className="study-point">{children}</p>;
 }
 
-function QuestionLink({ question }: { question: Question }) {
+function QuestionLink({
+  question,
+  solved = false,
+  bookmarked = false,
+  onToggleSolved,
+  onToggleBookmark
+}: {
+  question: Question;
+  solved?: boolean;
+  bookmarked?: boolean;
+  onToggleSolved?: (url: string) => void;
+  onToggleBookmark?: (url: string) => void;
+}) {
+  if (onToggleSolved && onToggleBookmark) {
+    return (
+      <article className={solved ? "question interactive solved" : "question interactive"}>
+        <span>
+          <strong>{question.title}</strong>
+          <small>{question.platform} · {question.difficulty}</small>
+        </span>
+        <div className="question-actions">
+          <button onClick={() => onToggleSolved(question.url)}>{solved ? "Solved" : "Mark"}</button>
+          <button className={bookmarked ? "active" : ""} onClick={() => onToggleBookmark(question.url)}>Save</button>
+          <a href={question.url} target="_blank" rel="noreferrer"><ArrowUpRight /></a>
+        </div>
+      </article>
+    );
+  }
+
   return (
     <a className="question" href={question.url} target="_blank" rel="noreferrer">
       <span>
@@ -723,6 +830,33 @@ function QuestionLink({ question }: { question: Question }) {
       </span>
       <ArrowUpRight />
     </a>
+  );
+}
+
+function QuestionRow({
+  question,
+  solved,
+  bookmarked,
+  onToggleSolved,
+  onToggleBookmark
+}: {
+  question: Question & { module: string };
+  solved: boolean;
+  bookmarked: boolean;
+  onToggleSolved: (url: string) => void;
+  onToggleBookmark: (url: string) => void;
+}) {
+  return (
+    <article className={solved ? "question-row solved" : "question-row"}>
+      <strong>{question.title}</strong>
+      <span>{question.module}</span>
+      <span>{question.difficulty}</span>
+      <div className="question-actions">
+        <button onClick={() => onToggleSolved(question.url)}>{solved ? "Solved" : "Mark"}</button>
+        <button className={bookmarked ? "active" : ""} onClick={() => onToggleBookmark(question.url)}>Save</button>
+        <a href={question.url} target="_blank" rel="noreferrer"><ArrowUpRight /></a>
+      </div>
+    </article>
   );
 }
 
@@ -738,16 +872,16 @@ function ConceptLinkCard({ concept }: { concept: ConceptLink }) {
   );
 }
 
-function LessonCard({ lesson, index }: { lesson: LessonLink; index: number }) {
+function LessonCard({ lesson, index, selected, onSelect }: { lesson: LessonLink; index: number; selected: boolean; onSelect: () => void }) {
   return (
-    <a className="lesson-link" href={lesson.url} target="_blank" rel="noreferrer">
+    <button className={selected ? "lesson-link selected" : "lesson-link"} onClick={onSelect}>
       <span>{String(index + 1).padStart(2, "0")}</span>
       <div>
         <strong>{lesson.title}</strong>
         <small>{lesson.duration}</small>
       </div>
-      <ArrowUpRight />
-    </a>
+      <PlayCircle />
+    </button>
   );
 }
 
