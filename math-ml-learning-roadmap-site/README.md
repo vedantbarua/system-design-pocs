@@ -21,7 +21,9 @@ Interactive learning roadmap for studying math foundations, intuition-first visu
 
 - Searchable course roadmap
 - Steady, accelerated, and deep pacing modes
-- Progress tracking in UI state
+- Progress tracking persisted through an Express API
+- SQLite storage for active step, pacing mode, completion, bookmarks, notes, and weekly plans
+- Optional Redis cache for streak/session counters with automatic in-memory fallback
 - Saved/bookmarked steps
 - Direct links to Khan Academy, 3Blue1Brown, MIT OCW, DeepLearning.AI, and Coursera resources
 - Study notes for the active step
@@ -32,6 +34,7 @@ Interactive learning roadmap for studying math foundations, intuition-first visu
 
 ```bash
 npm install
+npm run dev:api
 npm run dev
 ```
 
@@ -40,6 +43,26 @@ Open:
 ```text
 http://127.0.0.1:5360
 ```
+
+API:
+
+```text
+http://127.0.0.1:4360/api/health
+```
+
+If Redis is available, set `REDIS_URL` before starting the API. Without Redis, the API still runs with an in-memory cache:
+
+```bash
+REDIS_URL=redis://127.0.0.1:6379 npm run dev:api
+```
+
+## API Endpoints
+
+- `GET /api/health`
+- `GET /api/progress/:userId`
+- `PUT /api/progress/:userId`
+- `GET /api/plan/:userId`
+- `POST /api/plan/:userId`
 
 ## Build
 

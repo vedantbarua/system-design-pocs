@@ -1,10 +1,11 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ArrowUpRight,
   BarChart3,
   BookOpen,
   Brain,
   Calculator,
+  CalendarDays,
   CheckCircle2,
   Circle,
   Clock3,
@@ -38,6 +39,16 @@ type Step = {
   topics: string[];
   resources: Resource[];
   checkpoint: string;
+};
+type WeeklyPlanItem = { day: string; focus: string; task: string };
+type ApiStatus = { ok: boolean; cache: string; timestamp: string };
+type ApiProgress = {
+  activeId: string;
+  pace: Pace;
+  completed: string[];
+  bookmarked: string[];
+  notes: string;
+  streak: number;
 };
 
 const steps: Step[] = [
@@ -215,6 +226,8 @@ const habits = [
   "Build small notebooks once you reach ML topics."
 ];
 
+const userId = "demo-learner";
+
 export default function App() {
   const [activeId, setActiveId] = useState(steps[0].id);
   const [completed, setCompleted] = useState<string[]>(["algebra"]);
@@ -222,6 +235,12 @@ export default function App() {
   const [query, setQuery] = useState("");
   const [pace, setPace] = useState<Pace>("steady");
   const [notes, setNotes] = useState("Pair intuition with mechanics: watch the visual lesson before heavy exercises, then summarize the idea in your own words.");
+  const [apiStatus, setApiStatus] = useState<ApiStatus | null>(null);
+  const [streak, setStreak] = useState(0);
+  const [weeklyPlan, setWeeklyPlan] = useState<WeeklyPlanItem[]>([]);
+  const [isHydrated, setIsHydrated] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [apiError, setApiError] = useState("");
 
   const active = steps.find((step) => step.id === activeId) || steps[0];
   const filteredSteps = useMemo(() => {
@@ -234,6 +253,76 @@ export default function App() {
   const activeIndex = steps.findIndex((step) => step.id === active.id);
   const nextStep = steps[Math.min(activeIndex + 1, steps.length - 1)];
 
+  useEffect(() => {
+    let ignore = false;
+
+    async function loadBackendState() {
+      try {
+        const [healthRes, progressRes, planRes] = await Promise.all([
+          fetch("/api/health"),
+          fetch(`/api/progress/${userId}`),
+          fetch(`/api/plan/${userId}`)
+        ]);
+        if (!healthRes.ok || !progressRes.ok || !planRes.ok) {
+          throw new Error("Backend returned an error");
+        }
+        const health = await healthRes.json() as ApiStatus;
+        const progress = await progressRes.json() as ApiProgress;
+        const savedPlan = await planRes.json() as { plan: WeeklyPlanItem[] };
+        if (ignore) return;
+        setApiStatus(health);
+        setActiveId(progress.activeId);
+        setPace(progress.pace);
+        setCompleted(progress.completed);
+        setBookmarked(progress.bookmarked);
+        setNotes(progress.notes);
+        setStreak(progress.streak);
+        setWeeklyPlan(savedPlan.plan || []);
+        setApiError("");
+      } catch (error) {
+        if (!ignore) setApiError(error instanceof Error ? error.message : "Backend unavailable");
+      } finally {
+        if (!ignore) setIsHydrated(true);
+      }
+    }
+
+    loadBackendState();
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isHydrated) return;
+    const controller = new AbortController();
+    const timeout = window.setTimeout(async () => {
+      setIsSaving(true);
+      try {
+        const res = await fetch(`/api/progress/${userId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ activeId, pace, completed, bookmarked, notes }),
+          signal: controller.signal
+        });
+        if (!res.ok) throw new Error("Autosave failed");
+        const progress = await res.json() as ApiProgress;
+        setStreak(progress.streak);
+        setApiError("");
+      } catch (error) {
+        if (!controller.signal.aborted) {
+          setApiError(error instanceof Error ? error.message : "Autosave failed");
+        }
+      } finally {
+        if (!controller.signal.aborted) setIsSaving(false);
+      }
+    }, 350);
+
+    return () => {
+      window.clearTimeout(timeout);
+      controller.abort();
+    };
+  }, [activeId, bookmarked, completed, isHydrated, notes, pace]);
+
   function toggleCompleted(id: string) {
     setCompleted((current) => current.includes(id) ? current.filter((entry) => entry !== id) : [...current, id]);
   }
@@ -245,6 +334,25 @@ export default function App() {
   function selectRelative(offset: number) {
     const nextIndex = Math.max(0, Math.min(steps.length - 1, activeIndex + offset));
     setActiveId(steps[nextIndex].id);
+  }
+
+  async function generatePlan() {
+    setIsSaving(true);
+    try {
+      const res = await fetch(`/api/plan/${userId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ activeTitle: active.title, pace, completed, bookmarked })
+      });
+      if (!res.ok) throw new Error("Plan generation failed");
+      const payload = await res.json() as { plan: WeeklyPlanItem[] };
+      setWeeklyPlan(payload.plan);
+      setApiError("");
+    } catch (error) {
+      setApiError(error instanceof Error ? error.message : "Plan generation failed");
+    } finally {
+      setIsSaving(false);
+    }
   }
 
   return (
@@ -277,6 +385,10 @@ export default function App() {
             <span>{adjustedWeeks} week {pace} plan</span>
           </div>
           <meter min="0" max="100" value={completion} />
+          <footer>
+            <span>{apiStatus ? `API online · ${apiStatus.cache} cache` : apiError || "Connecting to API"}</span>
+            <span>{isSaving ? "Saving" : "Saved"} · streak {streak}</span>
+          </footer>
         </article>
       </section>
 
@@ -338,6 +450,12 @@ export default function App() {
         </section>
 
         <aside className="side">
+          <Panel title="Weekly Plan" icon={CalendarDays}>
+            <div className="weekly-plan">
+              <button onClick={generatePlan}>{weeklyPlan.length > 0 ? "Regenerate plan" : "Generate plan"}</button>
+              {weeklyPlan.length === 0 ? <p className="body-copy">Generate a saved seven-day plan from your active step and pace.</p> : weeklyPlan.map((item) => <article key={item.day}><strong>{item.day}</strong><span>{item.focus}</span><p>{item.task}</p></article>)}
+            </div>
+          </Panel>
           <Panel title="Operating Rules" icon={GraduationCap}>
             {habits.map((habit) => <p className="check" key={habit}><CheckCircle2 />{habit}</p>)}
           </Panel>

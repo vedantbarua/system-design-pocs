@@ -226,6 +226,16 @@ h1 {
   margin: 0 16px 18px;
 }
 
+.plan-card footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 16px 16px;
+  color: #5f727a;
+  font-size: 13px;
+}
+
 .metrics,
 .workspace {
   width: min(1480px, calc(100% - 36px));
@@ -466,6 +476,40 @@ h1 {
 .saved-list {
   display: grid;
   gap: 8px;
+}
+
+.weekly-plan {
+  display: grid;
+  gap: 10px;
+}
+
+.weekly-plan > button {
+  min-height: 38px;
+  border: 1px solid #8cc1bc;
+  border-radius: 8px;
+  color: #244046;
+  background: #dff1ed;
+}
+
+.weekly-plan article {
+  display: grid;
+  gap: 4px;
+  padding: 10px;
+  border: 1px solid #dfe8ec;
+  border-radius: 8px;
+  background: #f7fafb;
+}
+
+.weekly-plan span {
+  color: #2f6f73;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.weekly-plan p {
+  color: #465960;
+  font-size: 14px;
+  line-height: 1.4;
 }
 
 .saved-list button {
