@@ -483,6 +483,56 @@ h1 {
   gap: 10px;
 }
 
+.review-queue {
+  display: grid;
+  gap: 10px;
+}
+
+.review-queue > strong {
+  font-size: 24px;
+}
+
+.review-queue article {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid #dfe8ec;
+  border-radius: 8px;
+  background: #f7fafb;
+}
+
+.review-queue article > span {
+  color: #2f6f73;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.review-queue p,
+.review-queue small {
+  color: #465960;
+  line-height: 1.4;
+}
+
+.review-queue div {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.review-queue button {
+  min-height: 34px;
+  border: 1px solid #cbdce1;
+  border-radius: 8px;
+  color: #244046;
+  background: #ffffff;
+  text-transform: capitalize;
+}
+
+.review-queue article > button {
+  background: #dff1ed;
+  border-color: #8cc1bc;
+}
+
 .weekly-plan > button {
   min-height: 38px;
   border: 1px solid #8cc1bc;

@@ -50,6 +50,17 @@ type ApiProgress = {
   notes: string;
   streak: number;
 };
+type ReviewRating = "again" | "hard" | "good" | "easy";
+type ReviewCard = {
+  id: string;
+  stepId: string;
+  title: string;
+  prompt: string;
+  answer: string;
+  dueAt: string;
+  intervalDays: number;
+  repetitions: number;
+};
 
 const steps: Step[] = [
   {
@@ -226,6 +237,14 @@ const habits = [
   "Build small notebooks once you reach ML topics."
 ];
 
+const reviewSeedCards = steps.map((step) => ({
+  id: `${step.id}-checkpoint`,
+  stepId: step.id,
+  title: step.title,
+  prompt: `Explain the key idea behind ${step.title}: ${step.whyNow}`,
+  answer: step.checkpoint
+}));
+
 const userId = "demo-learner";
 
 export default function App() {
@@ -241,6 +260,8 @@ export default function App() {
   const [isHydrated, setIsHydrated] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [apiError, setApiError] = useState("");
+  const [reviewQueue, setReviewQueue] = useState<ReviewCard[]>([]);
+  const [revealedReviewId, setRevealedReviewId] = useState("");
 
   const active = steps.find((step) => step.id === activeId) || steps[0];
   const filteredSteps = useMemo(() => {
@@ -258,17 +279,23 @@ export default function App() {
 
     async function loadBackendState() {
       try {
-        const [healthRes, progressRes, planRes] = await Promise.all([
+        const [healthRes, progressRes, planRes, reviewRes] = await Promise.all([
           fetch("/api/health"),
           fetch(`/api/progress/${userId}`),
-          fetch(`/api/plan/${userId}`)
+          fetch(`/api/plan/${userId}`),
+          fetch(`/api/reviews/${userId}/seed`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ cards: reviewSeedCards })
+          })
         ]);
-        if (!healthRes.ok || !progressRes.ok || !planRes.ok) {
+        if (!healthRes.ok || !progressRes.ok || !planRes.ok || !reviewRes.ok) {
           throw new Error("Backend returned an error");
         }
         const health = await healthRes.json() as ApiStatus;
         const progress = await progressRes.json() as ApiProgress;
         const savedPlan = await planRes.json() as { plan: WeeklyPlanItem[] };
+        const reviews = await reviewRes.json() as { due: ReviewCard[] };
         if (ignore) return;
         setApiStatus(health);
         setActiveId(progress.activeId);
@@ -278,6 +305,7 @@ export default function App() {
         setNotes(progress.notes);
         setStreak(progress.streak);
         setWeeklyPlan(savedPlan.plan || []);
+        setReviewQueue(reviews.due || []);
         setApiError("");
       } catch (error) {
         if (!ignore) setApiError(error instanceof Error ? error.message : "Backend unavailable");
@@ -350,6 +378,26 @@ export default function App() {
       setApiError("");
     } catch (error) {
       setApiError(error instanceof Error ? error.message : "Plan generation failed");
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
+  async function rateReview(cardId: string, rating: ReviewRating) {
+    setIsSaving(true);
+    try {
+      const res = await fetch(`/api/reviews/${userId}/${encodeURIComponent(cardId)}/rate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ rating })
+      });
+      if (!res.ok) throw new Error("Review rating failed");
+      const payload = await res.json() as { due: ReviewCard[] };
+      setReviewQueue(payload.due);
+      setRevealedReviewId("");
+      setApiError("");
+    } catch (error) {
+      setApiError(error instanceof Error ? error.message : "Review rating failed");
     } finally {
       setIsSaving(false);
     }
@@ -450,6 +498,21 @@ export default function App() {
         </section>
 
         <aside className="side">
+          <Panel title="Daily Review" icon={Brain}>
+            <div className="review-queue">
+              <strong>{reviewQueue.length} due</strong>
+              {reviewQueue.length === 0 ? <p className="body-copy">No reviews due. New cards appear as spaced repetition brings them back.</p> : reviewQueue.slice(0, 2).map((card) => (
+                <article key={card.id}>
+                  <span>{card.title}</span>
+                  <p>{card.prompt}</p>
+                  {revealedReviewId === card.id ? <small>{card.answer}</small> : <button onClick={() => setRevealedReviewId(card.id)}>Reveal answer</button>}
+                  <div>
+                    {(["again", "hard", "good", "easy"] as const).map((rating) => <button key={rating} onClick={() => rateReview(card.id, rating)}>{rating}</button>)}
+                  </div>
+                </article>
+              ))}
+            </div>
+          </Panel>
           <Panel title="Weekly Plan" icon={CalendarDays}>
             <div className="weekly-plan">
               <button onClick={generatePlan}>{weeklyPlan.length > 0 ? "Regenerate plan" : "Generate plan"}</button>
