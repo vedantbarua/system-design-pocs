@@ -2,7 +2,7 @@ import cors from "cors";
 import express from "express";
 import { createCache } from "./cache.js";
 import { generateWeeklyPlan } from "./planner.js";
-import { getProgress, getWeeklyPlan, saveProgress, saveWeeklyPlan } from "./db.js";
+import { getDueReviews, getProgress, getWeeklyPlan, rateReviewCard, saveProgress, saveWeeklyPlan, seedReviewCards } from "./db.js";
 
 const app = express();
 const port = Number(process.env.PORT || 4360);
@@ -42,6 +42,26 @@ app.post("/api/plan/:userId", (req, res) => {
   res.json(saveWeeklyPlan(req.params.userId, plan));
 });
 
+app.post("/api/reviews/:userId/seed", async (req, res) => {
+  const due = seedReviewCards(req.params.userId, req.body.cards);
+  await cache.set(dueCountKey(req.params.userId), String(due.length), 900);
+  res.json({ userId: req.params.userId, due });
+});
+
+app.get("/api/reviews/:userId", async (req, res) => {
+  const due = getDueReviews(req.params.userId, req.query.limit);
+  await cache.set(dueCountKey(req.params.userId), String(due.length), 900);
+  res.json({ userId: req.params.userId, due, count: due.length });
+});
+
+app.post("/api/reviews/:userId/:cardId/rate", async (req, res) => {
+  const card = rateReviewCard(req.params.userId, req.params.cardId, req.body.rating);
+  if (!card) return res.status(404).json({ ok: false, error: "Review card not found" });
+  const due = getDueReviews(req.params.userId, 6);
+  await cache.set(dueCountKey(req.params.userId), String(due.length), 900);
+  res.json({ userId: req.params.userId, card, due, count: due.length });
+});
+
 app.use((err, _req, res, _next) => {
   res.status(500).json({ ok: false, error: err.message || "Internal server error" });
 });
@@ -61,4 +81,8 @@ async function shutdown() {
 
 function streakKey(userId) {
   return `streak:${userId}`;
+}
+
+function dueCountKey(userId) {
+  return `due-reviews:${userId}`;
 }

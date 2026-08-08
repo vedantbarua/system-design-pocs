@@ -24,6 +24,7 @@ Interactive learning roadmap for studying math foundations, intuition-first visu
 - Progress tracking persisted through an Express API
 - SQLite storage for active step, pacing mode, completion, bookmarks, notes, and weekly plans
 - Optional Redis cache for streak/session counters with automatic in-memory fallback
+- Spaced-repetition review queue with `again`, `hard`, `good`, and `easy` ratings
 - Saved/bookmarked steps
 - Direct links to Khan Academy, 3Blue1Brown, MIT OCW, DeepLearning.AI, and Coursera resources
 - Study notes for the active step
@@ -63,6 +64,9 @@ REDIS_URL=redis://127.0.0.1:6379 npm run dev:api
 - `PUT /api/progress/:userId`
 - `GET /api/plan/:userId`
 - `POST /api/plan/:userId`
+- `POST /api/reviews/:userId/seed`
+- `GET /api/reviews/:userId`
+- `POST /api/reviews/:userId/:cardId/rate`
 
 ## Build
 
